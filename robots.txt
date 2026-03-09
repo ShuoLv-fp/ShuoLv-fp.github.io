@@ -1,0 +1,29 @@
+User-agent: *
+Allow: /
+Sitemap: {{ site.url }}{{ site.baseurl }}/sitemap.xml
+
+# Allow crawling of all content
+Allow: /*.html
+Allow: /*.js
+Allow: /*.css
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.png
+Allow: /*.gif
+
+# Specific paths to ensure indexing
+Allow: /about/
+Allow: /publications/
+Allow: /research/
+Allow: /teaching/
+Allow: /blog/
+
+# Prevent duplicate content
+Disallow: /assets/css/
+Disallow: /assets/js/
+Disallow: /_site/
+Disallow: /_drafts/
+Disallow: /_includes/
+Disallow: /_layouts/
+Disallow: /_sass/
+Disallow: /google_scholar_crawler/
