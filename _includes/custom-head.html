@@ -1,0 +1,26 @@
+{% if page.title %}
+  {% assign seo_title = page.title | append: " | " | append: site.title %}
+{% else %}
+  {% assign seo_title = site.title %}
+{% endif %}
+
+<meta name="keywords" content="Xiaolong Luo, Harvard University, Engineering Science, Ph.D. Student, Machine Learning, Healthcare AI, Medical AI">
+<meta property="og:title" content="{{ seo_title }}">
+<meta property="og:description" content="{{ site.description }}">
+{% if site.author.avatar %}
+<meta property="og:image" content="{{ site.url }}{{ site.baseurl }}/{{ site.author.avatar }}">
+{% endif %}
+
+<!-- Additional SEO meta tags -->
+<meta name="author" content="{{ site.author.name }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ site.url }}{{ site.baseurl }}{{ page.url }}">
+
+<!-- Academic-specific meta tags -->
+<meta name="citation_author" content="{{ site.author.name }}">
+<meta name="citation_institution" content="Harvard University">
+<meta name="citation_department" content="School of Engineering and Applied Sciences">
+
+<!-- Ensure mobile and responsive design -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="format-detection" content="telephone=no">
