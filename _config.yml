@@ -27,8 +27,8 @@ author:
   avatar           : "images/profile.png"
   bio              : "Master Student in Electronic Information (Biomedical Engineering) at Beijing Institute of Technology"
   location         : "Beijing, China"
-  employer         : "Beijing Institute of Technology"
-  employer         : "Bytedance"
+  employer1        : "Beijing Institute of Technology"
+  employer2        : "Bytedance"
   pubmed           :
   googlescholar    : "https://scholar.google.com/citations?user=VAsm0T8AAAAJ"
   email            : "lv_shuo@foxmail.com"

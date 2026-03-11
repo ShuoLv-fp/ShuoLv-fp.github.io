@@ -7,44 +7,41 @@ author_profile: true
 
 # My Philosophy
 
-<!-- ## The Power of Pattern Recognition and Interdisciplinary Thinking
+## The Intersection of AI, Neuroscience, and Healthcare: My Academic Journey
 
-From an early age, I've been fascinated by patterns and underlying principles that govern different aspects of our world. Like a detective piecing together clues, I find joy in discovering how things work, whether it's the explicit rules of a system or the implicit dynamics within communities.
-
-This curiosity has led me to explore far beyond my primary field of AI, venturing into diverse areas such as cryptocurrency, politics, finance, and psychology. I believe that reality is multifaceted, and each discipline offers a unique lens through which to view and understand it. Just as a diamond's beauty is revealed through its many facets, true understanding comes from examining issues from multiple perspectives.
+As a Master student in Electronic Information (Biomedical Engineering) at Beijing Institute of Technology, my academic path has been defined by a passionate exploration of the connections between artificial intelligence, cognitive neuroscience, and healthcare. From my undergraduate studies at Southwest University to my current research, I've been driven by a simple yet profound question: how can we leverage cutting-edge technology to bridge the gap between medical research and real-world clinical impact?
 
 ## Principles That Guide Me
 
-*Inspired by Ray Dalio's approach to principles-based living, I've developed my own set of core principles that guide my decisions and actions:*
+*Inspired by my academic journey and personal experiences, I've developed a set of core principles that guide my decisions and actions:*
 
-1. **Pragmatic Realism & Long-term Vision**
-   - Understanding and respecting objective realities
-   - Viewing life through the lens of compound growth
+1. **AI for Social Good & Healthcare Equity**
+   - Believing in the transformative power of AI to revolutionize healthcare
+   - Committed to promoting equitable distribution of medical resources
+   - Striving to make quality healthcare more accessible to all
+
+2. **Interdisciplinary Exploration**
+   - Embracing the intersection of AI, cognitive neuroscience, and complex networks
+   - Recognizing that breakthroughs often occur at the boundaries of disciplines
+   - Constantly seeking to expand my knowledge beyond traditional engineering
+
+3. **Compound Growth & Long-term Vision**
+   - Viewing personal and professional growth through the lens of compounding
    - Prioritizing sustainable, long-term impact over short-term gains
+   - Aspiring to become a compound talent with deep expertise in multiple domains
 
-2. **Action-Oriented Growth**
-   - Believing in the power of practical experience over pure theory
-   - Embracing rapid iteration and learning from real-world feedback
-   - Converting insights into tangible actions
+4. **Passion-Driven Excellence**
+   - Drawing inspiration from diverse interests, from TYPE-MOON's philosophical narratives to JoJo's Bizarre Adventure's themes of resilience
+   - Believing that passion fuels innovation and sustains motivation through challenges
+   - Integrating creative thinking from my hobbies into my research approach
 
-3. **First Principles Thinking**
-   - Breaking down complex problems to their fundamental truths
-   - Building understanding from the ground up
-   - Challenging assumptions and conventional wisdom
-
-4. **Balanced Relationships**
-   - Surrounding myself with high-energy and exceptional individuals
-   - Building meaningful connections while maintaining healthy boundaries
-   - Actively collaborating with outstanding peers across different fields
-   - Contributing to others' growth while prioritizing personal development
-
-5. **Open-minded & Inclusive Thinking**
-   - Embracing diverse perspectives and worldviews
-   - Appreciating individuals with coherent value systems
-   - Maintaining intellectual curiosity and respectful dialogue
+5. **Bridging Theory and Practice**
+   - Committed to translating cutting-edge research into tangible clinical applications
+   - Valuing both theoretical rigor and practical impact
+   - Striving to create end-to-end solutions that benefit real patients
 
 ## Vision and Purpose
 
-My ultimate goal extends beyond personal achievement – I aim to create meaningful impact, particularly in healthcare, and help others navigate their paths with fewer detours than I experienced. I believe that combining ambition with action, while staying grounded in reality, is the key to creating lasting positive change.
+My ultimate goal is to become a leader in the field of AI for Science, specifically focusing on healthcare applications. I aim to develop technologies that enhance medical diagnosis, treatment, and healthcare delivery, while also addressing systemic challenges such as medical resource inequality. Through my work, I hope to contribute to a future where everyone has access to quality healthcare, regardless of their circumstances.
 
-This philosophy isn't just about professional growth; it's about understanding the world in its full complexity and using that understanding to make a difference. As someone who values both intellectual depth and practical impact, I strive to bridge the gap between understanding and action. -->
+This philosophy is not just a professional credo – it's a reflection of my belief in the power of technology to improve human lives. As I continue my journey towards a Ph.D. and beyond, I remain committed to pushing the boundaries of what's possible, while staying grounded in the values that have guided me thus far.
