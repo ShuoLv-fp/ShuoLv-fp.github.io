@@ -22,8 +22,11 @@
       {% if author.location %}
         <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ author.location }}</li>
       {% endif %}
-      {% if author.employer %}
-        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ author.employer }}</li>
+      {% if author.employer1 %}
+        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ author.employer1 }}</li>
+      {% endif %}
+      {% if author.employer2 %}
+        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ author.employer2 }}</li>
       {% endif %}
       {% if author.cv %}
         <li><a href="{{ site.baseurl }}/{{ author.cv }}"><i class="fas fa-fw fa-file-pdf"></i> Curriculum Vitae</a></li>

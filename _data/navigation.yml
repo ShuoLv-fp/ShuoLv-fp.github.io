@@ -22,7 +22,7 @@ main:
     url: '/#-teaching'
 
   - title: 'Philosophy'
-    url: '/philosophy'
+    url: '/#-philosophy'
 
   - title: 'Contact'
     url: '/#-contact'

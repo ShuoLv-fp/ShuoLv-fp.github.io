@@ -13,7 +13,7 @@
     <img src="/_pages/includes/images/WitchontheHolyNight_1.avif" style="width: 25%; height: auto;">
     <iframe
       src="https://www.youtube.com/embed/YGSJUm6Eq2M"
-      style="width: 100%; height: auto; aspect-ratio: 16 / 9;"
+      style="width: 80%; height: auto; aspect-ratio: 16 / 9;"
       frameborder="0"
       allowfullscreen>
     </iframe>

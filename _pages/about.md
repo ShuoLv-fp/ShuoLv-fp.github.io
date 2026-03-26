@@ -19,17 +19,21 @@ You can reach me via email at [lv_shuo@foxmail.com](mailto:lv_shuo@foxmail.com).
 
 <span style="color: #2E86AB; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(46, 134, 171, 0.1);">📋 Note: I am currently looking for summer 2026 internships! </span>  
 
-{% include_relative includes/education.md %}  
+{% include_relative includes/education.md %}
 
-{% include_relative includes/research_interests.md %}  
+{% include_relative includes/research_interests.md %}
 
-{% include_relative includes/pub.md %}  
+{% include_relative includes/pub.md %}
 
-{% include_relative includes/recent_projects.md %}  
+{% include_relative includes/recent_projects.md %}
 
-{% include_relative includes/honers.md %}  
+{% include_relative includes/honers.md %}
 
-{% include_relative includes/technical_skills.md %}  
+{% include_relative includes/technical_skills.md %}
+
+{% include_relative includes/teaching.md %}
+
+{% include_relative includes/philosophy.md %}
 
 {% include_relative includes/passions.md %}  
 
