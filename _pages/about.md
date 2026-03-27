@@ -33,7 +33,7 @@ You can reach me via email at [lv_shuo@foxmail.com](mailto:lv_shuo@foxmail.com).
 
 {% include_relative includes/teaching.md %}
 
-{% include_relative includes/philosophy.md %}
+<!-- {% include_relative includes/philosophy.md %} -->
 
 {% include_relative includes/passions.md %}  
 
@@ -46,4 +46,4 @@ You can reach me via email at [lv_shuo@foxmail.com](mailto:lv_shuo@foxmail.com).
 
 ---
 
-<em>Last updated: Feb. 2026</em>
+<em>Last updated: Wed. 2026</em>
