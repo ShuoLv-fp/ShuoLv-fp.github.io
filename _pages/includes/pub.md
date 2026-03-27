@@ -6,7 +6,7 @@
   [**Three parsimonious spatiotemporal patterns in cerebellum reveal individual traits in function and behavior**](https://www.researchsquare.com/article/rs-7559401/v1)
   </span>  
   **Shuo Lv**, Jinlong Li, Ruoqi Yang, Xinyu Wu, Zhiming Wang, Wenjing Zhu, Tan Gao, Jia-Hong Gao, Guoyuan Yang\*  
-  *[Nature Communications](https://www.researchsquare.com/article/rs-7559401/v1)* (IF=15.7), March. 2026;  
+  *[Nature Communications](https://www.nature.com/ncomms/)* (IF=15.7), March. 2026;  
   [Code](https://github.com/BIT-YangLab/CPCA_Cerebellum)
 
 - <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
