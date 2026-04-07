@@ -1,0 +1,31 @@
+# main links links
+main:
+  - title: 'About Me'
+    url: '/#about-me'
+
+  # - title: 'News'
+  #   url: '/#-news'
+
+  - title: 'Publications'
+    url: '/#-publications'
+
+  # - title: 'Invited Talks'
+  #   url: '/#-invited-talks'
+
+  - title: 'Education'
+    url: '/#-education'
+
+  - title: 'Technical Skills'
+    url: '/#-technical-skills'
+
+  - title: 'Teaching'
+    url: '/#-teaching'
+
+  # - title: 'Philosophy'
+  #   url: '/#-philosophy'
+
+  - title: 'Contact'
+    url: '/#-contact'
+
+  # - title: 'Blog'
+  #   url: 'https://ShuoLv-fp.github.io/my-blog/'

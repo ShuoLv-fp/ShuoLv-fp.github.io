@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cline: The AI Assistant That Doubled My Productivity</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #2c3e50;
+            --article-bg: white;
+            --article-shadow: rgba(0,0,0,0.1);
+            --heading-color: #34495e;
+            --date-color: #666;
+            --caption-color: #666;
+            --link-color: #3498db;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --article-bg: #2d2d2d;
+            --article-shadow: rgba(0,0,0,0.3);
+            --heading-color: #9ab;
+            --date-color: #999;
+            --caption-color: #999;
+            --link-color: #5dade2;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .nav-buttons {
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            margin-right: 15px;
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            background: linear-gradient(145deg, #2980b9, #2c3e50);
+        }
+
+        .nav-button:hover:before {
+            left: 100%;
+        }
+
+        .nav-button svg {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .article {
+            background: var(--article-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px var(--article-shadow);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        h1 {
+            color: var(--heading-color);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: var(--heading-color);
+            margin-top: 30px;
+        }
+        
+        .date {
+            color: var(--date-color);
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-toggle .moon {
+            display: none;
+        }
+
+        [data-theme="dark"] .theme-toggle .sun {
+            display: none;
+        }
+
+        [data-theme="dark"] .theme-toggle .moon {
+            display: block;
+        }
+        
+        .image-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        img {
+            max-width: 100%;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .caption {
+            color: var(--caption-color);
+            font-style: italic;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        code {
+            background: var(--bg-color);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: var(--bg-color);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid var(--article-shadow);
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-buttons">
+        <a href="/" class="nav-button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Homepage
+        </a>
+        <a href="/blog" class="nav-button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Blog
+        </a>
+    </div>
+    <div class="article">
+        <h1>Cline: The AI Assistant That Doubled My Productivity</h1>
+        <div class="date">January 26, 2024</div>
+        
+        <div class="content">
+            <p>It all started with a simple task - building my academic website. As a Ph.D. student at Harvard focusing on AI and healthcare, I've used various AI tools before, but nothing prepared me for what I was about to experience with Cline. What began as a straightforward development project turned into a fascinating journey that completely transformed my workflow.</p>
+
+            <p>The moment of realization came when Cline not only understood my website requirements but directly started creating files, implementing features, and executing commands - all while maintaining perfect context awareness. This wasn't just another AI chatbot; this was a true development partner that could interact with my system in ways I'd never seen before.</p>
+
+            <h2>Understanding Cline's Architecture</h2>
+
+            <div class="image-container">
+                <img src="/images/Cline_workflow.PNG" alt="Cline Workflow Diagram">
+                <div class="caption">Cline's System Architecture and Workflow</div>
+            </div>
+
+            <p>At its core, Cline operates through a sophisticated system of context-aware processing and tool integration. The workflow diagram above illustrates its elegant architecture:</p>
+
+            <h3>1. Task Initialization</h3>
+            <ul>
+                <li>The system loads a carefully crafted system prompt that defines Cline's capabilities and constraints</li>
+                <li>Simultaneously, it loads the current context, including task details and environmental information</li>
+                <li>These two streams merge to create a comprehensive understanding of the user's needs</li>
+            </ul>
+
+            <h3>2. Context Management</h3>
+            <ul>
+                <li>Token usage is optimized to stay within the context window</li>
+                <li>The system maintains a balance between retaining important historical information and incorporating new inputs</li>
+                <li>Context is continuously updated based on tool operations and their results</li>
+            </ul>
+
+            <h3>3. AI Processing</h3>
+            <ul>
+                <li>The combined input is processed by multiple AI models</li>
+                <li>Temperature settings are dynamically adjusted to balance creativity and precision</li>
+                <li>The system analyzes the task and determines the most appropriate tools to use</li>
+            </ul>
+
+            <h3>4. Tool Integration</h3>
+            <ul>
+                <li>Direct file operations for reading and writing content</li>
+                <li>Command execution for system-level operations</li>
+                <li>Browser control for web-based tasks</li>
+                <li>Real-time feedback loop for continuous adjustment</li>
+            </ul>
+
+            <p>This architecture enables Cline to maintain coherent, long-running sessions while executing complex tasks with precision.</p>
+
+            <h2>Real-World Applications</h2>
+
+            <h3>1. Research Enhancement</h3>
+            <p>When I found myself drowning in research papers for my healthcare AI project, Cline's capabilities truly shined. Within hours, it had helped me organize over 100 papers into a structured knowledge base. But what impressed me most was how it maintained context across different tasks:</p>
+
+            <ul>
+                <li><strong>Literature Organization</strong>
+                    <ul>
+                        <li>It didn't just categorize papers; it understood their relationships and built a coherent knowledge graph</li>
+                        <li>While processing one paper, it would automatically identify connections to previously analyzed works</li>
+                        <li>The citation management wasn't just about formatting - it helped identify key methodology patterns across the field</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>2. Development Projects</h3>
+            <div class="image-container">
+                <img src="/images/Cline_Website_Example.PNG" alt="Website Development Example">
+                <div class="caption">Cline assisting with website development</div>
+            </div>
+
+            <p>The website project became a perfect showcase of Cline's capabilities. What started as a simple static site evolved into a full-featured academic platform. Here's how Cline transformed my development process:</p>
+
+            <ul>
+                <li><strong>Website Development</strong>
+                    <ul>
+                        <li>From the first line of code, Cline understood the project's architecture and guided its evolution</li>
+                        <li>When implementing dark mode, it didn't just provide code - it explained the underlying design principles</li>
+                        <li>SEO optimization became an interactive learning experience, with Cline explaining each improvement</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>3. Code Quality and Documentation</h3>
+            <p>Perhaps most impressively, Cline excels at maintaining and improving code quality:</p>
+            <ul>
+                <li>Systematic refactoring with clear explanations of improvements</li>
+                <li>Automatic generation of comprehensive documentation</li>
+                <li>Implementation of testing strategies</li>
+                <li>Performance optimization recommendations</li>
+            </ul>
+
+            <h2>Best Practices and Insights</h2>
+
+            <h3>Maximizing Efficiency</h3>
+            <ul>
+                <li>Combine multiple tools for complex tasks</li>
+                <li>Maintain clear context boundaries</li>
+                <li>Use specific, well-structured prompts</li>
+                <li>Leverage the file system integration</li>
+            </ul>
+
+            <h3>Common Challenges and Solutions</h3>
+            <ul>
+                <li>Managing context limitations through strategic task breakdown</li>
+                <li>Selecting appropriate tools for specific tasks</li>
+                <li>Handling complex error scenarios</li>
+                <li>Optimizing performance for large-scale operations</li>
+            </ul>
+
+            <h2>Looking Forward</h2>
+            
+            <p>As I continue my research in AI and healthcare, I see endless possibilities for tools like Cline. The future holds exciting potential for:</p>
+            <ul>
+                <li>Enhanced integration with research workflows</li>
+                <li>More sophisticated code analysis and generation</li>
+                <li>Advanced natural language understanding</li>
+                <li>Improved context management and tool utilization</li>
+            </ul>
+
+            <p>Cline has not just doubled my productivity; it has fundamentally changed how I approach both research and development tasks. As AI assistants continue to evolve, tools like Cline will become increasingly essential for academic and professional work.</p>
+        </div>
+    </div>
+
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path class="sun" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            <path class="moon" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+    </button>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+</body>
+</html>

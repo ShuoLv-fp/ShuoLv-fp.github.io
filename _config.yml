@@ -1,0 +1,172 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your entire site, values
+# which you are expected to set up once and rarely need to edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# `jekyll serve`. If you change this file, please restart the server process.
+
+# Site Settings
+title                    : "Shuo Lv"
+description              : ""
+repository               : "ShuoLv-fp/ShuoLv-fp.github.io"
+baseurl                 : ""
+url                     : "https://aaronluo00.github.io"
+google_scholar_stats_use_cdn : true
+
+# google analytics
+google_analytics_id      : VAsm0T8AAAAJ&hl
+
+# SEO Related
+google_site_verification : b_BbOIt7d513ZXYDw-YRMicO6O5tthYiouqWDdWjGTU
+bing_site_verification   : B5AA590E7B9C03956A6F7DEC0F776211
+baidu_site_verification  : code-ZxFK3f4pfb
+
+# Site Author
+author:
+  name             : "Shuo Lv"
+  avatar           : "images/profile.png"
+  bio              : "Master Student in Electronic Information (Biomedical Engineering) at Beijing Institute of Technology"
+  location         : "Beijing, China"
+  employer1        : "Beijing Institute of Technology"
+  employer2        : "Bytedance"
+  pubmed           :
+  googlescholar    : "https://scholar.google.com/citations?user=VAsm0T8AAAAJ"
+  email            : "lv_shuo@foxmail.com"
+  cv               : "assets/files/CV202511.pdf"
+  researchgate     :  # e.g., "https://www.researchgate.net/profile/yourprofile"
+  uri              :
+  bitbucket        :
+  codepen          :
+  dribbble         :
+  flickr           :
+  facebook         :
+  foursquare       :
+  github           : "ShuoLv-fp"
+  google_plus      :
+  keybase          :
+  instagram        :
+  impactstory      : # e.g., "https://profiles.impactstory.org/u/xxxx-xxxx-xxxx-xxxx"
+  lastfm           :
+  linkedin         :  "https://www.linkedin.com/in/%E7%A1%95-%E5%90%95-793613399/"
+  dblp             : # e.g., "https://dblp.org/pid/xx/xxxx.html"
+  orcid            : "https://orcid.org/my-orcid?orcid=0009-0009-2540-0485"
+  pinterest        :
+  bilibili         : "https://space.bilibili.com/9570834?spm_id_from=333.1007.0.0"
+  zhihu            : "https://www.zhihu.com/people/0000-3-47"
+  xiaohongshu      : "https://www.xiaohongshu.com/user/profile/5fb2ad200000000001000e46?xsec_token=ABHeUI1FnyZMrBz-rEyJN0q4JRAgNrgG339z4BUoaJQ4I%3D&xsec_source=pc_search"
+  cloudmusic       : "https://music.163.com/#/user?id=300910782"
+  stackoverflow    : # http://stackoverflow.com/users/123456/username
+  steam            : "https://steamcommunity.com/profiles/76561198357228084/"
+  tumblr           :
+  twitter          : 
+  vine             :
+  weibo            :
+  wechat           : "assets/files/Wechat_QRcode.JPG"
+  xing             :
+  youtube          :
+  wikipedia        :
+
+
+# Reading Files
+include:
+  - .htaccess
+  - _pages
+  - files
+exclude:
+  - docs
+  - google_scholar_crawler
+  - "*.sublime-project"
+  - "*.sublime-workspace"
+  - .asset-cache
+  - .bundle
+  - .jekyll-assets-cache
+  - .sass-cache
+  - .github
+  - CHANGELOG
+  - Capfile
+  - Gemfile
+  - Gruntfile.js
+  - LICENSE
+  - README
+  - CLAUDE.md
+  - Rakefile
+  - assets/js/_main.js
+  - assets/js/plugins
+  - assets/js/vendor
+  - config
+  - gulpfile.js
+  - log
+  - node_modules
+  - package.json
+  - tmp
+  - vendor
+keep_files:
+  - .git
+  - .svn
+encoding: "utf-8"
+markdown_ext: "markdown,mkdown,mkdn,mkd,md"
+
+
+# Conversion
+markdown: kramdown
+highlighter: rouge
+lsi: false
+excerpt_separator: "\n\n"
+incremental: false
+
+
+# Markdown Processing
+kramdown:
+  input: GFM
+  hard_wrap: false
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  enable_coderay: false
+
+# Defaults
+defaults:
+  # _pages
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: default
+      author_profile: true
+
+
+# Sass/SCSS
+sass:
+  sass_dir: _sass
+  style: compressed # http://sass-lang.com/documentation/file.SASS_REFERENCE.html#output_style
+
+
+# Outputting
+permalink: /:categories/:title/
+timezone: Asia/Shanghai # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+
+# Plugins
+plugins:
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-gist
+  - jekyll-feed
+  - jekyll-redirect-from
+# mimic GitHub Pages with --safe
+whitelist:
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-gist
+  - jekyll-feed
+  - jemoji
+
+
+# HTML Compression
+# - http://jch.penibelst.de/
+compress_html:
+  clippings: all
+  ignore:
+    envs: development

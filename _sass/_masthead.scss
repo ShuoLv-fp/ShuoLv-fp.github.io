@@ -1,0 +1,90 @@
+/* ==========================================================================
+   MASTHEAD
+   ========================================================================== */
+
+.masthead {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  border-bottom: 1px solid $border-color;
+  -webkit-animation: intro 0.3s both;
+          animation: intro 0.3s both;
+  -webkit-animation-delay: 0.15s;
+          animation-delay: 0.15s;
+  z-index: 20;
+
+  &__inner-wrap {
+    @include container;
+    @include clearfix;
+    padding: .5em;
+    font-family: $sans-serif-narrow;
+
+    @include breakpoint($x-large) {
+      max-width: $x-large;
+    }
+
+    nav {
+      z-index: 10;
+    }
+
+    a {
+      text-decoration: none;
+    }
+  }
+}
+
+.masthead__menu {
+  ul {
+    margin: 0;
+    padding: 0;
+    clear: both;
+    list-style-type: none;
+  }
+}
+
+.greedy-nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: $background-color;
+
+  .dark-mode-toggle {
+    position: relative;
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0.5em;
+    display: flex;
+    align-items: center;
+    
+    svg {
+      width: 1.2em;
+      height: 1.2em;
+    }
+  }
+}
+
+.masthead__inner-wrap nav {
+  position: relative;
+  width: 100%;
+}
+
+.masthead__menu-home-item {
+  @include breakpoint($medium) {
+    display: block !important;
+  }
+  display: none !important;
+}
+
+.masthead__menu-item {
+  display: block;
+  list-style-type: none;
+  white-space: nowrap;
+
+  &--lg {
+    padding-right: 2em;
+    font-weight: 700;
+  }
+}
