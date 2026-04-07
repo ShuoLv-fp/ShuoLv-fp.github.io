@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Technology on Ls&#39;s Blog</title>
+    <link>https://ShuoLvfp.github.io/my-blog/tags/technology/</link>
+    <description>Recent content in Technology on Ls&#39;s Blog</description>
+    <generator>Hugo -- 0.128.0</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 16 Mar 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://ShuoLvfp.github.io/my-blog/tags/technology/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>How MCP Further Boosts Productivity</title>
+      <link>https://ShuoLvfp.github.io/my-blog/posts/mcp-productivity/</link>
+      <pubDate>Sun, 16 Mar 2025 00:00:00 +0000</pubDate>
+      <guid>https://ShuoLvfp.github.io/my-blog/posts/mcp-productivity/</guid>
+      <description>How Model Context Protocol (MCP) Further Boosts Productivity In today&amp;rsquo;s rapidly evolving technological landscape, productivity tools are constantly being refined and reimagined. Among these innovations, the Model Context Protocol (MCP) stands out as a revolutionary approach to enhancing how we interact with AI systems and leverage their capabilities. This article explores how MCP significantly boosts productivity across various domains.
+What is Model Context Protocol (MCP)? MCP enables seamless integration between AI systems and external tools</description>
+    </item>
+  </channel>
+</rss>
