@@ -33,7 +33,7 @@
   Advisor: Prof. Libo Zhang & Prof. Mingyang Zhong (SWU)  
   - Designed a smart cultural tourism system with wide coverage, optimal planning, and low cost. 
   - Applied big data sentiment analysis for preference mining in information recommendation and VR/AR technology for digital twin explanation.  
-  - \[Award\] **🥇 National Special Prize** at the 2024 "Challenge Cup" Competition - "Problem-Solving" Special Track.  
+  <!-- - \[Award\] **🥇 National Special Prize** at the 2024 "Challenge Cup" Competition - "Problem-Solving" Special Track.   -->
 
 
 **Chinese Chess Game Model** (SWU, 2021)  

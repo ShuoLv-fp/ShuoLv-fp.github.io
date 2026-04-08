@@ -1,7 +1,7 @@
 # 🎤 Passions
 
 - <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
-  [**TYPE-MOON**](https://typemoon.com/)
+  [**TYPE-MOON**](https://typemoon.com/)  
   </span>
   [Witch on the Holy Night (魔法使いの夜)](https://typemoon.com/products/mahoyo/windows/)
 
@@ -10,10 +10,10 @@
   </small>
 
   <div style="display: flex; gap: 2%; align-items: flex-start;">
-    <img src="/_pages/includes/images/WitchontheHolyNight_1.avif" style="width: 25%; height: auto;">
+    <img src="/_pages/includes/images/WitchontheHolyNight_1.avif" style="width: 15%; height: auto;">
     <iframe
       src="https://www.youtube.com/embed/YGSJUm6Eq2M"
-      style="width: 70%; height: 70%; aspect-ratio: 16 / 9;"
+      style="width: 40%; aspect-ratio: 16 / 9;"
       frameborder="0"
       allowfullscreen>
     </iframe>
@@ -21,7 +21,7 @@
 
   [the Garden of Sinners (空の境界)](https://www.karanokyoukai.com/)  
     <small style="display: block; margin: 4px 0 8px 16px; color: #555;"> A dark, philosophical masterpiece exploring identity, death, and the boundaries of human perception. </small>
-    <img src="/_pages/includes/images/theGardenofSinners_1.avif" style="width: 25%; height: auto;">  <img src="/_pages/includes/images/theGardenofSinners_2.avif" style="width: 25%; height: auto;">  <img src="/_pages/includes/images/theGardenofSinners_3.avif" style="width: 25%; height: auto;">  
+    <img src="/_pages/includes/images/theGardenofSinners_1.avif" style="width: 15%; height: auto;">  <img src="/_pages/includes/images/theGardenofSinners_2.avif" style="width: 15%; height: auto;">  <img src="/_pages/includes/images/theGardenofSinners_3.avif" style="width: 15%; height: auto;">  
 
   <!-- [Fate/Stay Night](https://www.typemoon.com/products/fate/index.html)  
     <small style="display: block; margin: 4px 0 8px 16px; color: #555;"> A seminal visual novel that redefined the Fate franchise with its deep character arcs and moral dilemmas. </small>
@@ -34,6 +34,7 @@
 
   [Fate/Grand Order](https://www.fate-go.jp/)  
     <small style="display: block; margin: 4px 0 8px 16px; color: #555;"> A sprawling mobile RPG that weaves together countless Fate timelines and historical figures. </small>
+    <small style="display: block; margin: 4px 0 8px 16px; color: #555;"> UID: 100100533242 </small>
 
   <!-- [Fate/Apocrypha](https://www.typemoon.com/products/tmbooks/apocrypha/index.html)  
     <small style="display: block; margin: 4px 0 8px 16px; color: #555;"> An alternate Holy Grail War story emphasizing faction conflicts and the meaning of heroism. </small> -->
