@@ -1,18 +1,23 @@
 # 🚀 Recent Projects  
 
+**MathNL TTS**
+  Advisor: Bytedance Seed AI4Math
+  - Developed a deep learning-based text-to-speech system for math equations, enabling natural and accurate speech synthesis.  
+  - Utilized pre-trained models for language understanding and speech synthesis, achieving state-of-the-art performance in math equation speech synthesis.  
+
 **Low-Dimensional Representation-Based Spatiotemporal Dynamics Model of Human Cerebellum**  
   Advisor: Prof. Guoyuan Yang (BIT)  
   - Applied complex principal component analysis for modeling to obtain sparse representations of complex human brain activities.  
   - Verified pattern robustness at the group level and specificity of biological characteristics and behaviors at the individual level.  
   - Accurately described static (zero-lag) and dynamic (time-lag) features of neural activities.  
-  - \[Paper\]: 2 submitted papers.  
+  - \[Paper\]: 1 accepted paper (*Nature Communications*), 1 submitted paper.  
 
 
 **Modeling of Social Awareness on Complex Networks**  
   Advisor: Prof. Libo Zhang & Prof. Minyu Feng (SWU)  
   - Designed network dynamics of experts and isolated individuals under disease prevention scenarios based on Prospect Theory and Regret Theory.  
   - Simulated social awareness diffusion on randomly generated networks, demonstrating the promotion effect of human intervention on disease prevention and the containment effect of timely isolation of infected individuals.  
-  - \[Paper\]: 2 published papers.  
+  - \[Paper\]: 2 published papers (*Nonlinear Dynamics* & *CCSCW 2025*).  
 
 
 **Intelligent Security System for Factories**  
@@ -33,7 +38,7 @@
   Advisor: Prof. Libo Zhang & Prof. Mingyang Zhong (SWU)  
   - Designed a smart cultural tourism system with wide coverage, optimal planning, and low cost. 
   - Applied big data sentiment analysis for preference mining in information recommendation and VR/AR technology for digital twin explanation.  
-  <!-- - \[Award\] **🥇 National Special Prize** at the 2024 "Challenge Cup" Competition - "Problem-Solving" Special Track.   -->
+  - \[Award\] **🥇 National Special Prize** at the 2024 "Challenge Cup" Competition - "Problem-Solving" Special Track.  
 
 
 **Chinese Chess Game Model** (SWU, 2021)  

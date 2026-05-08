@@ -9,7 +9,7 @@
   A poetic and atmospheric tale focusing on magic, growth, and the bonds between three unique characters.
   </small>
 
-  <div style="display: flex; gap: 2%; align-items: flex-start;">
+  <!-- <div style="display: flex; gap: 2%; align-items: flex-start;">
     <img src="/_pages/includes/images/WitchontheHolyNight_1.avif" style="width: 15%; height: auto;">
     <iframe
       src="https://www.youtube.com/embed/YGSJUm6Eq2M"
@@ -17,11 +17,11 @@
       frameborder="0"
       allowfullscreen>
     </iframe>
-  </div>
+  </div> -->
 
   [the Garden of Sinners (空の境界)](https://www.karanokyoukai.com/)  
     <small style="display: block; margin: 4px 0 8px 16px; color: #555;"> A dark, philosophical masterpiece exploring identity, death, and the boundaries of human perception. </small>
-    <img src="/_pages/includes/images/theGardenofSinners_1.avif" style="width: 15%; height: auto;">  <img src="/_pages/includes/images/theGardenofSinners_2.avif" style="width: 15%; height: auto;">  <img src="/_pages/includes/images/theGardenofSinners_3.avif" style="width: 15%; height: auto;">  
+    <!-- <img src="/_pages/includes/images/theGardenofSinners_1.avif" style="width: 15%; height: auto;">  <img src="/_pages/includes/images/theGardenofSinners_2.avif" style="width: 15%; height: auto;">  <img src="/_pages/includes/images/theGardenofSinners_3.avif" style="width: 15%; height: auto;">   -->
 
   <!-- [Fate/Stay Night](https://www.typemoon.com/products/fate/index.html)  
     <small style="display: block; margin: 4px 0 8px 16px; color: #555;"> A seminal visual novel that redefined the Fate franchise with its deep character arcs and moral dilemmas. </small>
@@ -43,9 +43,9 @@
   [**KUPO GAMES**](https://kupogames.com/)
   </span>
 
-- <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
+<!-- - <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
   [**JoJo’s Bizarre Adventure (ジョジョの奇妙な冒険)**](https://jojo-portal.com/)
-  </span>
+  </span> -->
 
 <!-- - <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
   **Lecture**
