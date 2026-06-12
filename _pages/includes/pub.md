@@ -3,10 +3,10 @@
 
 ## Journal Articles
 - <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
-  [**Three parsimonious spatiotemporal patterns in cerebellum reveal individual traits in function and behavior**](https://www.researchsquare.com/article/rs-7559401/v1)
+  [**Three parsimonious spatiotemporal patterns in cerebellum reveal individual traits in function and behavior**](https://www.nature.com/articles/s41467-026-72931-6)
   </span>  
   **Shuo Lv**, Jinlong Li, Ruoqi Yang, Xinyu Wu, Zhiming Wang, Wenjing Zhu, Tan Gao, Jia-Hong Gao, Guoyuan Yang\*  
-  *[Nature Communications](https://www.nature.com/ncomms/)* (IF=15.7), March. 2026;  
+  *[Nature Communications](https://www.nature.com/ncomms/)* (IF=15.7), May. 2026;  
   [Code](https://github.com/BIT-YangLab/CPCA_Cerebellum)
 
 - <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
@@ -31,7 +31,7 @@
 
 ## Conference Papers
 - <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
-  [**BrainLMM: A Label-Free Framework for Mapping Multi-Semantic Representation in the Human Visual Cortex**]()
+  [**BrainLMM: A Label-Free Framework for Mapping Multi-Semantic Representation in the Human Visual Cortex**](https://ojs.aaai.org/index.php/AAAI/article/view/42413#:~:text=Here%2C%20we%20propose%20BrainLMM%2C%20a%20label-free%20framework%20for,hypothesis-free%20analysis%20of%20the%20human%20high-level%20visual%20cortex.)
   </span>  
   Tan Gao, Mufan Xue, Haofang Zheng, **Shuo Lv**, Jia Xu, Dabin Sheng, Ziming Mao, Xinyu Wu, Andrew Luo, Guoyuan Yang\*  
   *[Proceedings of the AAAI Conference on Artificial Intelligence (AAAI) 40](https://aaai.org/conference/aaai/aaai-26/)*, Jan. 2026;  

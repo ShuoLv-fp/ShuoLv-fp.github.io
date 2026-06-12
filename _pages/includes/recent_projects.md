@@ -1,9 +1,9 @@
 # 🚀 Recent Projects  
 
-**MathNL TTS**
+<!-- **MathNL TTS**  
   Advisor: Bytedance Seed AI4Math
   - Developed a deep learning-based text-to-speech system for math equations, enabling natural and accurate speech synthesis.  
-  - Utilized pre-trained models for language understanding and speech synthesis, achieving state-of-the-art performance in math equation speech synthesis.  
+  - Utilized pre-trained models for language understanding and speech synthesis, achieving state-of-the-art performance in math equation speech synthesis.   -->
 
 **Low-Dimensional Representation-Based Spatiotemporal Dynamics Model of Human Cerebellum**  
   Advisor: Prof. Guoyuan Yang (BIT)  

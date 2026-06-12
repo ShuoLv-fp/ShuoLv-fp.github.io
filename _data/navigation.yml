@@ -27,5 +27,5 @@ main:
   - title: 'Contact'
     url: '/#-contact'
 
-  - title: 'Blog'
-    url: 'https://ShuoLv-fp.github.io/lsBlog/'
+  # - title: 'Blog'
+  #   url: 'https://ShuoLv-fp.github.io/lsBlog/'
