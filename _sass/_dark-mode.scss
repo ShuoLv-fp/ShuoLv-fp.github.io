@@ -20,6 +20,14 @@
     border-bottom: 1px solid var(--border-color);
   }
 
+  .greedy-nav {
+    background-color: var(--masthead-background);
+  }
+
+  .masthead__inner-wrap {
+    background-color: var(--masthead-background);
+  }
+
   .page__footer {
     background-color: var(--footer-background);
     color: var(--text-color);

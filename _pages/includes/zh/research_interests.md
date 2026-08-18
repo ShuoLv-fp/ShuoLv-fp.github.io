@@ -1,12 +1,17 @@
 <span class='anchor' id='research'></span>
 # 🔬 研究方向
 
-- <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
+- <span style="font-weight: 600; font-size: 1.08em;">
   **人脑动力学的时空模式**
   </span>: 
   我的研究聚焦于**认知功能调控的神经机制**，结合人工智能方法与神经影像技术，从时间与空间两个维度分析人脑动力学，旨在为解析大脑认知调控机制提供实证依据。
 
-- <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
+- <span style="font-weight: 600; font-size: 1.08em;">
   **复杂系统**
   </span>: 
   我对复杂系统同样充满兴趣，关注网络动力学与多智能体相互作用的耦合。我运用非线性分析与数学建模，探索复杂传染与交互传播的演化规律，为理解和调控真实复杂系统提供洞见。
+
+- <span style="font-weight: 600; font-size: 1.08em;">
+  **面向科学的智能体（AI4Science）**
+  </span>: 
+  我关注将大语言模型智能体（LLM Agents）应用于加速科学发现与自动化科研流程。在 AI4Math 方向，我参与过形式化验证与交互式定理证明（如基于 Lean）相关项目，探索如何用 AI 智能体辅助数学命题的形式化与证明自动化。

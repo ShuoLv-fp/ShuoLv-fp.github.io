@@ -17,17 +17,19 @@ lang: zh
 
 <span style="color: #2E86AB; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(46, 134, 171, 0.1);">📋 我正在寻找 2027 年秋季入学的博士职位！ </span>  
 
-{% include_relative includes/zh/vision.md %}
+{% comment %}
+News 板块暂时隐藏（保留文件以备恢复）：{% include_relative includes/zh/news.md %}
+{% endcomment %}
 
-{% include_relative includes/zh/news.md %}
+{% include_relative includes/zh/education.md %}
+
+{% include_relative includes/zh/vision.md %}
 
 {% include_relative includes/zh/pub.md %}
 
 {% include_relative includes/zh/research_interests.md %}
 
 {% include_relative includes/zh/recent_projects.md %}
-
-{% include_relative includes/zh/education.md %}
 
 {% include_relative includes/zh/honers.md %}
 

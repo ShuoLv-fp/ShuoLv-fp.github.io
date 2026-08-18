@@ -3,8 +3,12 @@ main:
   - title: 'About'
     url: '/#about-me'
 
-  - title: 'News'
-    url: '/#news'
+  - title: 'Education'
+    url: '/#education'
+
+  # News 板块暂时隐藏，恢复时取消注释：
+  # - title: 'News'
+  #   url: '/#news'
 
   - title: 'Publications'
     url: '/#publications'
@@ -14,9 +18,6 @@ main:
 
   - title: 'Projects'
     url: '/#projects'
-
-  - title: 'Education'
-    url: '/#education'
 
   - title: 'Awards'
     url: '/#awards'

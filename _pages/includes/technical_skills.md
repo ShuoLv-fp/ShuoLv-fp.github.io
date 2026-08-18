@@ -1,6 +1,6 @@
 <span class='anchor' id='skills'></span>
 # 💻 Skills
-<span style="font-weight: 600; font-size: 1.08em; color: #000000;">
+<span style="font-weight: 600; font-size: 1.08em;">
   **Programming Languages**
   </span>  : 
   <img src="/_pages/includes/images/python_48x48.png" style="width: auto; height: 20px; vertical-align: middle; margin: 0 4px;"> 
@@ -16,7 +16,7 @@
   <img src="/_pages/includes/images/html_48x48.png" style="width: auto; height: 20px; vertical-align: middle; margin: 0 4px;"> 
   [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML) 
 
-<span style="font-weight: 600; font-size: 1.08em; color: #000000;">
+<span style="font-weight: 600; font-size: 1.08em;">
   **Machine Learning & Deep Learning**
   </span>  : 
   [PyTorch](https://pytorch.org/), 
@@ -24,7 +24,17 @@
   [Hugging Face](https://huggingface.co/), 
   [OpenAI API](https://openai.com/)
 
-<span style="font-weight: 600; font-size: 1.08em; color: #000000;">
+<span style="font-weight: 600; font-size: 1.08em;">
+  **Agents & LLM Tools**
+  </span>  : 
+  [LangChain](https://www.langchain.com/), 
+  [LangGraph](https://www.langchain.com/langgraph), 
+  [LlamaIndex](https://www.llamaindex.ai/), 
+  [vLLM](https://docs.vllm.ai/), 
+  [Ollama](https://ollama.com/), 
+  [MCP](https://modelcontextprotocol.io/) (Model Context Protocol)
+
+<span style="font-weight: 600; font-size: 1.08em;">
   **Neuroimaging & Research Tools**
   </span>  : 
   [fMRIPrep](https://fmriprep.org/), 
