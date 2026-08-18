@@ -17,6 +17,8 @@ lang: zh
 
 <span style="color: #2E86AB; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(46, 134, 171, 0.1);">📋 我正在寻找 2027 年秋季入学的博士职位！ </span>  
 
+<div class="apply-banner">🤝 <strong>开放 2027 年秋季入学的博士（Ph.D.）职位申请</strong>——正积极寻找 AI for Science、计算神经科学与大语言模型智能体方向的机会，欢迎潜在导师与合作伙伴联系交流。</div>
+
 {% comment %}
 News 板块暂时隐藏（保留文件以备恢复）：{% include_relative includes/zh/news.md %}
 {% endcomment %}

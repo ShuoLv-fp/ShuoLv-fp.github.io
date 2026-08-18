@@ -20,6 +20,8 @@ You can reach me via email at [lv_shuo@foxmail.com](mailto:lv_shuo@foxmail.com).
 
 <span style="color: #2E86AB; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(46, 134, 171, 0.1);">📋 I am seeking Ph.D. positions for Fall 2027! </span>  
 
+<div class="apply-banner">🤝 <strong>Open to Ph.D. positions for Fall 2027</strong> — actively seeking opportunities in AI for Science, computational neuroscience, and LLM agents. I would be glad to connect with potential advisors and collaborators.</div>
+
 {% comment %}
 News 板块暂时隐藏（保留文件以备恢复）：{% include_relative includes/news.md %}
 {% endcomment %}

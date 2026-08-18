@@ -14,6 +14,11 @@ layout: compress
     {% include browser-upgrade.html %}
     {% include masthead.html %}
 
+    <div id="section-bar" role="button" tabindex="0" aria-label="Current section">
+      <span class="bar-label">▸</span>
+      <span class="bar-title"></span>
+    </div>
+
     <div id="main" role="main">
       {% include sidebar.html %}
     
@@ -28,6 +33,8 @@ layout: compress
     </div>
 
     {% include scripts.html %}
+
+    <button id="back-to-top" type="button" aria-label="Back to top">↑</button>
 
   </body>
 </html>
