@@ -1,4 +1,4 @@
-<span class='anchor' id='-teaching'></span>
+<span class='anchor' id='teaching'></span>
 # 👨‍🏫 Teaching Experience
 ## Teaching Fellow
 ### Algorithm Design and Analysis (Spring 2024 at [SWU](https://www.swu.edu.cn/))

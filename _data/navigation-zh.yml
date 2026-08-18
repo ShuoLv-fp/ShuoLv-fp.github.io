@@ -1,0 +1,31 @@
+# main links links (Chinese)
+main_zh:
+  - title: '关于我'
+    url: '/zh/#about-me'
+
+  - title: '新闻'
+    url: '/zh/#news'
+
+  - title: '论文'
+    url: '/zh/#publications'
+
+  - title: '研究'
+    url: '/zh/#research'
+
+  - title: '项目'
+    url: '/zh/#projects'
+
+  - title: '教育'
+    url: '/zh/#education'
+
+  - title: '荣誉'
+    url: '/zh/#awards'
+
+  - title: '技能'
+    url: '/zh/#skills'
+
+  - title: '教学'
+    url: '/zh/#teaching'
+
+  - title: '联系'
+    url: '/zh/#contact'

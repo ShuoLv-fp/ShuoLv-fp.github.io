@@ -4,7 +4,7 @@
   {% assign seo_title = site.title %}
 {% endif %}
 
-<meta name="keywords" content="Xiaolong Luo, Harvard University, Engineering Science, Ph.D. Student, Machine Learning, Healthcare AI, Medical AI">
+<meta name="keywords" content="Shuo Lv, Beijing Institute of Technology, Computational Neuroscience, Cognitive Neuroscience, fMRI, Large Language Models, Complex Networks, AI for Science">
 <meta property="og:title" content="{{ seo_title }}">
 <meta property="og:description" content="{{ site.description }}">
 {% if site.author.avatar %}
@@ -18,8 +18,15 @@
 
 <!-- Academic-specific meta tags -->
 <meta name="citation_author" content="{{ site.author.name }}">
-<meta name="citation_institution" content="Harvard University">
-<meta name="citation_department" content="School of Engineering and Applied Sciences">
+<meta name="citation_institution" content="Beijing Institute of Technology">
+<meta name="citation_department" content="School of Interdisciplinary Science">
+
+<!-- Language alternates -->
+{% if page.lang == 'zh' %}
+<link rel="alternate" hreflang="en" href="{{ site.url }}{{ site.baseurl }}/">
+{% else %}
+<link rel="alternate" hreflang="zh" href="{{ site.url }}{{ site.baseurl }}/zh/">
+{% endif %}
 
 <!-- Ensure mobile and responsive design -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">

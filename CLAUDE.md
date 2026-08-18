@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Build site**: `bundle exec jekyll build`
 
 ### Alternative Development Scripts
-- `run_server.sh` contains: `bundle exec jekyll liveserve` (Note: should be `serve`, not `liveserve`)
+- `run_server.sh` contains: `bundle exec jekyll serve`
 - `start_jekyll.rb` forces EventMachine pure Ruby implementation and runs `bundle exec jekyll serve`
 - CLAUDE.md is excluded from Jekyll processing to avoid build errors
 
@@ -75,9 +75,16 @@ This is a Jekyll-based academic personal homepage built on the AcadHomepage temp
 - **Publication workflow**: Move papers from Working Projects to Conference/Journal sections when accepted
 - **Important notices**: Use colored highlight boxes for collaboration requests, job seeking, etc.
 
+### Bilingual Content (English + Chinese)
+- English homepage: `_pages/about.md` (`/`), Chinese homepage: `_pages/zh.md` (`/zh/`)
+- English sections live in `_pages/includes/`, Chinese sections in `_pages/includes/zh/`
+- Language switch button and per-language navigation are handled in `_includes/masthead.html` based on `page.lang`
+- **Keep both language versions in sync** when updating content; paper titles/authors/journals stay English in both
+- Navigation data: `_data/navigation.yml` (English, `/ #anchor`) and `_data/navigation-zh.yml` (Chinese, `/zh/#anchor`)
+
 ### Site Configuration Notes
-- Site title: "Xiaolong Luo | Harvard Ph.D. Student"
-- Repository: "AaronLuo00/AaronLuo00.github.io"
+- Site title: "Shuo Lv | Computational Neuroscience & AI for Science"
+- Repository: "ShuoLv-fp/ShuoLv-fp.github.io"
 - Base URL: ""
 - Google Analytics and SEO configured
 - CLAUDE.md is excluded from Jekyll processing in `_config.yml`

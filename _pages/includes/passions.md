@@ -1,4 +1,5 @@
-# 🎤 Passions
+<details>
+<summary style="cursor: pointer;"><strong>🎤 Passions &amp; Hobbies</strong></summary>
 
 - <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
   [**TYPE-MOON**](https://typemoon.com/)  
@@ -50,4 +51,6 @@
 <!-- - <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
   **Lecture**
   </span> -->
+
+</details>
 

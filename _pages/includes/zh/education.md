@@ -1,5 +1,5 @@
 <span class='anchor' id='education'></span>
-# 📚 Education
+# 📚 教育经历
 
 <div style="display: flex; align-items: center; margin: 12px 0;">
   <img
@@ -9,10 +9,10 @@
   />
   <div>
     <div>
-      <strong>Beijing Institute of Technology</strong>, Beijing, China (2024–Present)
+      <strong>北京理工大学</strong>，北京，中国（2024–至今）
     </div>
     <div style="margin-top: 4px; color: #555;">
-      S.M. in Electronic Information (Biomedical Engineering)
+      电子信息（生物医学工程）硕士
     </div>
   </div>
 </div>
@@ -25,10 +25,10 @@
   />
   <div>
     <div>
-      <strong>Southwest University</strong>, Chongqing, China (2020-2024)
+      <strong>西南大学</strong>，重庆，中国（2020-2024）
     </div>
     <div style="margin-top: 4px; color: #555;">
-      Bachelor in Data Science
+      数据科学学士
     </div>
   </div>
 </div>

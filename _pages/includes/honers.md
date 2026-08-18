@@ -1,3 +1,4 @@
+<span class='anchor' id='awards'></span>
 # 🏆 Honors and Awards
 
 ## Scholarships

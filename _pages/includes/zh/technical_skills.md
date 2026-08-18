@@ -1,7 +1,7 @@
 <span class='anchor' id='skills'></span>
-# 💻 Skills
+# 💻 技能
 <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
-  **Programming Languages**
+  **编程语言**
   </span>  : 
   <img src="/_pages/includes/images/python_48x48.png" style="width: auto; height: 20px; vertical-align: middle; margin: 0 4px;"> 
   [Python](https://www.python.org/), 
@@ -17,7 +17,7 @@
   [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML) 
 
 <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
-  **Machine Learning & Deep Learning**
+  **机器学习与深度学习**
   </span>  : 
   [PyTorch](https://pytorch.org/), 
   [scikit-learn](https://scikit-learn.org/), 
@@ -25,7 +25,7 @@
   [OpenAI API](https://openai.com/)
 
 <span style="font-weight: 600; font-size: 1.08em; color: #000000;">
-  **Neuroimaging & Research Tools**
+  **神经影像与研究工具**
   </span>  : 
   [fMRIPrep](https://fmriprep.org/), 
   [Nilearn](https://nilearn.github.io/), 

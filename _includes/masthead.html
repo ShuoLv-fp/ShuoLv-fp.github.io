@@ -4,14 +4,25 @@
       <nav id="site-nav" class="greedy-nav">
         <button><div class="navicon"></div></button>
         <ul class="visible-links">
-          <li class="masthead__menu-item masthead__menu-item--lg masthead__menu-home-item"><a href="{{ site.baseurl }}/#about-me">Homepage</a></li>
-          {% for link in site.data.navigation.main %}
+          {% if page.lang == 'zh' %}
+            <li class="masthead__menu-item masthead__menu-item--lg masthead__menu-home-item"><a href="{{ site.baseurl }}/zh/#about-me">主页</a></li>
+          {% else %}
+            <li class="masthead__menu-item masthead__menu-item--lg masthead__menu-home-item"><a href="{{ site.baseurl }}/#about-me">Homepage</a></li>
+          {% endif %}
+          {% assign nav = site.data.navigation.main %}
+          {% if page.lang == 'zh' %}{% assign nav = site.data.navigation.main_zh %}{% endif %}
+          {% for link in nav %}
             {% if link.url contains 'http' %}
               <li class="masthead__menu-item"><a href="{{ link.url }}" target="_blank">{{ link.title }}</a></li>
             {% else %}
               <li class="masthead__menu-item"><a href="{{ site.baseurl }}{{ link.url }}">{{ link.title }}</a></li>
             {% endif %}
           {% endfor %}
+          {% if page.lang == 'zh' %}
+            <li class="masthead__menu-item lang-switch"><a href="{{ site.baseurl }}/">EN</a></li>
+          {% else %}
+            <li class="masthead__menu-item lang-switch"><a href="{{ site.baseurl }}/zh/">中文</a></li>
+          {% endif %}
         </ul>
         <ul class="hidden-links hidden"></ul>
         <div class="dark-mode-toggle" role="button" tabindex="0" aria-label="Toggle Dark Mode">
