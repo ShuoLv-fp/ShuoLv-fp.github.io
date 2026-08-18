@@ -2,6 +2,30 @@
   {% assign author = site.data.authors[page.author] %}{% else %}{% assign author = site.author %}
 {% endif %}
 
+{% if page.lang == 'zh' %}
+  {% assign t_cv = '简历' %}
+  {% assign t_website = '个人主页' %}
+  {% assign t_email = '邮箱' %}
+  {% assign t_wechat = '微信' %}
+  {% assign t_github = 'GitHub' %}
+  {% assign t_location = site.author.location_zh | default: author.location %}
+  {% assign t_employer1 = site.author.employer1_zh | default: author.employer1 %}
+  {% assign t_employer2 = site.author.employer2_zh | default: author.employer2 %}
+  {% assign t_bio = site.author.bio_zh | default: author.bio %}
+  {% assign t_desc = site.description_zh | default: site.description %}
+{% else %}
+  {% assign t_cv = 'Curriculum Vitae' %}
+  {% assign t_website = 'Website' %}
+  {% assign t_email = 'Email' %}
+  {% assign t_wechat = 'WeChat' %}
+  {% assign t_github = 'GitHub' %}
+  {% assign t_location = author.location %}
+  {% assign t_employer1 = author.employer1 %}
+  {% assign t_employer2 = author.employer2 %}
+  {% assign t_bio = author.bio %}
+  {% assign t_desc = site.description %}
+{% endif %}
+
 <div itemscope itemtype="http://schema.org/Person" class="profile_box">
 
   <div class="author__avatar">
@@ -10,32 +34,32 @@
 
   <div class="author__content">
     <h3 class="author__name">{{ author.name }}</h3>
-    {% if author.bio %}<p class="author__bio">{{ author.bio }}</p>{% endif %}
+    {% if t_bio %}<p class="author__bio">{{ t_bio }}</p>{% endif %}
   </div>
 
   <div class="author__urls-wrapper">
     <!-- <button class="btn btn--inverse">More Info & Contact</button> -->
     <ul class="author__urls social-icons">
-      {% if site.description %}
-        <li><div style="white-space: normal; margin-bottom: 1em;">{{ site.description }}</div></li>
+      {% if t_desc %}
+        <li><div style="white-space: normal; margin-bottom: 1em;">{{ t_desc }}</div></li>
       {% endif %}
-      {% if author.location %}
-        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ author.location }}</li>
+      {% if t_location %}
+        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ t_location }}</li>
       {% endif %}
-      {% if author.employer1 %}
-        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ author.employer1 }}</li>
+      {% if t_employer1 %}
+        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ t_employer1 }}</li>
       {% endif %}
-      {% if author.employer2 %}
-        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ author.employer2 }}</li>
+      {% if t_employer2 %}
+        <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ t_employer2 }}</li>
       {% endif %}
       {% if author.cv %}
-        <li><a href="{{ site.baseurl }}/{{ author.cv }}"><i class="fas fa-fw fa-file-pdf"></i> Curriculum Vitae</a></li>
+        <li><a href="{{ site.baseurl }}/{{ author.cv }}"><i class="fas fa-fw fa-file-pdf"></i> {{ t_cv }}</a></li>
       {% endif %}
       {% if author.uri %}
-        <li><a href="{{ author.uri }}"><i class="fas fa-fw fa-link" aria-hidden="true"></i> Website</a></li>
+        <li><a href="{{ author.uri }}"><i class="fas fa-fw fa-link" aria-hidden="true"></i> {{ t_website }}</a></li>
       {% endif %}
       {% if author.email %}
-        <li><a href="mailto:{{ author.email }}"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i> Email</a></li>
+        <li><a href="mailto:{{ author.email }}"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i> {{ t_email }}</a></li>
       {% endif %}
       {% if author.keybase %}
         <li><a href="https://keybase.io/{{ author.keybase }}"><i class="fas fa-fw fa-key" aria-hidden="true"></i> Keybase</a></li>
@@ -71,7 +95,7 @@
         <li><a href="https://bitbucket.org/{{ author.bitbucket }}"><i class="fab fa-fw fa-bitbucket" aria-hidden="true"></i> Bitbucket</a></li>
       {% endif %}
       {% if author.github %}
-        <li><a href="https://github.com/{{ author.github }}"><i class="fab fa-fw fa-github" aria-hidden="true"></i> Github</a></li>
+        <li><a href="https://github.com/{{ author.github }}"><i class="fab fa-fw fa-github" aria-hidden="true"></i> {{ t_github }}</a></li>
       {% endif %}
       {% if author.stackoverflow %}
         <li><a href="https://www.stackoverflow.com/users/{{ author.stackoverflow }}"><i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i> Stackoverflow</a></li>
@@ -101,7 +125,7 @@
         <li><a href="https://www.weibo.com/{{ author.weibo }}"><i class="fab fa-fw fa-weibo" aria-hidden="true"></i> Weibo</a></li>
       {% endif %}
       {% if author.wechat %}
-        <li><a href="{{ site.baseurl }}/{{ author.wechat }}" target="_blank"><i class="fab fa-fw fa-weixin" aria-hidden="true"></i> WeChat</a></li>
+        <li><a href="{{ site.baseurl }}/{{ author.wechat }}" target="_blank"><i class="fab fa-fw fa-weixin" aria-hidden="true"></i> {{ t_wechat }}</a></li>
       {% endif %}
       {% if author.flickr %}
         <li><a href="https://www.flickr.com/{{ author.flickr }}"><i class="fab fa-fw fa-flickr" aria-hidden="true"></i> Flickr</a></li>

@@ -32,7 +32,10 @@
   [LlamaIndex](https://www.llamaindex.ai/), 
   [vLLM](https://docs.vllm.ai/), 
   [Ollama](https://ollama.com/), 
-  [MCP](https://modelcontextprotocol.io/)（模型上下文协议）
+  [MCP](https://modelcontextprotocol.io/)（模型上下文协议）, 
+  提示工程（Prompt Engineering）, 
+  多智能体编排（动态调度树）, 
+  测试时扩展（Test-Time Scaling）
 
 <span style="font-weight: 600; font-size: 1.08em;">
   **神经影像与研究工具**

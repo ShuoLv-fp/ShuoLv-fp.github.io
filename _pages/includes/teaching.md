@@ -1,5 +1,6 @@
 <span class='anchor' id='teaching'></span>
-# 👨‍🏫 Teaching Experience
+<details>
+<summary style="cursor: pointer; font-size: 1.25em; margin-bottom: 8px;">👨‍🏫 <strong>Teaching Experience</strong> <span style="font-weight: normal; opacity: .7;">(Teaching Fellow — click to expand)</span></summary>
 ## Teaching Fellow
 ### Algorithm Design and Analysis (Spring 2024 at [SWU](https://www.swu.edu.cn/))
 - Instructor: Prof. Libo Zhang
@@ -16,3 +17,5 @@
 ### Big data analytics (Spring 2023 at [SWU](https://www.swu.edu.cn/))
 - Instructors: Prof. Jing Cheng
 <!-- - Class size: 150 (Uncertain...) students -->
+
+</details>

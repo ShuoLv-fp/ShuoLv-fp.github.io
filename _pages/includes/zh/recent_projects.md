@@ -1,5 +1,13 @@
 <span class='anchor' id='projects'></span>
-# 🚀 近期项目
+<details>
+<summary style="cursor: pointer; font-size: 1.25em; margin-bottom: 8px;">🚀 <strong>近期项目</strong> <span style="font-weight: normal; opacity: .7;">（8 个项目 — 点击展开）</span></summary>
+
+**MathNL TTS：数学推理的测试时扩展多智能体系统**（字节跳动 Seed 团队，2025）  
+  角色：大模型智能体研究实习生（AI4Math 团队）  
+  - 基于 Seed 2.0 系列大模型 API（Lite + Pro），设计并搭建了 7 角色多智能体推理系统（Planner、Attacker、Solver、Verifier、Refiner、Summarizer、Grader），仅通过测试时扩展（Test-Time Scaling）实现强数学推理能力，无需任何额外训练（无 SFT/RL）。  
+  - 独立负责动态调度树与提示工程（Prompt Engineering）的设计，运行时协调上千次智能体动作。  
+  - 将 IMO 风格题目平均得分从基线约 3 分提升至 7 分制下的 6.4 分。  
+  - 技术栈：Python、LLM API、多智能体编排、动态调度、提示工程。  
 
 **基于低维表征的人脑小脑时空动力学模型**  
   导师：Prof. Guoyuan Yang（北京理工大学）  
@@ -48,3 +56,5 @@
   导师：Prof. Ran Li（北京师范大学）  
   - 基于 98 名被试的基因组测序与问卷数据，构建了涵盖神经特质、工作倾向与生活习惯的个体领导力画像。  
   - 通过中介模型识别出若干领导力决定通路。  
+
+</details>

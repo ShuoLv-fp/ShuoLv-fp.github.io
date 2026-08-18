@@ -32,7 +32,10 @@
   [LlamaIndex](https://www.llamaindex.ai/), 
   [vLLM](https://docs.vllm.ai/), 
   [Ollama](https://ollama.com/), 
-  [MCP](https://modelcontextprotocol.io/) (Model Context Protocol)
+  [MCP](https://modelcontextprotocol.io/) (Model Context Protocol), 
+  Prompt Engineering, 
+  Multi-Agent Orchestration (dynamic scheduling trees), 
+  Test-Time Scaling
 
 <span style="font-weight: 600; font-size: 1.08em;">
   **Neuroimaging & Research Tools**

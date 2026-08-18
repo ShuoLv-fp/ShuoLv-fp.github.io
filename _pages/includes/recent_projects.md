@@ -1,10 +1,13 @@
 <span class='anchor' id='projects'></span>
-# 🚀 Recent Projects  
+<details>
+<summary style="cursor: pointer; font-size: 1.25em; margin-bottom: 8px;">🚀 <strong>Recent Projects</strong> <span style="font-weight: normal; opacity: .7;">(8 projects — click to expand)</span></summary>
 
-<!-- **MathNL TTS**  
-  Advisor: Bytedance Seed AI4Math
-  - Developed a deep learning-based text-to-speech system for math equations, enabling natural and accurate speech synthesis.  
-  - Utilized pre-trained models for language understanding and speech synthesis, achieving state-of-the-art performance in math equation speech synthesis.   -->
+**MathNL TTS: Test-Time Scaling Multi-Agent System for Mathematical Reasoning** (ByteDance Seed, 2025)  
+  Role: LLM Agent Research Intern (AI4Math team)  
+  - Designed and built a 7-role multi-agent reasoning system (Planner, Attacker, Solver, Verifier, Refiner, Summarizer, Grader) on top of the Seed 2.0 API family (Lite + Pro), achieving strong mathematical reasoning purely through test-time scaling, without any additional training (no SFT/RL).  
+  - Independently designed the dynamic scheduling tree and the prompt-engineering pipeline, coordinating thousands of agent actions at runtime.  
+  - Improved the average score on IMO-style problems from a baseline of ~3 to 6.4 out of 7.0.  
+  - Tech: Python, LLM APIs, multi-agent orchestration, dynamic scheduling, prompt engineering.  
 
 **Low-Dimensional Representation-Based Spatiotemporal Dynamics Model of Human Cerebellum**  
   Advisor: Prof. Guoyuan Yang (BIT)  
@@ -53,3 +56,5 @@
   Advisor: Prof. Ran Li (BNU)
   - Constructed individual leadership portraits covering neural traits, work tendencies, and living habits based on genomic sequencing and questionnaire data of 98 subjects.  
   - Identified several leadership determinant pathways through mediation models.  
+
+</details>

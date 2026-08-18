@@ -9,8 +9,11 @@
           {% else %}
             <li class="masthead__menu-item masthead__menu-item--lg masthead__menu-home-item"><a href="{{ site.baseurl }}/#about-me">Homepage</a></li>
           {% endif %}
-          {% assign nav = site.data.navigation.main %}
-          {% if page.lang == 'zh' %}{% assign nav = site.data.navigation.main_zh %}{% endif %}
+          {% if page.lang == 'zh' %}
+    {% assign nav = site.data['navigation-zh'].main_zh %}
+  {% else %}
+    {% assign nav = site.data.navigation.main %}
+  {% endif %}
           {% for link in nav %}
             {% if link.url contains 'http' %}
               <li class="masthead__menu-item"><a href="{{ link.url }}" target="_blank">{{ link.title }}</a></li>

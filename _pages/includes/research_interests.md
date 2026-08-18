@@ -14,4 +14,4 @@
 - <span style="font-weight: 600; font-size: 1.08em;">
   **AI Agents for Science (AI4Science)**
   </span>: 
-  I am interested in applying LLM-based agents to accelerate scientific discovery and automate research workflows. In the AI4Math direction, I have worked on formal verification and interactive theorem proving (e.g., with Lean), exploring how AI agents can assist in formalizing mathematical statements and automating proof search.
+  I am interested in applying LLM-based agents to accelerate scientific discovery and automate research workflows. During an LLM-agent research internship at ByteDance (Seed, AI4Math), I designed a 7-role multi-agent reasoning system with dynamic scheduling and prompt engineering that achieved 6.4/7.0 on IMO-style problems through test-time scaling alone (no additional training). In the formal verification direction, I have also worked on interactive theorem proving (e.g., with Lean), exploring how AI agents can assist in formalizing mathematical statements and automating proof search.

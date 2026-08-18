@@ -111,3 +111,12 @@ h1:before, .anchor:before {
     background-color: #00369f;
     font-size: .8em;
 }
+
+/* co-authors dimmed, highlight the first-author/self */
+.pub-coauthor {
+    color: #6c757d;
+}
+
+[data-theme="dark"] .pub-coauthor {
+    color: #9aa0a6;
+}
