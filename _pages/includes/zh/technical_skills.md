@@ -22,7 +22,10 @@
   [PyTorch](https://pytorch.org/), 
   [scikit-learn](https://scikit-learn.org/), 
   [Hugging Face](https://huggingface.co/), 
-  [OpenAI API](https://openai.com/)
+  [NumPy](https://numpy.org/) / [SciPy](https://scipy.org/), 
+  [Pandas](https://pandas.pydata.org/), 
+  [Matplotlib](https://matplotlib.org/) / [Seaborn](https://seaborn.pydata.org/), 
+  [PyTorch Geometric](https://pytorch-geometric.readthedocs.io/)（图神经网络 GNN）
 
 <span style="font-weight: 600; font-size: 1.08em;">
   **智能体与大模型工具**

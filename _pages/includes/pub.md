@@ -34,7 +34,7 @@
 
 <div style="display: flex; flex-wrap: wrap; gap: 24px; margin: 18px 0; align-items: flex-start;">
   <div style="flex: 1 1 46%; min-width: 280px;">
-    <a href="/images/pub/pub_biorxiv_autism_placeholder.webp" data-lightbox="pubs" title="<a href='https://www.biorxiv.org/content/10.1101/2025.10.23.684286v1' target='_blank' style='color:#fff;text-decoration:underline;'>Open paper &#8599;</a>"><img src="/images/pub/pub_biorxiv_autism_placeholder.webp" class="pub-fig" loading="lazy" alt="Normative models of language network expansion in autism"><!-- TODO: 替换该占位图：浏览器打开 https://www.biorxiv.org/content/10.1101/2025.10.23.684286v1 右键保存图 1，覆盖 images/pub/pub_biorxiv_autism_placeholder.png（保留文件名）--></a>
+    <a href="/images/pub/pub_biorxiv_autism.webp" data-lightbox="pubs" title="<a href='https://www.biorxiv.org/content/10.1101/2025.10.23.684286v1' target='_blank' style='color:#fff;text-decoration:underline;'>Open paper &#8599;</a>"><img src="/images/pub/pub_biorxiv_autism.webp" class="pub-fig" loading="lazy" alt="Normative models of language network expansion in autism"></a>
   </div>
   <div style="flex: 1 1 46%; min-width: 280px;">
     <span style="font-weight: 600; font-size: 1.05em;"><a href="https://www.biorxiv.org/content/10.1101/2025.10.23.684286v1" target="_blank">Normative models of individualized functional brain networks reveal language network expansion in autism</a></span><br>
