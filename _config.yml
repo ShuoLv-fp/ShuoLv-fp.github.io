@@ -7,8 +7,8 @@
 
 # Site Settings
 title                    : "Shuo Lv | Computational Neuroscience & AI for Science"
-description              : "Master's student at Beijing Institute of Technology. Research on computational neuroscience, large language models, and complex networks. Seeking Ph.D. positions for Fall 2027."
-description_zh           : "北京理工大学硕士研究生。研究方向：计算神经科学、大语言模型与复杂网络。正在申请 2027 年秋季入学的海外博士项目。"
+# description              : "Master's student at Beijing Institute of Technology. Research on computational neuroscience, large language models, and complex networks. Seeking Ph.D. positions for Fall 2027."
+# description_zh           : "北京理工大学硕士研究生。研究方向：计算神经科学、大语言模型与复杂网络。正在申请 2027 年秋季入学的海外博士项目。"
 repository               : "ShuoLv-fp/ShuoLv-fp.github.io"
 baseurl                 : ""
 url                     : "https://ShuoLv-fp.github.io"

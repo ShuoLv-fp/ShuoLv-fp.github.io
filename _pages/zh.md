@@ -13,9 +13,9 @@ lang: zh
 
 可通过邮箱与我联系：[lv_shuo@foxmail.com](mailto:lv_shuo@foxmail.com)。  
 
-<span style="color: #E74C3C; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(231, 76, 60, 0.1);">🤝 我正积极寻找 AI for Science 领域的博士（Ph.D.）机会！ </span>  
+<!-- <span style="color: #E74C3C; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(231, 76, 60, 0.1);">🤝 我正积极寻找 AI for Science 领域的博士（Ph.D.）机会！ </span>   -->
 
-<span style="color: #2E86AB; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(46, 134, 171, 0.1);">📋 我正在寻找 2027 年秋季入学的博士职位！ </span>  
+<!-- <span style="color: #2E86AB; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(46, 134, 171, 0.1);">📋 我正在寻找 2027 年秋季入学的博士职位！ </span>   -->
 
 <div class="apply-banner">🤝 <strong>开放 2027 年秋季入学的博士（Ph.D.）职位申请</strong>——正积极寻找 AI for Science、计算神经科学与大语言模型智能体方向的机会，欢迎潜在导师与合作伙伴联系交流。</div>
 

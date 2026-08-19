@@ -16,9 +16,9 @@ My research focuses on the dynamic intersection of cognitive neuroscience, large
 
 You can reach me via email at [lv_shuo@foxmail.com](mailto:lv_shuo@foxmail.com).  
 
-<span style="color: #E74C3C; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(231, 76, 60, 0.1);">🤝 I am actively seeking PH.D. opportunities in AI for Science domains! </span>  
+<!-- <span style="color: #E74C3C; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(231, 76, 60, 0.1);">🤝 I am actively seeking PH.D. opportunities in AI for Science domains! </span>   -->
 
-<span style="color: #2E86AB; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(46, 134, 171, 0.1);">📋 I am seeking Ph.D. positions for Fall 2027! </span>  
+<!-- <span style="color: #2E86AB; font-weight: bold; padding: 5px 10px; border-radius: 4px; background-color: rgba(46, 134, 171, 0.1);">📋 I am seeking Ph.D. positions for Fall 2027! </span>   -->
 
 <div class="apply-banner">🤝 <strong>Open to Ph.D. positions for Fall 2027</strong> — actively seeking opportunities in AI for Science, computational neuroscience, and LLM agents. I would be glad to connect with potential advisors and collaborators.</div>
 
