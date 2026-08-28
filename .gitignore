@@ -5,3 +5,6 @@ push.sh
 protected_phd_agent/.dev.vars
 protected_phd_agent/.wrangler/
 protected_phd_agent/node_modules/
+/phd_application_agent/
+/phd-advisor-summary/
+**/private_data/

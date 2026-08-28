@@ -79,6 +79,11 @@ include:
 exclude:
   - docs
   - google_scholar_crawler
+  - phd_application_agent
+  - phd-advisor-summary
+  - protected_phd_agent
+  - "**/private_data"
+  - .worktrees
   - "*.sublime-project"
   - "*.sublime-workspace"
   - .asset-cache
