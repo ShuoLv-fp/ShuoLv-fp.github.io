@@ -1,10 +1,6 @@
 import { jsonResponse } from "./http.js";
 
-export class WorkflowCoordinator {
-  async fetch() {
-    return jsonResponse({ error: "service not initialized" }, 503);
-  }
-}
+export { WorkflowCoordinator } from "./coordinator.js";
 
 export default {
   async fetch() {
