@@ -5,8 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow, noarchive">
     <title>PhD Application Agent</title>
+    <link rel="stylesheet" href="/style.css">
   </head>
   <body>
-    <main id="app" aria-live="polite"></main>
+    <div class="workspace">
+      <nav class="workspace-rail" aria-label="Primary navigation">
+        <a class="wordmark" href="#dossiers" aria-label="PhD Application Agent home">
+          <span class="wordmark-glyph">P</span>
+          <span>PhD<br>Agent</span>
+        </a>
+        <p class="rail-label">Workspace</p>
+        <a href="#dashboard" data-view-link="dashboard">Overview</a>
+        <a href="#dossiers" data-view-link="dossiers">Advisor dossiers</a>
+        <a href="#drafts" data-view-link="drafts">Draft desk</a>
+        <p class="rail-label">Reference</p>
+        <a href="#profile" data-view-link="profile">Applicant profile</a>
+        <div class="rail-state">
+          <span class="cloud-dot" aria-hidden="true"></span>
+          Private cloud
+        </div>
+      </nav>
+
+      <main class="workspace-main">
+        <header class="command-bar">
+          <div>
+            <p class="utility-label">FALL 2027 · APPLICATION CONTROL ROOM</p>
+            <h1 id="page-title">Advisor dossiers</h1>
+          </div>
+          <div class="command-actions">
+            <span id="sync-indicator" class="sync-indicator" role="status" aria-live="polite">Loading…</span>
+            <button id="export-backup" class="button secondary" type="button">Export backup</button>
+            <button id="sync-cloud" class="button primary" type="button">Sync changes</button>
+            <button id="logout" class="button quiet" type="button">Lock</button>
+          </div>
+        </header>
+
+        <aside id="conflict-panel" class="conflict-panel" hidden>
+          <strong>Cloud copy changed elsewhere.</strong>
+          <span>Your unsynchronized edits remain in this browser. Export them or refresh before continuing.</span>
+          <button id="conflict-export" class="button secondary" type="button">Export current cloud copy</button>
+          <button id="refresh-cloud" class="button quiet" type="button">Refresh cloud data</button>
+        </aside>
+
+        <section id="view-dashboard" class="view" data-view="dashboard" hidden>
+          <div class="view-heading">
+            <div><p class="signal-label">CURRENT SIGNALS</p><h2>Application overview</h2></div>
+            <p>One compact view of the private research and outreach pipeline.</p>
+          </div>
+          <div id="overview-metrics" class="metric-strip"></div>
+          <div id="overview-focus" class="overview-focus"></div>
+        </section>
+
+        <section id="view-dossiers" class="view dossier-view" data-view="dossiers" hidden>
+          <div class="dossier-shell">
+            <aside class="advisor-index" aria-label="Advisor dossier list">
+              <div class="advisor-index-head">
+                <div><p class="signal-label">CURATED INDEX</p><strong id="dossier-count">0 advisors</strong></div>
+                <input id="advisor-search" type="search" placeholder="Filter" aria-label="Filter advisors">
+              </div>
+              <div id="dossier-nav" class="dossier-nav"></div>
+            </aside>
+            <article id="dossier-detail" class="dossier-detail" aria-live="polite"></article>
+          </div>
+        </section>
+
+        <section id="view-drafts" class="view" data-view="drafts" hidden>
+          <div class="view-heading">
+            <div><p class="signal-label">HUMAN REVIEW REQUIRED</p><h2>Draft desk</h2></div>
+            <p>Every outreach draft stays editable and is never transmitted from this workspace.</p>
+          </div>
+          <div id="draft-list" class="draft-list"></div>
+        </section>
+
+        <section id="view-profile" class="view" data-view="profile" hidden>
+          <div class="view-heading">
+            <div><p class="signal-label">FIT REFERENCE</p><h2>Applicant profile</h2></div>
+            <p>The evidence base used to evaluate advisor alignment.</p>
+          </div>
+          <div id="profile-content" class="profile-content"></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="relogin-dialog" class="relogin-dialog">
+      <form id="relogin-form" method="dialog">
+        <p class="utility-label">SESSION CHECKPOINT</p>
+        <h2>Unlock to keep editing</h2>
+        <p>Your unsynchronized changes remain in memory.</p>
+        <label for="relogin-password">Workflow password</label>
+        <input id="relogin-password" type="password" autocomplete="current-password" required>
+        <p id="relogin-error" class="form-message" role="alert"></p>
+        <button class="button primary wide" type="submit">Resume workspace</button>
+      </form>
+    </dialog>
+
+    <script type="module" src="/app.js"></script>
   </body>
 </html>

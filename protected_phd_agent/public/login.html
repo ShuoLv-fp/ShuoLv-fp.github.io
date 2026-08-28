@@ -4,12 +4,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow, noarchive">
-    <title>Private workflow</title>
+    <title>Private PhD workflow</title>
+    <link rel="stylesheet" href="/style.css">
   </head>
-  <body>
-    <main>
-      <h1>Private workflow</h1>
-      <p>This workspace is not initialized yet.</p>
+  <body class="login-page">
+    <main class="login-shell">
+      <section class="login-intro" aria-labelledby="login-title">
+        <p class="signal-label">PRIVATE RESEARCH WORKSPACE</p>
+        <h1 id="login-title">PhD Application<br>Agent</h1>
+        <p class="login-copy">Advisor research notes, fit memos and outreach drafts live behind this checkpoint.</p>
+        <div class="signal-trace" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      </section>
+      <section class="login-card">
+        <div class="checkpoint-mark" aria-hidden="true">P</div>
+        <p class="utility-label">SECURE CHECKPOINT</p>
+        <h2>Unlock the workspace</h2>
+        <form id="login-form">
+          <label for="workflow-password">Workflow password</label>
+          <input id="workflow-password" name="password" type="password" autocomplete="current-password" required autofocus>
+          <button class="button primary wide" type="submit">Enter workspace</button>
+        </form>
+        <p id="login-error" class="form-message" role="alert" aria-live="polite"></p>
+        <p class="privacy-note">The password is checked by the server and is never retained by this page.</p>
+      </section>
     </main>
+    <script type="module" src="/login.js"></script>
   </body>
 </html>
