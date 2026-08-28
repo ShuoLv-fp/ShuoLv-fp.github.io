@@ -95,11 +95,13 @@ The Cloudflare project serves the login shell, authenticated application assets,
 
 No send-mail, SMTP, webhook, arbitrary proxy, or generic file-write endpoint is permitted.
 
-### 4.3 Cloudflare KV model
+### 4.3 Durable Object and Cloudflare KV model
 
-KV stores versioned JSON records. At minimum it contains faculty, artifacts, profile, applications, programmes, activity metadata, active session records, schema version, and global revision. Each mutation includes the revision observed by the browser.
+Workers KV is eventually consistent and cannot provide an atomic compare-and-swap operation. A single Durable Object named `WorkflowCoordinator` therefore owns the authoritative workflow state and serializes all reads and mutations. Its storage contains faculty, artifacts, profile, applications, programmes, activity metadata, active session records, schema version, and global revision. Each mutation includes the revision observed by the browser.
 
-The Worker rejects a mutation when the submitted revision is stale and returns a conflict response containing only the new revision identifier. The browser preserves the unsynchronized text and offers export before reload; it never silently overwrites the newer cloud state.
+After each accepted mutation, the coordinator writes a versioned recovery snapshot to KV. KV is used for authenticated exports, migration verification, and disaster recovery, not for concurrency control. This preserves a private KV backup while ensuring the browser receives strongly ordered revisions from the Durable Object.
+
+The coordinator rejects a mutation when the submitted revision is stale and returns a conflict response containing only the new revision identifier. The browser preserves the unsynchronized text and offers export before reload; it never silently overwrites the newer cloud state.
 
 Writes validate:
 
@@ -135,8 +137,8 @@ Migration follows a fail-closed sequence:
 1. Fetch the remote repository and confirm the expected branch head.
 2. Create a full local Git bundle outside the working repository.
 3. Copy production workflow data to `private_data/` and generate the manifest.
-4. Create Cloudflare resources, secrets, and KV bindings.
-5. Import production JSON into KV without routing it through public build artifacts.
+4. Create Cloudflare resources, secrets, Durable Object migration, and KV bindings.
+5. Import production JSON into the coordinator and mirror its first recovery snapshot to KV without routing it through public build artifacts.
 6. Verify record counts, stable identifiers, selected content hashes, and authenticated retrieval.
 7. Build and test the data-free public application.
 8. Rewrite all local Git refs to remove historical `phd_application_agent/` and `phd-advisor-summary/` content.
