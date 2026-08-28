@@ -12,6 +12,7 @@ title                    : "Shuo Lv | Computational Neuroscience & AI for Scienc
 repository               : "ShuoLv-fp/ShuoLv-fp.github.io"
 baseurl                 : ""
 url                     : "https://ShuoLv-fp.github.io"
+phd_agent_url           : "https://shuo-phd-agent.shuo-private-phd-agent.workers.dev"
 google_scholar_stats_use_cdn : true
 
 # google analytics (currently unused: analytics.html is not included by any layout)

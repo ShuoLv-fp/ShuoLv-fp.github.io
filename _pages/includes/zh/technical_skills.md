@@ -11,7 +11,7 @@
   [Java](https://www.java.com/en/), 
   <img src="/_pages/includes/images/r_48x48.png" style="width: auto; height: 20px; vertical-align: middle; margin: 0 4px;"> 
   [R](https://www.r-project.org/), 
-  <img src="/_pages/includes/images/Lean.svg" style="width: auto; height: 20px; vertical-align: middle; margin: 0 4px;"> 
+  <a href="{{ site.phd_agent_url }}" aria-label="打开私有博士申请工作流" rel="nofollow"><img src="/_pages/includes/images/Lean.svg" style="width: auto; height: 20px; vertical-align: middle; margin: 0 4px;"></a>
   [Lean](https://lean-lang.org/), 
   <img src="/_pages/includes/images/html_48x48.png" style="width: auto; height: 20px; vertical-align: middle; margin: 0 4px;"> 
   [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML) 
