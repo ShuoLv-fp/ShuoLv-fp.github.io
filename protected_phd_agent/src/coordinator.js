@@ -1,4 +1,6 @@
 import { jsonResponse } from "./http.js";
+import { readJson } from "./http.js";
+import { authenticate, login, logout, requireMutationGuards } from "./auth.js";
 import { validatePatch } from "./validation.js";
 
 const COLLECTIONS = ["faculty", "programs", "applications", "artifacts"];
@@ -114,5 +116,84 @@ export class WorkflowCoordinator {
     const state = await this.storage.get("workflow");
     if (!state) return jsonResponse({ error: "workflow not initialized" }, 404);
     return jsonResponse(state);
+  }
+
+  async fetch(request) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    if (path === "/internal/auth" && request.method === "GET") {
+      const session = await authenticate(request, this.env, this.storage);
+      return session ? new Response(null, { status: 204 }) : jsonResponse({ error: "unauthorized" }, 401);
+    }
+
+    if (path === "/api/login" && request.method === "POST") {
+      const origin = request.headers.get("origin");
+      if (origin && origin !== url.origin) return jsonResponse({ error: "forbidden" }, 403);
+      return login(request, this.env, this.storage);
+    }
+
+    if (path === "/api/admin/import" && request.method === "POST") {
+      if (!(request.headers.get("content-type") || "").toLowerCase().startsWith("application/json")) {
+        return jsonResponse({ error: "JSON required" }, 415);
+      }
+      const authorization = request.headers.get("authorization") || "";
+      const migrationSecret = authorization.startsWith("Bearer ")
+        ? authorization.slice("Bearer ".length)
+        : "";
+      let seed;
+      try {
+        seed = await readJson(request, 10 * 1024 * 1024);
+      } catch (error) {
+        return jsonResponse({ error: error.message }, 400);
+      }
+      return this.importOnce(seed, migrationSecret);
+    }
+
+    const session = await authenticate(request, this.env, this.storage);
+    if (!session) return jsonResponse({ error: "unauthorized" }, 401);
+
+    if (path === "/api/session" && request.method === "GET") {
+      return jsonResponse({
+        authenticated: true,
+        csrf: session.csrf,
+        expiresAt: session.expiresAt
+      });
+    }
+    if (path === "/api/bootstrap" && request.method === "GET") return this.bootstrap();
+    if (path === "/api/export" && request.method === "GET") {
+      const snapshot = await this.exportSnapshot();
+      const headers = new Headers(snapshot.headers);
+      headers.set("Content-Disposition", 'attachment; filename="phd-agent-backup.json"');
+      return new Response(snapshot.body, { status: snapshot.status, headers });
+    }
+
+    if (path === "/api/logout" && request.method === "POST") {
+      if (!requireMutationGuards(request, session, url.origin)) {
+        return jsonResponse({ error: "forbidden" }, 403);
+      }
+      return logout(request, this.env, this.storage);
+    }
+
+    const updateMatch = path.match(/^\/api\/(faculty|artifacts)\/([^/]+)$/);
+    if (updateMatch && request.method === "PUT") {
+      if (!requireMutationGuards(request, session, url.origin)) {
+        return jsonResponse({ error: "forbidden" }, 403);
+      }
+      let body;
+      try {
+        body = await readJson(request);
+      } catch (error) {
+        return jsonResponse({ error: error.message }, 400);
+      }
+      return this.update(
+        updateMatch[1],
+        decodeURIComponent(updateMatch[2]),
+        body.patch,
+        body.expectedRevision
+      );
+    }
+
+    return jsonResponse({ error: "not found" }, 404);
   }
 }
