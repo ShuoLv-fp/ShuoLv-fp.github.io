@@ -9,9 +9,24 @@
     "run_worker_first": true,
     "html_handling": "none"
   },
-  "kv_namespaces": [{ "binding": "PHD_AGENT_DATA" }],
+  "kv_namespaces": [
+    {
+      "binding": "PHD_AGENT_DATA",
+      "id": "cccf0bd2bfe04081a177f57242e15b7e"
+    }
+  ],
   "durable_objects": {
-    "bindings": [{ "name": "WORKFLOW_COORDINATOR", "class_name": "WorkflowCoordinator" }]
+    "bindings": [
+      {
+        "name": "WORKFLOW_COORDINATOR",
+        "class_name": "WorkflowCoordinator"
+      }
+    ]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["WorkflowCoordinator"] }]
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["WorkflowCoordinator"]
+    }
+  ]
 }
