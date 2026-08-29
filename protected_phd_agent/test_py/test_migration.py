@@ -1,11 +1,16 @@
 import json
+import http.cookiejar
 from pathlib import Path
 import subprocess
 from tempfile import TemporaryDirectory
 import unittest
 
 from protected_phd_agent.scripts.prepare_private_migration import prepare
-from protected_phd_agent.scripts.verify_private_migration import verify_seed
+from protected_phd_agent.scripts.verify_private_migration import (
+    remote_opener,
+    semantic_collection_hashes,
+    verify_seed,
+)
 from protected_phd_agent.scripts.verify_rewritten_history import verify_history
 
 
@@ -14,6 +19,33 @@ def write_json(path, value):
 
 
 class MigrationTests(unittest.TestCase):
+    def test_remote_verifier_uses_an_explicit_client_identifier(self):
+        opener = remote_opener(http.cookiejar.CookieJar())
+        headers = dict(opener.addheaders)
+        self.assertIn("User-agent", headers)
+        self.assertNotIn("Python-urllib", headers["User-agent"])
+
+    def test_remote_hashes_treat_integral_json_numbers_as_equivalent(self):
+        local = {
+            "profile": {"score": 1.0},
+            "faculty": [{"fit": {"ratio": 2.0}}],
+            "programs": [],
+            "applications": [],
+            "artifacts": [],
+        }
+        remote = {
+            "profile": {"score": 1},
+            "faculty": [{"fit": {"ratio": 2}}],
+            "programs": [],
+            "applications": [],
+            "artifacts": [],
+        }
+
+        self.assertEqual(
+            semantic_collection_hashes(local),
+            semantic_collection_hashes(remote),
+        )
+
     def make_source(self, root):
         source = root / "source"
         (source / "data").mkdir(parents=True)

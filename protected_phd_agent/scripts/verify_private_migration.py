@@ -33,6 +33,29 @@ def collection_hashes(seed):
     return {name: sha256_bytes(canonical_bytes(seed[name])) for name in COLLECTIONS}
 
 
+def normalize_json_numbers(value):
+    if isinstance(value, dict):
+        return {key: normalize_json_numbers(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [normalize_json_numbers(item) for item in value]
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    return value
+
+
+def semantic_collection_hashes(seed):
+    return {
+        name: sha256_bytes(canonical_bytes(normalize_json_numbers(seed[name])))
+        for name in COLLECTIONS
+    }
+
+
+def remote_opener(cookie_jar):
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie_jar))
+    opener.addheaders = [("User-agent", "Shuo-PhD-Agent-Verifier/1.0")]
+    return opener
+
+
 def verify_seed(seed_path, manifest_path):
     seed_path = Path(seed_path)
     manifest_path = Path(manifest_path)
@@ -51,15 +74,16 @@ def verify_seed(seed_path, manifest_path):
         raise RuntimeError("collection hash mismatch")
 
 
-def verify_remote(remote, manifest_path):
+def verify_remote(remote, seed_path, manifest_path):
     manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
+    seed = json.loads(Path(seed_path).read_text(encoding="utf-8"))
     base = remote.rstrip("/")
     parsed = urllib.parse.urlparse(base)
     if parsed.scheme != "https" and parsed.hostname not in {"127.0.0.1", "localhost"}:
         raise RuntimeError("remote verification requires HTTPS")
     password = os.environ.get("PHD_AGENT_VERIFY_PASSWORD") or getpass("Workflow password: ")
     cookie_jar = http.cookiejar.CookieJar()
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie_jar))
+    opener = remote_opener(cookie_jar)
     login_request = urllib.request.Request(
         f"{base}/api/login",
         data=json.dumps({"password": password}).encode("utf-8"),
@@ -79,7 +103,7 @@ def verify_remote(remote, manifest_path):
 
     if record_counts(remote_state) != manifest["counts"]:
         raise RuntimeError("remote record count mismatch")
-    if collection_hashes(remote_state) != manifest["collectionHashes"]:
+    if semantic_collection_hashes(remote_state) != semantic_collection_hashes(seed):
         raise RuntimeError("remote collection hash mismatch")
 
 
@@ -91,7 +115,7 @@ def main():
     args = parser.parse_args()
     verify_seed(args.seed, args.manifest)
     if args.remote:
-        verify_remote(args.remote, args.manifest)
+        verify_remote(args.remote, args.seed, args.manifest)
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     print("Private migration verification passed.")
     print("Record counts:", json.dumps(manifest["counts"], sort_keys=True))
