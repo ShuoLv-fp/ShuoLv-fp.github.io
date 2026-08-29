@@ -42,10 +42,12 @@ News 板块暂时隐藏（保留文件以备恢复）：{% include_relative incl
 
 {% include_relative includes/teaching.md %}
 
+{% comment %}
 {% include_relative includes/passions.md %}  
 
 # 💡Collaborators and friends  
 - [Prof. Libo Zhang](https://scholar.google.com/citations?hl=zh-CN&user=8I-krtYAAAAJ) @ SWU.  
+{% endcomment %}
 
 <span class='anchor' id='contact'></span>
 # 📧 Contact  

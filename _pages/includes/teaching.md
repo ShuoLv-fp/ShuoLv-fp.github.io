@@ -1,5 +1,5 @@
 <span class='anchor' id='teaching'></span>
-<details>
+<details markdown="1">
 <summary style="cursor: pointer; font-size: 1.25em; margin-bottom: 8px;">👨‍🏫 <strong>Teaching Experience</strong> <span style="font-weight: normal; opacity: .7;">(Teaching Fellow — click to expand)</span></summary>
 
 **Teaching Fellow**

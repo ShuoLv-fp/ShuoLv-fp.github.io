@@ -1,5 +1,5 @@
 <span class='anchor' id='projects'></span>
-<details>
+<details markdown="1">
 <summary style="cursor: pointer; font-size: 1.25em; margin-bottom: 8px;">🚀 <strong>Recent Projects</strong> <span style="font-weight: normal; opacity: .7;">(8 projects — click to expand)</span></summary>
 
 **MathNL TTS: Test-Time Scaling Multi-Agent System for Mathematical Reasoning** (ByteDance Seed, 2025)

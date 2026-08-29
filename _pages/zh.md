@@ -39,10 +39,12 @@ News 板块暂时隐藏（保留文件以备恢复）：{% include_relative incl
 
 {% include_relative includes/zh/teaching.md %}
 
+{% comment %}
 {% include_relative includes/zh/passions.md %}  
 
 # 💡合作者与朋友  
 - [Prof. Libo Zhang](https://scholar.google.com/citations?hl=zh-CN&user=8I-krtYAAAAJ) @ 西南大学。  
+{% endcomment %}
 
 <span class='anchor' id='contact'></span>
 # 📧 联系  
