@@ -67,10 +67,9 @@
   <div class="pub-highlight">A label-free framework that maps multi-semantic representations in the human visual cortex with foundation models.</div></div>
 </div>
 
-<!-- TODO: 该论文已由 Springer CCIS 2910 论文集收录（2026-08 上市），待章节 DOI 上线后补充论文链接与正式配图（替换占位图 images/pub/pub_ccscw_placeholder.png） -->
 <div style="display: flex; flex-wrap: wrap; gap: 24px; margin: 18px 0; align-items: flex-start;">
   <div style="flex: 1 1 46%; min-width: 280px;">
-    <a href="/images/pub/pub_ccscw_placeholder.webp" data-lightbox="pubs" title="<a href='https://conf.ccf.org.cn/web/api/m1413311151097384960175700123647.action' target='_blank' style='color:#fff;text-decoration:underline;'>Open paper &#8599;</a>"><img src="/images/pub/pub_ccscw_placeholder.webp" class="pub-fig" loading="lazy" alt="Sampling disease detection and collective intervention"></a>
+    <a href="/images/pub/pub_ccscw_sampling_detection.webp" data-lightbox="pubs" title="<a href='https://conf.ccf.org.cn/web/api/m1413311151097384960175700123647.action' target='_blank' style='color:#fff;text-decoration:underline;'>Open paper &#8599;</a>"><img src="/images/pub/pub_ccscw_sampling_detection.webp" class="pub-fig" loading="lazy" alt="Sampling disease detection and collective intervention"></a>
   </div>
   <div style="flex: 1 1 46%; min-width: 280px;">
     <span style="font-weight: 600; font-size: 1.05em;"><a href="https://conf.ccf.org.cn/web/api/m1413311151097384960175700123647.action" target="_blank">Impact of Sampling Disease Detection and Collective Intervention Measures in Epidemic Transmission</a></span><br>
