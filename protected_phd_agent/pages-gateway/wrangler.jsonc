@@ -1,0 +1,12 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "shuo-phd-agent-gateway",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-08-15",
+  "services": [
+    {
+      "binding": "PHD_AGENT_SERVICE",
+      "service": "shuo-phd-agent"
+    }
+  ]
+}

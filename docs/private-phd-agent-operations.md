@@ -41,7 +41,7 @@ pnpm run check
 pnpm exec wrangler deploy
 ```
 
-The login shell is data-free. Confirm `/api/bootstrap` returns HTTP 401 without a session before importing production data.
+The login shell is data-free. Confirm `/api/bootstrap` returns HTTP 401 without a session before importing production data. The production browser URL uses the Pages gateway at `https://shuo-phd-agent-gateway.pages.dev`; it forwards requests to the private Worker through a Cloudflare service binding, so the Worker remains the only place that handles secrets and records.
 
 ## One-time production import
 

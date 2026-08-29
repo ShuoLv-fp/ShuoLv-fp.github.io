@@ -21,6 +21,9 @@ function coordinatorFixture() {
   const snapshots = [];
   const env = {
     MIGRATION_SECRET: "synthetic-migration-secret-32-bytes",
+    WORKFLOW_PASSWORD: "synthetic-test-password",
+    SESSION_SECRET: "synthetic-session-secret-with-32-bytes",
+    RATE_LIMIT_SECRET: "synthetic-rate-limit-secret-32-bytes",
     PHD_AGENT_DATA: {
       async put(key, value) {
         snapshots.push([key, JSON.parse(value)]);
@@ -52,6 +55,25 @@ describe("workflow mutation schema", () => {
 });
 
 describe("WorkflowCoordinator", () => {
+  it("uses the trusted public origin when invoked behind a gateway", async () => {
+    const { coordinator } = coordinatorFixture();
+    const publicOrigin = "https://gateway.pages.dev";
+    const response = await coordinator.fetch(new Request(
+      "https://coordinator.internal/api/login",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          origin: publicOrigin,
+          "x-phd-agent-origin": publicOrigin
+        },
+        body: JSON.stringify({ password: "synthetic-test-password" })
+      }
+    ));
+
+    expect(response.status).toBe(200);
+  });
+
   it("imports once, increments revisions, mirrors snapshots and rejects stale writes", async () => {
     const { coordinator, snapshots } = coordinatorFixture();
 

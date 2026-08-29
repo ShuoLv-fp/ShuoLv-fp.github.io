@@ -14,6 +14,12 @@ function coordinator(env) {
   return env.WORKFLOW_COORDINATOR.get(id);
 }
 
+function coordinatorRequest(request, publicOrigin) {
+  const headers = new Headers(request.headers);
+  headers.set("x-phd-agent-origin", publicOrigin);
+  return new Request(request, { headers });
+}
+
 function isKnownApi(path, method) {
   if (path === "/api/login") return method === "POST";
   if (path === "/api/session" || path === "/api/bootstrap" || path === "/api/export") {
@@ -61,7 +67,7 @@ export default {
 
     if (path.startsWith("/api/")) {
       if (!isKnownApi(path, request.method)) return jsonResponse({ error: "not found" }, 404);
-      return stub.fetch(request);
+      return stub.fetch(coordinatorRequest(request, url.origin));
     }
 
     if (PUBLIC_ASSETS.has(path)) return serveAsset(request, env, PUBLIC_ASSETS.get(path));

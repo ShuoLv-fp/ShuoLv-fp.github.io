@@ -121,6 +121,7 @@ export class WorkflowCoordinator {
   async fetch(request) {
     const url = new URL(request.url);
     const path = url.pathname;
+    const publicOrigin = request.headers.get("x-phd-agent-origin") || url.origin;
 
     if (path === "/internal/auth" && request.method === "GET") {
       const session = await authenticate(request, this.env, this.storage);
@@ -129,7 +130,7 @@ export class WorkflowCoordinator {
 
     if (path === "/api/login" && request.method === "POST") {
       const origin = request.headers.get("origin");
-      if (origin && origin !== url.origin) return jsonResponse({ error: "forbidden" }, 403);
+      if (origin && origin !== publicOrigin) return jsonResponse({ error: "forbidden" }, 403);
       return login(request, this.env, this.storage);
     }
 
@@ -169,7 +170,7 @@ export class WorkflowCoordinator {
     }
 
     if (path === "/api/logout" && request.method === "POST") {
-      if (!requireMutationGuards(request, session, url.origin)) {
+      if (!requireMutationGuards(request, session, publicOrigin)) {
         return jsonResponse({ error: "forbidden" }, 403);
       }
       return logout(request, this.env, this.storage);
@@ -177,7 +178,7 @@ export class WorkflowCoordinator {
 
     const updateMatch = path.match(/^\/api\/(faculty|artifacts)\/([^/]+)$/);
     if (updateMatch && request.method === "PUT") {
-      if (!requireMutationGuards(request, session, url.origin)) {
+      if (!requireMutationGuards(request, session, publicOrigin)) {
         return jsonResponse({ error: "forbidden" }, 403);
       }
       let body;
