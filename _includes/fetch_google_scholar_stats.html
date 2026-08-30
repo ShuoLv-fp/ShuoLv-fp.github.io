@@ -1,11 +1,13 @@
 <script>
     $(document).ready(function () {
+        var gsDataUrls = [];
         {% if site.google_scholar_stats_use_cdn %}
-        var gsDataBaseUrl = 'https://cdn.jsdelivr.net/gh/{{ site.repository }}@'
-        {% else %}
-        var gsDataBaseUrl = 'https://raw.githubusercontent.com/{{ site.repository }}/'
+        gsDataUrls.push('https://cdn.jsdelivr.net/gh/{{ site.repository }}@google-scholar-stats/gs_data.json');
         {% endif %}
-        $.getJSON(gsDataBaseUrl + "google-scholar-stats/gs_data.json", function (data) {
+
+        gsDataUrls.push('https://raw.githubusercontent.com/{{ site.repository }}/google-scholar-stats/gs_data.json');
+
+        var renderStats = function (data) {
             var setText = function (id, value) {
                 var el = document.getElementById(id);
                 if (el) el.innerHTML = value;
@@ -15,9 +17,19 @@
             var citationEles = document.getElementsByClassName('show_paper_citations')
             Array.prototype.forEach.call(citationEles, element => {
                 var paperId = element.getAttribute('data')
-                var numCitations = data['publications'][paperId]['num_citations']
-                element.innerHTML = '| Citations: ' + numCitations;
+                var publication = data['publications'] && data['publications'][paperId]
+                if (publication) {
+                    element.innerHTML = '| Citations: ' + publication['num_citations'];
+                }
             });
-        });
+        };
+
+        var loadStats = function (index) {
+            $.getJSON(gsDataUrls[index], renderStats).fail(function () {
+                if (index + 1 < gsDataUrls.length) loadStats(index + 1);
+            });
+        };
+
+        loadStats(0);
     })
 </script>
