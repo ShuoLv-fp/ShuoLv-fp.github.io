@@ -3,7 +3,8 @@
 {% endif %}
 
 {% if page.lang == 'zh' %}
-  {% assign t_cv = '简历（2026 年 6 月）' %}
+  {% assign t_cv_en = '英文简历（2026 年 9 月）' %}
+  {% assign t_cv_zh = '中文简历（2026 年 9 月）' %}
   {% assign t_website = '个人主页' %}
   {% assign t_email = '邮箱' %}
   {% assign t_wechat = '微信' %}
@@ -14,7 +15,8 @@
   {% assign t_bio = site.author.bio_zh | default: author.bio %}
   {% assign t_desc = site.description_zh | default: site.description %}
 {% else %}
-  {% assign t_cv = 'Curriculum Vitae (Jun 2026)' %}
+  {% assign t_cv_en = 'CV (English, Sep 2026)' %}
+  {% assign t_cv_zh = 'CV (Chinese, Sep 2026)' %}
   {% assign t_website = 'Website' %}
   {% assign t_email = 'Email' %}
   {% assign t_wechat = 'WeChat' %}
@@ -52,8 +54,11 @@
       {% if t_employer2 %}
         <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> {{ t_employer2 }}</li>
       {% endif %}
-      {% if author.cv %}
-        <li><a href="{{ site.baseurl }}/{{ author.cv }}"><i class="fas fa-fw fa-file-pdf"></i> {{ t_cv }}</a></li>
+      {% if author.cv_en %}
+        <li><a href="{{ site.baseurl }}/{{ author.cv_en }}"><i class="fas fa-fw fa-file-pdf" aria-hidden="true"></i> {{ t_cv_en }}</a></li>
+      {% endif %}
+      {% if author.cv_zh %}
+        <li><a href="{{ site.baseurl }}/{{ author.cv_zh }}"><i class="fas fa-fw fa-file-pdf" aria-hidden="true"></i> {{ t_cv_zh }}</a></li>
       {% endif %}
       {% if author.uri %}
         <li><a href="{{ author.uri }}"><i class="fas fa-fw fa-link" aria-hidden="true"></i> {{ t_website }}</a></li>
@@ -153,8 +158,11 @@
 {% endif %}
     </ul>
       <div class="author__urls_sm">
-      {% if author.cv %}
-        <a href="{{ site.baseurl }}/{{ author.cv }}"><i class="fas fa-fw fa-file-pdf"></i></a>
+      {% if author.cv_en %}
+        <a href="{{ site.baseurl }}/{{ author.cv_en }}" aria-label="{{ t_cv_en }}" title="{{ t_cv_en }}"><i class="fas fa-fw fa-file-pdf" aria-hidden="true"></i></a>
+      {% endif %}
+      {% if author.cv_zh %}
+        <a href="{{ site.baseurl }}/{{ author.cv_zh }}" aria-label="{{ t_cv_zh }}" title="{{ t_cv_zh }}"><i class="fas fa-fw fa-file-pdf" aria-hidden="true"></i></a>
       {% endif %}
       {% if author.uri %}
         <a href="{{ author.uri }}"><i class="fas fa-fw fa-link" aria-hidden="true"></i></a>
