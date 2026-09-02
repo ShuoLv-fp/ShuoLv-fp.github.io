@@ -48,6 +48,14 @@ describe("private dossier UI", () => {
     expect(appJs).toContain("dirtyRecords: new Map()");
   });
 
+  it("shows each advisor's sourced contact email with a copy control", async () => {
+    const { appJs } = await uiSources();
+    expect(appJs).toContain("Contact email");
+    expect(appJs).toContain("Copy email");
+    expect(appJs).toContain("contact_email_source_url");
+    expect(appJs).toContain("navigator.clipboard.writeText(row.contact_email)");
+  });
+
   it("does not serve legacy JSON data paths", async () => {
     for (const path of ["profile", "faculty", "programs", "applications", "artifacts"]) {
       expect((await SELF.fetch(`${origin}/data/${path}.json`)).status).toBe(404);

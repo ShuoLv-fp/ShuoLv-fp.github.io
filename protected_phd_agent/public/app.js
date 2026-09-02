@@ -454,6 +454,33 @@ function renderEmailWorkbench(row, draft) {
     return section;
   }
 
+  const contactEmail = element("input", {
+    id: "advisor-contact-email",
+    type: "email",
+    readonly: true,
+    value: row.contact_email || "Email not published"
+  });
+  const contactActions = element("div", { class: "contact-email-actions" }, [
+    contactEmail,
+    element("button", {
+      class: "button secondary",
+      type: "button",
+      text: "Copy email",
+      disabled: !row.contact_email,
+      onclick: async () => {
+        await navigator.clipboard.writeText(row.contact_email);
+      }
+    }),
+    row.contact_email_source_url
+      ? element("a", {
+        class: "contact-source",
+        href: safeExternalUrl(row.contact_email_source_url),
+        target: "_blank",
+        rel: "noopener noreferrer",
+        text: "Official source ↗"
+      })
+      : null
+  ]);
   const subject = element("input", { id: "advisor-email-subject", type: "text" });
   subject.value = draft.subject || "";
   const content = element("textarea", { id: "advisor-email-editor", spellcheck: "true" });
@@ -468,6 +495,7 @@ function renderEmailWorkbench(row, draft) {
   content.addEventListener("input", updateDraft);
 
   section.append(
+    element("label", { class: "editor-field" }, [element("span", { text: "Contact email" }), contactActions]),
     element("label", { class: "editor-field" }, [element("span", { text: "Subject" }), subject]),
     element("label", { class: "editor-field" }, [element("span", { text: "Body" }), content]),
     element("div", { class: "editor-actions" }, [

@@ -347,9 +347,18 @@ select:focus-visible {
 .review-flag { border: 1px solid var(--amber); color: #ffd9ae; font: 0.65rem var(--utility); padding: 0.4rem 0.5rem; }
 .editor-field { color: #b7c9d0; margin-top: 1rem; }
 .editor-field input, .editor-field textarea { border-color: #57707b; }
+.contact-email-actions { align-items: center; display: grid; gap: 0.6rem; grid-template-columns: minmax(0, 1fr) auto auto; }
+.contact-email-actions input[readonly] { color: #fff; cursor: text; }
+.contact-source { color: #aee8ff; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+.contact-source:hover { color: #fff; }
 .editor-field textarea { font-family: var(--display); line-height: 1.62; min-height: 390px; resize: vertical; }
 .editor-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.9rem; }
 .email-workbench .button.secondary { border-color: #77909a; color: #fff; }
+
+@media (max-width: 660px) {
+  .contact-email-actions { grid-template-columns: 1fr auto; }
+  .contact-source { grid-column: 1 / -1; }
+}
 .editor-note { color: #8fa6af; font: 0.7rem var(--utility); margin-left: auto; }
 
 .draft-list { border-top: 1px solid var(--line); }
