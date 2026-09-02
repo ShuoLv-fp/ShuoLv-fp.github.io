@@ -4,6 +4,15 @@ import unittest
 
 
 class CvProjectsUpdateTests(unittest.TestCase):
+    def test_profile_uses_new_portrait_and_preserves_original(self):
+        config = Path("_config.yml").read_text(encoding="utf-8")
+        self.assertRegex(
+            config,
+            r'(?m)^  avatar\s+: "images/profile_202609\.jpg"$',
+        )
+        self.assertTrue(Path("images/profile_202609.jpg").is_file())
+        self.assertTrue(Path("images/profile.png").is_file())
+
     def test_bilingual_cv_assets_and_configuration(self):
         config = Path("_config.yml").read_text(encoding="utf-8")
         self.assertRegex(
