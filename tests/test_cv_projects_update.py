@@ -8,9 +8,9 @@ class CvProjectsUpdateTests(unittest.TestCase):
         config = Path("_config.yml").read_text(encoding="utf-8")
         self.assertRegex(
             config,
-            r'(?m)^  avatar\s+: "images/profile_202609\.jpg"$',
+            r'(?m)^  avatar\s+: "images/profile_202609\.png"$',
         )
-        self.assertTrue(Path("images/profile_202609.jpg").is_file())
+        self.assertTrue(Path("images/profile_202609.png").is_file())
         self.assertTrue(Path("images/profile.png").is_file())
 
     def test_bilingual_cv_assets_and_configuration(self):
