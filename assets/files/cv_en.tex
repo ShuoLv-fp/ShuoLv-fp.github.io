@@ -39,15 +39,17 @@
   \begin{tabularx}{\textwidth}{@{}p{0.85em}@{}X>{\raggedleft\arraybackslash}p{0.19\textwidth}@{}}
     \textbullet & \textbf{#1} & #2 \\
     & #3 & \textit{#4}
-  \end{tabularx}%
+  \end{tabularx}\par
   \if\relax\detokenize{#5}\relax\else
-    \hspace*{0.85em}{\footnotesize #5}\par
+    \hspace*{0.85em}\begin{minipage}{\dimexpr\textwidth-0.85em\relax}
+      \small #5
+    \end{minipage}\par
   \fi
   \vspace{0.12em}
 }
 
 \newenvironment{publicationlist}{%
-  \footnotesize
+  \small
   \begin{itemize}[
     label=\textbullet,
     leftmargin=1.10em,
@@ -68,7 +70,7 @@
     \textbf{#1}\hspace{0.45em}{\textit{-- #2}} & \textit{#3}
   \end{tabularx}\vspace{-0.03em}
   \hspace*{0.85em}\begin{minipage}{\dimexpr\textwidth-0.85em\relax}
-    \footnotesize
+    \small
     \if\relax\detokenize{#4}\relax\else
       \textcolor{muted}{\textit{Advisor: #4.}}\ 
     \fi
@@ -79,23 +81,23 @@
 \newcommand{\CVName}{Shuo Lv}
 
 \begin{document}
-\fontsize{8.7}{9.6}\selectfont
+\fontsize{9.3}{10.3}\selectfont
 
 \begin{center}
   {\LARGE\bfseries \CVName}\\[-0.08em]
   {\small AI Agents $\cdot$ AI for Science $\cdot$ Cognitive Neuroscience $\cdot$ Complex Networks $\cdot$ Pattern Recognition}\\[0.12em]
   {\footnotesize
-    \contactlink{mailto:lv_shuo@foxmail.com}{\faEnvelope}{Email}
+    \contactlink{mailto:lv_shuo@foxmail.com}{\faIcon{envelope}}{Email}
     \enspace $\cdot$ \enspace
-    \contactlink{https://www.google.com/maps/place/Beijing}{\faMapMarkerAlt}{Beijing, China}
+    \contactlink{https://www.google.com/maps/place/Beijing}{\faIcon{map-marker-alt}}{Beijing, China}
     \enspace $\cdot$ \enspace
-    \contactlink{https://ShuoLv-fp.github.io}{\faGlobe}{Homepage}
+    \contactlink{https://ShuoLv-fp.github.io}{\faIcon{globe}}{Homepage}
     \enspace $\cdot$ \enspace
-    \contactlink{https://github.com/ShuoLv-fp}{\faGithub}{GitHub}
+    \contactlink{https://github.com/ShuoLv-fp}{\faIcon[brands]{github}}{GitHub}
     \enspace $\cdot$ \enspace
-    \contactlink{https://scholar.google.com/citations?user=VAsm0T8AAAAJ}{\faGraduationCap}{Scholar}
+    \contactlink{https://scholar.google.com/citations?user=VAsm0T8AAAAJ}{\faIcon{graduation-cap}}{Scholar}
     \enspace $\cdot$ \enspace
-    \contactlink{https://orcid.org/0009-0009-2540-0485}{\faOrcid}{ORCID}
+    \contactlink{https://orcid.org/0009-0009-2540-0485}{\faIcon[brands]{orcid}}{ORCID}
   }
 \end{center}
 \vspace{-0.55em}
@@ -176,7 +178,7 @@
 
 \section{Awards and Honors}
 
-{\footnotesize
+{\small
 \renewcommand{\arraystretch}{0.94}
 \begin{tabularx}{\textwidth}{@{}p{0.105\textwidth}X>{\raggedleft\arraybackslash}p{0.20\textwidth}@{}}
   Jun. 2023 & China Robot and Artificial Intelligence Competition & \textbf{National First Prize} \\
@@ -189,14 +191,13 @@
 
 \section{Technical Skills}
 
-{\footnotesize
+{\small
 \renewcommand{\arraystretch}{0.94}
 \begin{tabularx}{\textwidth}{@{}>{\bfseries}p{0.13\textwidth}@{\hspace{0.55em}}X@{}}
   Languages & Python, C++, Java, R, Lean 4, JavaScript, SQL, HTML, Bash \\
   Software Stack & FastAPI, Pydantic, LangGraph, Guardrails, React, PyTorch \\
-  Tools & Git, Model Context Protocol (MCP), PE, FSL, Connectome Workbench, MATLAB, Adobe Photoshop, Premiere Pro, and InDesign
+  Tools & Git, Model Context Protocol (MCP), PE, FSL, Connectome Workbench, MATLAB, Adobe Photoshop, Premiere Pro, and \mbox{InDesign}
 \end{tabularx}
 }
 
 \end{document}
-

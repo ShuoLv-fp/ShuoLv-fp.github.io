@@ -18,6 +18,29 @@ class EnglishCvSourceTests(unittest.TestCase):
         self.assertIn("top=0.35in,bottom=0.35in", self.source)
         self.assertNotIn(r"\newpage", self.source)
 
+    def test_education_detail_respects_text_width(self):
+        macro = self.source.split(r"\newcommand{\educationentry}", 1)[1]
+        macro = macro.split(r"\newenvironment{publicationlist}", 1)[0]
+        self.assertIn(
+            r"\begin{minipage}{\dimexpr\textwidth-0.85em\relax}",
+            macro,
+        )
+        self.assertIn(r"\end{tabularx}\par", macro)
+
+    def test_body_text_is_not_overcompressed(self):
+        self.assertIn(r"\fontsize{9.3}{10.3}\selectfont", self.source)
+        publication_block = self.source.split(
+            r"\newenvironment{publicationlist}", 1
+        )[1].split(r"\newcommand{\cvpublication}", 1)[0]
+        experience_macro = self.source.split(
+            r"\newcommand{\experienceentry}", 1
+        )[1].split(r"\newcommand{\CVName}", 1)[0]
+        self.assertIn(r"\small", publication_block)
+        self.assertIn(r"\small", experience_macro)
+
+    def test_product_name_is_not_hyphenated(self):
+        self.assertIn(r"\mbox{InDesign}", self.source)
+
     def test_linked_header_without_phone_or_birth_date(self):
         required = (
             "mailto:lv_shuo@foxmail.com",
@@ -26,12 +49,12 @@ class EnglishCvSourceTests(unittest.TestCase):
             "https://github.com/ShuoLv-fp",
             "https://scholar.google.com/citations?user=VAsm0T8AAAAJ",
             "https://orcid.org/0009-0009-2540-0485",
-            r"\faEnvelope",
-            r"\faMapMarkerAlt",
-            r"\faGlobe",
-            r"\faGithub",
-            r"\faGraduationCap",
-            r"\faOrcid",
+            r"\faIcon{envelope}",
+            r"\faIcon{map-marker-alt}",
+            r"\faIcon{globe}",
+            r"\faIcon[brands]{github}",
+            r"\faIcon{graduation-cap}",
+            r"\faIcon[brands]{orcid}",
         )
         for value in required:
             with self.subTest(value=value):
@@ -125,4 +148,3 @@ class EnglishCvPdfTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
