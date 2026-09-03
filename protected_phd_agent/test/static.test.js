@@ -14,13 +14,14 @@ async function authenticatedCookie() {
 
 async function uiSources() {
   const cookie = await authenticatedCookie();
-  const [login, loginJs, html, appJs] = await Promise.all([
+  const [login, loginJs, html, appJs, css] = await Promise.all([
     SELF.fetch(`${origin}/`).then((response) => response.text()),
     SELF.fetch(`${origin}/login.js`).then((response) => response.text()),
     SELF.fetch(`${origin}/app`, { headers: { cookie } }).then((response) => response.text()),
-    SELF.fetch(`${origin}/app.js`, { headers: { cookie } }).then((response) => response.text())
+    SELF.fetch(`${origin}/app.js`, { headers: { cookie } }).then((response) => response.text()),
+    SELF.fetch(`${origin}/style.css`).then((response) => response.text())
   ]);
-  return { login, loginJs, html, appJs };
+  return { login, loginJs, html, appJs, css };
 }
 
 describe("private dossier UI", () => {
@@ -54,6 +55,15 @@ describe("private dossier UI", () => {
     expect(appJs).toContain("Copy email");
     expect(appJs).toContain("contact_email_source_url");
     expect(appJs).toContain("navigator.clipboard.writeText(row.contact_email)");
+  });
+
+  it("keeps the curated advisor index independently scrollable on desktop", async () => {
+    const { css } = await uiSources();
+    expect(css).toContain(".advisor-index { background: #f6f9f9;");
+    expect(css).toContain("position: sticky");
+    expect(css).toContain("grid-template-rows: auto minmax(0, 1fr)");
+    expect(css).toContain(".dossier-nav { min-height: 0; overflow-y: auto;");
+    expect(css).toContain(".advisor-index { border-bottom: 1px solid var(--line); border-right: 0; display: block; height: auto; overflow: visible; position: static; }");
   });
 
   it("does not serve legacy JSON data paths", async () => {

@@ -264,8 +264,8 @@ select:focus-visible {
   grid-template-columns: minmax(260px, 310px) minmax(0, 1fr);
   min-height: calc(100vh - 145px);
 }
-.advisor-index { background: #f6f9f9; border-right: 1px solid var(--line); min-width: 0; }
-.advisor-index-head { background: var(--night-2); color: #fff; display: grid; gap: 1rem; padding: 1.2rem; position: sticky; top: 96px; z-index: 5; }
+.advisor-index { background: #f6f9f9; border-right: 1px solid var(--line); align-self: start; display: grid; grid-template-rows: auto minmax(0, 1fr); height: calc(100vh - 96px); min-width: 0; overflow: hidden; position: sticky; top: 96px; }
+.advisor-index-head { background: var(--night-2); color: #fff; display: grid; gap: 1rem; padding: 1.2rem; z-index: 5; }
 .advisor-index-head .signal-label { color: var(--cyan); }
 .advisor-index-head strong { font-size: 0.9rem; }
 .advisor-index-head input {
@@ -276,7 +276,7 @@ select:focus-visible {
   padding: 0.55rem 0.65rem;
 }
 .advisor-index-head input::placeholder { color: #9ab0b9; }
-.dossier-nav { max-height: calc(100vh - 250px); overflow-y: auto; padding: 0.5rem; }
+.dossier-nav { min-height: 0; overflow-y: auto; padding: 0.5rem; }
 .advisor-tab {
   align-items: center;
   background: transparent;
@@ -391,7 +391,7 @@ select:focus-visible {
   .workspace { grid-template-columns: 180px minmax(0, 1fr); }
   .dossier-shell { grid-template-columns: 260px minmax(0, 1fr); }
   .command-bar { align-items: flex-start; flex-direction: column; gap: 0.8rem; padding: 1rem 0; }
-  .advisor-index-head { top: 137px; }
+  .advisor-index { height: calc(100vh - 137px); top: 137px; }
 }
 
 @media (max-width: 780px) {
@@ -418,8 +418,7 @@ select:focus-visible {
   .overview-focus { grid-template-columns: 1fr; }
   .focus-list li { grid-template-columns: 1fr; }
   .dossier-shell { display: block; }
-  .advisor-index { border-bottom: 1px solid var(--line); border-right: 0; }
-  .advisor-index-head { position: static; }
+  .advisor-index { border-bottom: 1px solid var(--line); border-right: 0; display: block; height: auto; overflow: visible; position: static; }
   .dossier-nav { display: flex; max-height: none; overflow-x: auto; }
   .advisor-tab { flex: 0 0 245px; }
   .dossier-detail { padding: 1.2rem; }
