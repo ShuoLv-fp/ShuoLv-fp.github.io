@@ -20,7 +20,7 @@
 - **Role:** Project Lead; **Advisor:** Prof. Guoyuan Yang
 - First applied complex principal component analysis to resting-state cerebellar fMRI and identified three dominant sparse patterns that jointly capture zero-lag spatial structure and time-lag dynamics. Validated robustness through network features, sequence reconstruction, and modularity analysis.
 - Applied sCCA and linear SVMs to link individualized cerebellar activity with age, sex, cognition, and emotion.
-- **Output:** 2 manuscripts, including a first-author article in *Nature Communications* and one manuscript under review.
+- **Output:** 2 articles, including a first-author article in *Nature Communications* and one accepted by *Translational Psychiatry*.
 
 **Complex Social Awareness Modeling** (SWU, Apr. 2022-Nov. 2024)
 

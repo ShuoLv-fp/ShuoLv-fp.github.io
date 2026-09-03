@@ -7,7 +7,7 @@ My research centers on **the neural mechanisms of cognitive function regulation*
 Key outcomes:
 - **First-author** study identifying three parsimonious spatiotemporal patterns in the human cerebellum that reflect individual traits in function and behavior (*Nature Communications*, 2026).
 - Mapping the developmental trajectory of individualized homologous functional parcellations in youth (*Communications Biology*, 2025).
-- Normative models of individualized functional brain networks revealing language network expansion in autism (bioRxiv, under review).
+- Normative modeling reveals alterations in functional brain network topography in autism (accepted by *Translational Psychiatry* in Sep. 2026).
 
 ### 🌐 Complex Systems
 I am also interested in complex systems, focusing on network dynamics and the coupling of multi-agent interactions. I employ nonlinear analysis and mathematical modeling to explore evolutionary laws of complex contagion and interactive spreading, striving to offer insights for understanding and regulating complex real-world systems.
