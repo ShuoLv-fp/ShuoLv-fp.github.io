@@ -66,4 +66,3 @@ Revise `assets/files/cv_en.tex` and regenerate `assets/files/CV202609_EN.pdf` as
 - Regenerate the file already referenced by the homepage: `assets/files/CV202609_EN.pdf`.
 - Verify that the PDF has exactly one A4 page, contains no clipped or overlapping text, and has working links for the header profiles and every publication title.
 - Render the final PDF to an image and visually inspect it before committing and pushing to the current remote branch.
-
