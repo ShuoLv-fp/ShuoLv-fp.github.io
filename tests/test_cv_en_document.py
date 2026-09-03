@@ -6,6 +6,7 @@ from pypdf import PdfReader
 
 SOURCE_PATH = Path("assets/files/cv_en.tex")
 PDF_PATH = Path("assets/files/CV202609_EN.pdf")
+ZH_PDF_PATH = Path("assets/files/CV202609_ZH.pdf")
 
 
 class EnglishCvSourceTests(unittest.TestCase):
@@ -100,6 +101,35 @@ class EnglishCvSourceTests(unittest.TestCase):
             with self.subTest(target=target):
                 self.assertIn(target, self.source)
 
+    def test_accepted_autism_paper_metadata_and_order(self):
+        final_title = (
+            "Alterations in functional brain network topography in autism "
+            "revealed by normative models"
+        )
+        ordered_titles = (
+            "Three parsimonious spatiotemporal patterns in cerebellum",
+            "Effects of experts on the coupling dynamics",
+            final_title,
+            "BrainLMM: A Label-Free Framework",
+        )
+        for title in ordered_titles:
+            self.assertIn(title, self.source)
+        positions = [self.source.find(title) for title in ordered_titles]
+        self.assertEqual(sorted(positions), positions)
+        self.assertIn(
+            r"\textit{Transl Psychiatry} (accepted Sep. 2026)",
+            self.source,
+        )
+        self.assertIn(
+            "https://doi.org/10.1101/2025.10.23.684286",
+            self.source,
+        )
+        self.assertNotIn(
+            "Normative models of individualized functional brain networks "
+            "reveal language network expansion in autism",
+            self.source,
+        )
+
 
 class EnglishCvPdfTests(unittest.TestCase):
     def test_pdf_is_one_a4_page_with_expected_links(self):
@@ -144,6 +174,25 @@ class EnglishCvPdfTests(unittest.TestCase):
                 self.assertIn(section, text.upper())
         self.assertNotIn("Born Mar. 2002", text)
         self.assertNotIn("+86 133", text)
+
+
+class AcceptedPaperPdfTests(unittest.TestCase):
+    def test_generated_pdfs_contain_accepted_paper(self):
+        final_title = (
+            "Alterations in functional brain network topography in autism "
+            "revealed by normative models"
+        )
+        for path, page_count in ((PDF_PATH, 1), (ZH_PDF_PATH, 2)):
+            with self.subTest(path=path):
+                reader = PdfReader(path)
+                self.assertEqual(page_count, len(reader.pages))
+                text = " ".join(
+                    "\n".join(
+                        page.extract_text() or "" for page in reader.pages
+                    ).split()
+                )
+                self.assertIn(final_title, text)
+                self.assertIn("Translational Psychiatry", text)
 
 
 if __name__ == "__main__":
