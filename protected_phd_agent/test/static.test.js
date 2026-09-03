@@ -66,6 +66,18 @@ describe("private dossier UI", () => {
     expect(css).toContain(".advisor-index { border-bottom: 1px solid var(--line); border-right: 0; display: block; height: auto; overflow: visible; position: static; }");
   });
 
+  it("shows and immediately updates each advisor contact status in the curated index", async () => {
+    const { appJs, css } = await uiSources();
+    expect(appJs).toContain("function advisorStatus(value)");
+    expect(appJs).toContain('label: "Discovered"');
+    expect(appJs).toContain('label: "Shortlisted"');
+    expect(appJs).toContain('label: "Contacted"');
+    expect(appJs).toContain('id: `advisor-contact-status-${row.id}`');
+    expect(appJs).toContain("updateAdvisorStatusBadge(row)");
+    expect(css).toContain(".contact-status");
+    expect(css).toContain(".contact-status.contacted");
+  });
+
   it("does not serve legacy JSON data paths", async () => {
     for (const path of ["profile", "faculty", "programs", "applications", "artifacts"]) {
       expect((await SELF.fetch(`${origin}/data/${path}.json`)).status).toBe(404);

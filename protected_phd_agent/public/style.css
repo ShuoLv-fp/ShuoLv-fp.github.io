@@ -298,7 +298,11 @@ select:focus-visible {
 .advisor-tab-copy { display: flex; flex-direction: column; min-width: 0; }
 .advisor-tab-copy strong { font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .advisor-tab-copy small { color: var(--muted); font: 0.66rem var(--utility); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.advisor-tab-signals { align-items: flex-end; display: flex; flex-direction: column; gap: 0.3rem; }
 .fit-chip { color: var(--success); font: 700 0.72rem var(--utility); }
+.contact-status { border: 1px solid var(--line-dark); border-radius: 999px; color: var(--muted); font: 700 0.55rem/1 var(--utility); padding: 0.24rem 0.36rem; text-transform: uppercase; white-space: nowrap; }
+.contact-status.shortlisted { background: var(--cyan-soft); border-color: var(--cyan); color: var(--signal-dark); }
+.contact-status.contacted { background: #e1f2eb; border-color: #79af9c; color: var(--success); }
 
 .dossier-detail {
   background:

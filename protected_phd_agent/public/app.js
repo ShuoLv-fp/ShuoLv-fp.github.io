@@ -241,6 +241,23 @@ function dossierRows() {
     .sort((left, right) => Number(left.featured_rank) - Number(right.featured_rank));
 }
 
+function advisorStatus(value) {
+  const statuses = {
+    discovered: { key: "discovered", label: "Discovered" },
+    shortlisted: { key: "shortlisted", label: "Shortlisted" },
+    contacted: { key: "contacted", label: "Contacted" }
+  };
+  return statuses[value] || statuses.discovered;
+}
+
+function updateAdvisorStatusBadge(row) {
+  const badge = document.getElementById(`advisor-contact-status-${row.id}`);
+  if (!badge) return;
+  const status = advisorStatus(row.status);
+  badge.className = `contact-status ${status.key}`;
+  badge.textContent = status.label;
+}
+
 function linkedDraft(facultyId) {
   return state.artifacts.find((item) => item.kind === "outreach_email" && item.target_id === facultyId);
 }
@@ -299,6 +316,7 @@ function renderDossiers() {
   for (const row of rows) {
     const label = row.display_name || row.name || "Advisor";
     const institution = row.institution_short || row.institution || "Institution";
+    const contactStatus = advisorStatus(row.status);
     nav.appendChild(element("button", {
       class: `advisor-tab${row.id === state.activeDossierId ? " active" : ""}`,
       title: `Open ${label} dossier`,
@@ -312,10 +330,17 @@ function renderDossiers() {
         element("strong", { text: label }),
         element("small", { text: `@ ${institution}` })
       ]),
-      element("span", {
-        class: "fit-chip",
-        text: row.fit && Number.isFinite(Number(row.fit.total)) ? row.fit.total : "—"
-      })
+      element("span", { class: "advisor-tab-signals" }, [
+        element("span", {
+          class: "fit-chip",
+          text: row.fit && Number.isFinite(Number(row.fit.total)) ? row.fit.total : "—"
+        }),
+        element("span", {
+          id: `advisor-contact-status-${row.id}`,
+          class: `contact-status ${contactStatus.key}`,
+          text: contactStatus.label
+        })
+      ])
     ]));
   }
 
@@ -427,8 +452,12 @@ function renderNotes(row) {
     element("option", { value: "shortlisted", text: "Shortlisted" }),
     element("option", { value: "contacted", text: "Contacted" })
   ]);
-  status.value = row.status || "discovered";
-  status.addEventListener("change", () => markDirty("faculty", row.id, { status: status.value }));
+  status.value = advisorStatus(row.status).key;
+  status.addEventListener("change", () => {
+    row.status = status.value;
+    markDirty("faculty", row.id, { status: row.status });
+    updateAdvisorStatusBadge(row);
+  });
 
   return element("section", { class: "research-section compact" }, [
     element("div", { class: "section-marker", text: "YOUR NOTES" }),
