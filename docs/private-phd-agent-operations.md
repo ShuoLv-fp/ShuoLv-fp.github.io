@@ -4,11 +4,11 @@ This runbook operates the password-protected Cloudflare Worker without placing p
 
 ## Local recovery assets
 
-- Ignored migration bundle: `phd_application_agent/private_data/`
-- Redundant private copy: `../ShuoLv-fp.github.io-private-agent-backup/`
+- The retired `phd_application_agent/` local application has been removed from this repository workspace. It is not required by the deployed Worker.
+- Private recovery copy: `../ShuoLv-fp.github.io-private-agent-backup/`
 - Pre-cleanup Git bundle: `../ShuoLv-fp.github.io-before-private-agent.bundle`
 
-Keep both external files outside any public repository and include them in the normal encrypted computer backup.
+Production records are authoritative in the protected Cloudflare application. Keep both external recovery assets outside any public repository and include them in the normal encrypted computer backup.
 
 ## Authenticate Wrangler
 
@@ -49,8 +49,8 @@ First verify the local bundle:
 
 ```bash
 python3 scripts/verify_private_migration.py \
-  --seed ../phd_application_agent/private_data/cloudflare-seed.json \
-  --manifest ../phd_application_agent/private_data/manifest.json
+  --seed ../ShuoLv-fp.github.io-private-agent-backup/cloudflare-seed.json \
+  --manifest ../ShuoLv-fp.github.io-private-agent-backup/manifest.json
 ```
 
 In a private interactive terminal, read the migration secret without echo and import once:
@@ -61,7 +61,7 @@ export PHD_MIGRATION_SECRET
 curl --fail-with-body --request POST "$PHD_AGENT_URL/api/admin/import" \
   --header "Authorization: Bearer $PHD_MIGRATION_SECRET" \
   --header "Content-Type: application/json" \
-  --data-binary @../phd_application_agent/private_data/cloudflare-seed.json
+  --data-binary @../ShuoLv-fp.github.io-private-agent-backup/cloudflare-seed.json
 unset PHD_MIGRATION_SECRET
 ```
 
@@ -69,8 +69,8 @@ A successful first import returns revision `1`; every later import to the same c
 
 ```bash
 python3 scripts/verify_private_migration.py \
-  --seed ../phd_application_agent/private_data/cloudflare-seed.json \
-  --manifest ../phd_application_agent/private_data/manifest.json \
+  --seed ../ShuoLv-fp.github.io-private-agent-backup/cloudflare-seed.json \
+  --manifest ../ShuoLv-fp.github.io-private-agent-backup/manifest.json \
   --remote "$PHD_AGENT_URL"
 ```
 
