@@ -1,0 +1,202 @@
+% !TEX program = xelatex
+% Adapted from zhude233/Academic-CV-LaTeX-Template (MIT License).
+% Original template: https://github.com/zhude233/Academic-CV-LaTeX-Template
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[a4paper,top=0.35in,bottom=0.35in,left=0.45in,right=0.45in]{geometry}
+\usepackage{newtxtext}
+\usepackage{newtxmath}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\usepackage{array}
+\usepackage{fontawesome5}
+
+\definecolor{accent}{HTML}{1F4E79}
+\definecolor{muted}{HTML}{4D4D4D}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\tabcolsep}{0pt}
+\setlength{\emergencystretch}{1.5em}
+\urlstyle{same}
+\raggedbottom
+
+\titleformat{\section}
+  {\normalsize\scshape\bfseries\color{black}}
+  {}{0pt}{}
+  [\vspace{0.02em}\color{black}\titlerule]
+\titlespacing*{\section}{0pt}{0.28em}{0.18em}
+
+\newcommand{\contactlink}[3]{%
+  \href{#1}{\textcolor{accent}{#2}\,\textcolor{black}{#3}}%
+}
+
+\newcommand{\educationentry}[5]{%
+  \begin{tabularx}{\textwidth}{@{}p{0.85em}@{}X>{\raggedleft\arraybackslash}p{0.19\textwidth}@{}}
+    \textbullet & \textbf{#1} & #2 \\
+    & #3 & \textit{#4}
+  \end{tabularx}%
+  \if\relax\detokenize{#5}\relax\else
+    \hspace*{0.85em}{\footnotesize #5}\par
+  \fi
+  \vspace{0.12em}
+}
+
+\newenvironment{publicationlist}{%
+  \footnotesize
+  \begin{itemize}[
+    label=\textbullet,
+    leftmargin=1.10em,
+    labelsep=0.42em,
+    itemsep=0.10em,
+    topsep=0.02em,
+    parsep=0pt,
+    partopsep=0pt
+  ]
+}{\end{itemize}\vspace{-0.08em}}
+
+\newcommand{\cvpublication}[4]{%
+  \item #1 \href{#4}{\textcolor{accent}{#2}}. #3%
+}
+
+\newcommand{\experienceentry}[5]{%
+  \begin{tabularx}{\textwidth}{@{}X>{\raggedleft\arraybackslash}p{0.19\textwidth}@{}}
+    \textbf{#1}\hspace{0.45em}{\textit{-- #2}} & \textit{#3}
+  \end{tabularx}\vspace{-0.03em}
+  \hspace*{0.85em}\begin{minipage}{\dimexpr\textwidth-0.85em\relax}
+    \footnotesize
+    \if\relax\detokenize{#4}\relax\else
+      \textcolor{muted}{\textit{Advisor: #4.}}\ 
+    \fi
+    #5
+  \end{minipage}\par\vspace{0.16em}
+}
+
+\newcommand{\CVName}{Shuo Lv}
+
+\begin{document}
+\fontsize{8.7}{9.6}\selectfont
+
+\begin{center}
+  {\LARGE\bfseries \CVName}\\[-0.08em]
+  {\small AI Agents $\cdot$ AI for Science $\cdot$ Cognitive Neuroscience $\cdot$ Complex Networks $\cdot$ Pattern Recognition}\\[0.12em]
+  {\footnotesize
+    \contactlink{mailto:lv_shuo@foxmail.com}{\faEnvelope}{Email}
+    \enspace $\cdot$ \enspace
+    \contactlink{https://www.google.com/maps/place/Beijing}{\faMapMarkerAlt}{Beijing, China}
+    \enspace $\cdot$ \enspace
+    \contactlink{https://ShuoLv-fp.github.io}{\faGlobe}{Homepage}
+    \enspace $\cdot$ \enspace
+    \contactlink{https://github.com/ShuoLv-fp}{\faGithub}{GitHub}
+    \enspace $\cdot$ \enspace
+    \contactlink{https://scholar.google.com/citations?user=VAsm0T8AAAAJ}{\faGraduationCap}{Scholar}
+    \enspace $\cdot$ \enspace
+    \contactlink{https://orcid.org/0009-0009-2540-0485}{\faOrcid}{ORCID}
+  }
+\end{center}
+\vspace{-0.55em}
+
+\section{Education}
+
+\educationentry{Beijing Institute of Technology}{Beijing, China}
+  {M.Eng. in Electronic Information (Biomedical Engineering)}
+  {Sep. 2024 -- Present}{}
+% Optional fields intentionally omitted until confirmed:
+% GPA: ; Courses:
+
+\educationentry{Southwest University}{Chongqing, China}
+  {B.Eng. in Data Science and Big Data Technology}
+  {Sep. 2020 -- Jun. 2024}
+  {Ranked \textbf{2/103}; received the \textbf{National Scholarship twice}, the Gratitude to Modern Chinese Scientists Scholarship, and the Top-Tier Scholarship.}
+% Optional fields intentionally omitted until confirmed:
+% GPA: ; Courses:
+
+\section{Selected Publications}
+
+\begin{publicationlist}
+  \cvpublication{\textbf{Lv, S.}, Li, J., Yang, R. \textit{et al.}}
+    {Three parsimonious spatiotemporal patterns in cerebellum reveal individual traits in function and behavior}
+    {\textit{Nat Commun} \textbf{17}, 6232 (2026).}
+    {https://doi.org/10.1038/s41467-026-72931-6}
+
+  \cvpublication{\textbf{Lv, S.}, Wang, Y., Guo, C. \& Zhang, L.}
+    {Effects of experts on the coupling dynamics of complex contagion of awareness and epidemic spreading}
+    {\textit{Nonlinear Dyn} \textbf{112}, 2367--2380 (2024).}
+    {https://doi.org/10.1007/s11071-023-09146-7}
+
+  \cvpublication{Gao, T., Xue, M., Zheng, H., \textbf{Lv, S.} \textit{et al.}}
+    {BrainLMM: A Label-Free Framework for Mapping Multi-Semantic Representation in the Human Visual Cortex}
+    {\textit{Proc. AAAI Conf. Artif. Intell.} \textbf{40}, 4176--4184 (2026).}
+    {https://doi.org/10.1609/aaai.v40i6.42413}
+
+  \cvpublication{Guo, C., Wang, Y., \textbf{Lv, S.} \textit{et al.}}
+    {Impact of Sampling Disease Detection and Collective Intervention Measures in Epidemic Transmission}
+    {In \textit{Proc. 20th Chinese Conf. on Computer Supported Cooperative Work and Social Computing (ChineseCSCW 2025)} (2025).}
+    {https://link.springer.com/book/10.1007/978-981-92-0291-1}
+
+  \cvpublication{Li, J., Zhang, Y., Wu, X. \textit{et al.}}
+    {Development of areal-level individualized homologous functional parcellations in youth}
+    {\textit{Commun Biol} \textbf{8}, 1083 (2025).}
+    {https://doi.org/10.1038/s42003-025-08509-7}
+
+  \cvpublication{Yang, R., Wu, X., \textbf{Lv, S.} \textit{et al.}}
+    {Normative models of individualized functional brain networks reveal language network expansion in autism}
+    {\textit{bioRxiv} (2025).}
+    {https://doi.org/10.1101/2025.10.23.684286}
+\end{publicationlist}
+
+\section{Research Internship}
+
+\experienceentry{ByteDance, Seed Foundation Model -- AI4Math}{Research Intern, AI Agent Development}{Nov. 2025 -- May 2026}{}
+  {Built a test-time-scaling multi-agent system on the Seed 2.0 model family for olympiad mathematics, designing Planner, Solver, and Verifier roles for strategy generation, parallel solving, proof verification, and backtracking; completed \textbf{5 iterations} over \textbf{100+ problems} and averaged \textbf{6.4/7} on an IMO problem set. Led an automated Lean 4 proof-QA workflow that produced \textbf{600+ formalized data items} and improved expert review efficiency by \textbf{70\%+}. Standardized evaluation-data SOPs, delivering \textbf{2,000+ data items} and \textbf{11} production and quality specifications.}
+
+\section{Research Experience}
+
+\experienceentry{General-Purpose Cybersecurity Agent}{Lead Researcher}{Jun. 2026 -- Present}{Libo Zhang, Southwest University}
+  {Built \textbf{5 specialized agents} and a \textbf{16-node bounded state machine} with LangGraph, separating LLM interpretation, planning, and reflection from explicit permissions, routing, and termination. Designed R0--R3 risk levels, Finding--Evidence validation, human approval for high-risk actions, and a two-layer state/domain blackboard for traceable decisions across code audit, penetration testing, incident response, and reverse engineering.}
+
+\experienceentry{Low-Dimensional Spatiotemporal Dynamics of the Human Brain}{Lead Researcher}{Dec. 2023 -- Present}{Guoyuan Yang, Beijing Institute of Technology}
+  {Applied complex principal component analysis to resting-state cerebellar fMRI and identified three dominant sparse patterns spanning zero-lag spatial structure and time-lag dynamics. Used sCCA and linear SVMs to associate individualized cerebellar activity with age, sex, cognition, and emotion, resulting in \textbf{2 manuscripts}: a first-author \textit{Nature Communications} article and one manuscript under review.}
+
+\experienceentry{Complex Social Awareness Modeling}{Lead Researcher}{Apr. 2022 -- Nov. 2024}{Libo Zhang, Southwest University}
+  {Modeled expert influence and isolation behavior in epidemic prevention using prospect and regret theories. Random-network simulations quantified intervention benefits and revealed phase transitions in social awareness, resulting in \textbf{2 papers}: a first-author \textit{Nonlinear Dynamics} article and a CCF Class C conference paper.}
+
+\experienceentry{Intelligent Factory Security}{Lead Researcher}{Apr. 2022 -- Sep. 2023}{Mingyang Zhong, Southwest University}
+  {Developed adaptive multimodal identity recognition for faces under abnormal illumination or occlusion and voices in noisy environments; used three-way decisions (accept, reject, defer) to exploit uncertainty estimates from visual and audio modalities.}
+
+\experienceentry{Large Language Model for Early Childhood Education}{Researcher}{Dec. 2023 -- Oct. 2024}{Libo Zhang, Southwest University}
+  {Built a personalized multimodal teaching-material generation system on vivo's BlueLM, integrating content generation, interactive dialogue, and AI-assisted drawing.}
+
+\experienceentry{Xiangqi Game-Playing System}{Lead Developer}{Apr. 2021 -- Aug. 2021}{Shenglin Li, Southwest University}
+  {Implemented a Java Chinese chess engine using pruned $\alpha$--$\beta$ search, custom search and evaluation functions, human-vs-computer play, and game-record storage.}
+
+\section{Awards and Honors}
+
+{\footnotesize
+\renewcommand{\arraystretch}{0.94}
+\begin{tabularx}{\textwidth}{@{}p{0.105\textwidth}X>{\raggedleft\arraybackslash}p{0.20\textwidth}@{}}
+  Jun. 2023 & China Robot and Artificial Intelligence Competition & \textbf{National First Prize} \\
+  Oct. 2024 & China Collegiate Computing Contest -- AIGC Innovation Track & \textbf{National First Prize} \\
+  Oct. 2023 & Contemporary Undergraduate Mathematical Contest in Modeling & \textbf{National Second Prize} \\
+  Aug. 2022 & Chinese Computer Game Championship & \textbf{National Second Prize} \\
+  Sep. 2024 & China International College Students' Innovation Competition & \textbf{National Third Prize}
+\end{tabularx}
+}
+
+\section{Technical Skills}
+
+{\footnotesize
+\renewcommand{\arraystretch}{0.94}
+\begin{tabularx}{\textwidth}{@{}>{\bfseries}p{0.13\textwidth}@{\hspace{0.55em}}X@{}}
+  Languages & Python, C++, Java, R, Lean 4, JavaScript, SQL, HTML, Bash \\
+  Software Stack & FastAPI, Pydantic, LangGraph, Guardrails, React, PyTorch \\
+  Tools & Git, Model Context Protocol (MCP), PE, FSL, Connectome Workbench, MATLAB, Adobe Photoshop, Premiere Pro, and InDesign
+\end{tabularx}
+}
+
+\end{document}
+
