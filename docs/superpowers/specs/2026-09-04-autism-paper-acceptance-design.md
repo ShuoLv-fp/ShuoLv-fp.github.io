@@ -55,4 +55,3 @@ Synchronize the newly accepted autism paper across the English CV, Chinese CV, a
 - Updated `assets/files/CV202609_EN.pdf`
 - Updated `assets/files/CV202609_ZH.pdf`
 - Updated matching Chinese CV Word source outside the repository, retained as the editable source
-

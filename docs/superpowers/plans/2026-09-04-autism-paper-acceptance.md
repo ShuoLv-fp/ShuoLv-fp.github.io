@@ -586,4 +586,3 @@ git diff --stat HEAD~4..HEAD
 ```
 
 Expected: no News path, no unexpected uncommitted files, no whitespace errors, and four focused implementation commits after the specification and plan commits.
-
