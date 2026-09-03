@@ -65,7 +65,9 @@ class EnglishCvSourceTests(unittest.TestCase):
 
     def test_education_and_roles(self):
         required = (
-            "M.Eng. in Electronic Information (Biomedical Engineering)",
+            "M.Eng. in Electronic Information",
+            "Major Courses:",
+            "Machine Learning; Mathematical Modeling; Optimization; Matrix Theory; Discrete Mathematics; Big Data Applications",
             "Sep. 2024 -- Present",
             "B.Eng. in Data Science and Big Data Technology",
             "Sep. 2020 -- Jun. 2024",
@@ -82,6 +84,20 @@ class EnglishCvSourceTests(unittest.TestCase):
         self.assertEqual(4, self.source.count("{Lead Researcher}"))
         self.assertEqual(1, self.source.count("{Lead Developer}"))
         self.assertEqual(1, self.source.count("{Researcher}"))
+
+    def test_academic_service_has_two_entries_between_awards_and_skills(self):
+        headings = [r"\section{Awards and Honors}", r"\section{Academic Service}", r"\section{Technical Skills}"]
+        for heading in headings:
+            self.assertIn(heading, self.source)
+        positions = [self.source.index(heading) for heading in headings]
+        self.assertEqual(sorted(positions), positions)
+        service = self.source.split(headings[1], 1)[1].split(headings[2], 1)[0]
+        self.assertIn("Teaching Assistant", service)
+        self.assertIn("Algorithm Design and Analysis; Introduction to Algorithms; Big Data Analytics", service)
+        self.assertIn("Reviewer", service)
+        self.assertIn("Nonlinear Dynamics", service)
+        self.assertIn("Brain Structure and Function", service)
+        self.assertEqual(1, service.count(r"\\"))
 
     def test_sections_and_publications_are_preserved(self):
         self.assertIn(r"\section{Research Internship}", self.source)
@@ -168,12 +184,24 @@ class EnglishCvPdfTests(unittest.TestCase):
             "RESEARCH INTERNSHIP",
             "RESEARCH EXPERIENCE",
             "AWARDS AND HONORS",
+            "ACADEMIC SERVICE",
             "TECHNICAL SKILLS",
         ):
             with self.subTest(section=section):
                 self.assertIn(section, text.upper())
         self.assertNotIn("Born Mar. 2002", text)
         self.assertNotIn("+86 133", text)
+
+    def test_academic_service_renders_as_two_content_lines(self):
+        text = PdfReader(PDF_PATH).pages[0].extract_text()
+        self.assertIn("ACADEMIC SERVICE", text.upper())
+        lines = text.upper().split("ACADEMIC SERVICE", 1)[1].split("TECHNICAL SKILLS", 1)[0]
+        lines = [line.strip() for line in lines.splitlines() if line.strip()]
+        self.assertEqual(2, len(lines), lines)
+        self.assertIn("TEACHING ASSISTANT", lines[0])
+        self.assertIn("BIG DATA ANALYTICS", lines[0])
+        self.assertIn("REVIEWER", lines[1])
+        self.assertIn("BRAIN STRUCTURE AND FUNCTION", lines[1])
 
 
 class AcceptedPaperPdfTests(unittest.TestCase):
