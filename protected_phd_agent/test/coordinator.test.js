@@ -178,17 +178,17 @@ describe("WorkflowCoordinator", () => {
       skipped: 0,
       previousFacultyTotal: 1,
       facultyTotal: 2,
-      featuredTotal: 1,
+      featuredTotal: 0,
       artifactTotal: 1
     });
     expect(after.revision).toBe(before.revision + 1);
     expect(after.faculty[0]).toEqual(before.faculty[0]);
     expect(after.faculty[1]).toMatchObject({
       id: "fac_0123456789ab",
-      featured_rank: 1,
       status: "discovered",
       notes: ""
     });
+    expect(after.faculty[1]).not.toHaveProperty("featured_rank");
     expect(after.profile).toEqual(before.profile);
     expect(after.programs).toEqual(before.programs);
     expect(after.applications).toEqual(before.applications);
@@ -218,7 +218,7 @@ describe("WorkflowCoordinator", () => {
       skipped: 1,
       previousFacultyTotal: 2,
       facultyTotal: 2,
-      featuredTotal: 1,
+      featuredTotal: 0,
       artifactTotal: 1
     });
     expect(snapshots).toHaveLength(2);
@@ -236,6 +236,63 @@ describe("WorkflowCoordinator", () => {
 
     expect(response.status).toBe(400);
     expect(after.faculty).toHaveLength(1);
+    expect(after.revision).toBe(1);
+    expect(snapshots).toHaveLength(1);
+  });
+
+  it("unfeatures an exact faculty batch atomically and idempotently", async () => {
+    const { coordinator, snapshots } = coordinatorFixture();
+    const seed = syntheticSeed();
+    seed.faculty = [
+      { id: "fac_aaaaaaaaaaaa", name: "Existing Featured", featured_rank: 1, notes: "" },
+      { id: "fac_bbbbbbbbbbbb", name: "Uploaded Featured", featured_rank: 2, notes: "" },
+      { id: "fac_cccccccccccc", name: "Uploaded Plain", notes: "" }
+    ];
+    await coordinator.importOnce(seed, "synthetic-migration-secret-32-bytes");
+
+    const response = await coordinator.unfeatureFaculty(
+      ["fac_bbbbbbbbbbbb", "fac_cccccccccccc"],
+      "synthetic-migration-secret-32-bytes"
+    );
+    const result = await response.json();
+    const after = await (await coordinator.exportSnapshot()).json();
+
+    expect(response.status).toBe(200);
+    expect(result).toMatchObject({
+      revision: 2,
+      submitted: 2,
+      cleared: 1,
+      skipped: 1,
+      facultyTotal: 3,
+      featuredTotal: 1,
+      artifactTotal: 1
+    });
+    expect(after.faculty[0].featured_rank).toBe(1);
+    expect(after.faculty[1]).not.toHaveProperty("featured_rank");
+    expect(after.faculty[2]).not.toHaveProperty("featured_rank");
+
+    const repeated = await coordinator.unfeatureFaculty(
+      ["fac_bbbbbbbbbbbb", "fac_cccccccccccc"],
+      "synthetic-migration-secret-32-bytes"
+    );
+    expect(await repeated.json()).toMatchObject({ revision: 2, cleared: 0, skipped: 2 });
+    expect(snapshots).toHaveLength(2);
+  });
+
+  it("rejects an unfeature batch with a missing faculty id without writing", async () => {
+    const { coordinator, snapshots } = coordinatorFixture();
+    const seed = syntheticSeed();
+    seed.faculty = [{ id: "fac_aaaaaaaaaaaa", name: "Featured", featured_rank: 1, notes: "" }];
+    await coordinator.importOnce(seed, "synthetic-migration-secret-32-bytes");
+
+    const response = await coordinator.unfeatureFaculty(
+      ["fac_aaaaaaaaaaaa", "fac_missing00000"],
+      "synthetic-migration-secret-32-bytes"
+    );
+    const after = await (await coordinator.exportSnapshot()).json();
+
+    expect(response.status).toBe(400);
+    expect(after.faculty[0].featured_rank).toBe(1);
     expect(after.revision).toBe(1);
     expect(snapshots).toHaveLength(1);
   });

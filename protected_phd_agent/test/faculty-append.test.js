@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   canonicalHttpUrl,
-  prepareFacultyAppend
+  prepareFacultyAppend,
+  prepareFacultyUnfeature
 } from "../src/faculty-append.js";
 
 function validFaculty(overrides = {}) {
@@ -65,7 +66,7 @@ describe("canonicalHttpUrl", () => {
 });
 
 describe("prepareFacultyAppend", () => {
-  it("prepares a valid record and assigns the next featured rank", () => {
+  it("prepares a valid record without changing featured curation", () => {
     const result = prepareFacultyAppend([
       validFaculty({
         id: "fac_existing0001",
@@ -81,12 +82,12 @@ describe("prepareFacultyAppend", () => {
     expect(result.skipped).toBe(0);
     expect(result.appended).toHaveLength(1);
     expect(result.appended[0]).toMatchObject({
-      featured_rank: 29,
       status: "discovered",
       notes: "",
       curated_on: "2026-09-07",
       updated_at: "2026-09-07T00:00:00.000Z"
     });
+    expect(result.appended[0]).not.toHaveProperty("featured_rank");
   });
 
   it.each(["United States", "USA", "U.S.", "Canada", "CA"])(
@@ -202,5 +203,54 @@ describe("prepareFacultyAppend", () => {
     );
 
     expect(result).toEqual({ appended: [], skipped: 1 });
+  });
+});
+
+describe("prepareFacultyUnfeature", () => {
+  it("removes featured ranks only from the submitted faculty identifiers", () => {
+    const plain = validFaculty({
+      id: "fac_cccccccccccc",
+      name: "Third Researcher",
+      display_name: "Third Researcher",
+      institution: "Third Institute",
+      homepage_url: "https://third.example.edu/lab",
+      word_homepage_url: "https://third.example.edu/lab"
+    });
+    delete plain.featured_rank;
+    const existing = [
+      validFaculty({ id: "fac_aaaaaaaaaaaa", featured_rank: 4 }),
+      validFaculty({
+        id: "fac_bbbbbbbbbbbb",
+        name: "Second Researcher",
+        display_name: "Second Researcher",
+        institution: "Second Institute",
+        homepage_url: "https://second.example.edu/lab",
+        word_homepage_url: "https://second.example.edu/lab",
+        featured_rank: 5
+      }),
+      plain
+    ];
+
+    const result = prepareFacultyUnfeature(existing, ["fac_bbbbbbbbbbbb", "fac_cccccccccccc"]);
+
+    expect(result.cleared).toBe(1);
+    expect(result.skipped).toBe(1);
+    expect(result.faculty[0].featured_rank).toBe(4);
+    expect(result.faculty[1]).not.toHaveProperty("featured_rank");
+    expect(result.faculty[2]).not.toHaveProperty("featured_rank");
+    expect(existing[1].featured_rank).toBe(5);
+  });
+
+  it("rejects the whole operation when a submitted identifier is missing", () => {
+    const existing = [validFaculty({ id: "fac_aaaaaaaaaaaa", featured_rank: 4 })];
+
+    expect(() => prepareFacultyUnfeature(existing, ["fac_aaaaaaaaaaaa", "fac_missing00000"]))
+      .toThrow("faculty id not found");
+    expect(existing[0].featured_rank).toBe(4);
+  });
+
+  it("rejects duplicate identifiers", () => {
+    expect(() => prepareFacultyUnfeature([], ["fac_aaaaaaaaaaaa", "fac_aaaaaaaaaaaa"]))
+      .toThrow("duplicate submitted faculty id");
   });
 });

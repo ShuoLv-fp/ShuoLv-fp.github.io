@@ -27,7 +27,8 @@ function isKnownApi(path, method) {
   }
   if (path === "/api/logout"
     || path === "/api/admin/import"
-    || path === "/api/admin/faculty/append") {
+    || path === "/api/admin/faculty/append"
+    || path === "/api/admin/faculty/unfeature") {
     return method === "POST";
   }
   return method === "PUT" && /^\/api\/(faculty|artifacts)\/[^/]+$/.test(path);

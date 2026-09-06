@@ -37,6 +37,8 @@ python3 scripts/append_research_group_batch.py \
 
 The uploader requires HTTPS except for explicit localhost tests and reports aggregate
 totals only. Re-running the same batch is safe: already-present records are skipped.
+Newly appended records remain unfeatured so the existing hand-curated featured list is
+unchanged.
 
 ## Post-upload checks
 

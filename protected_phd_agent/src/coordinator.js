@@ -1,7 +1,7 @@
 import { jsonResponse } from "./http.js";
 import { readJson } from "./http.js";
 import { authenticate, login, logout, requireMutationGuards } from "./auth.js";
-import { prepareFacultyAppend } from "./faculty-append.js";
+import { prepareFacultyAppend, prepareFacultyUnfeature } from "./faculty-append.js";
 import { validatePatch } from "./validation.js";
 
 const COLLECTIONS = ["faculty", "programs", "applications", "artifacts"];
@@ -135,8 +135,7 @@ export class WorkflowCoordinator {
       skipped: prepared.skipped,
       previousFacultyTotal: state.faculty.length,
       facultyTotal: state.faculty.length + prepared.appended.length,
-      featuredTotal: state.faculty.filter((record) => Number(record.featured_rank) > 0).length
-        + prepared.appended.length,
+      featuredTotal: state.faculty.filter((record) => Number(record.featured_rank) > 0).length,
       artifactTotal: state.artifacts.length
     };
 
@@ -146,6 +145,44 @@ export class WorkflowCoordinator {
 
     const next = clone(state);
     next.faculty.push(...prepared.appended);
+    next.revision += 1;
+    next.updatedAt = new Date().toISOString();
+    await this.storage.put("workflow", next);
+    await this.env.PHD_AGENT_DATA.put("snapshot:latest", JSON.stringify(next));
+    return jsonResponse({ revision: next.revision, ...counts });
+  }
+
+  async unfeatureFaculty(ids, migrationSecret) {
+    if (!this.env.MIGRATION_SECRET
+      || !(await secretMatches(migrationSecret || "", this.env.MIGRATION_SECRET))) {
+      return jsonResponse({ error: "forbidden" }, 403);
+    }
+
+    const state = await this.storage.get("workflow");
+    if (!state) return jsonResponse({ error: "workflow not initialized" }, 404);
+
+    let prepared;
+    try {
+      prepared = prepareFacultyUnfeature(state.faculty, ids);
+    } catch (error) {
+      return jsonResponse({ error: error.message }, 400);
+    }
+
+    const counts = {
+      submitted: ids.length,
+      cleared: prepared.cleared,
+      skipped: prepared.skipped,
+      facultyTotal: state.faculty.length,
+      featuredTotal: prepared.faculty.filter((record) => Number(record.featured_rank) > 0).length,
+      artifactTotal: state.artifacts.length
+    };
+
+    if (prepared.cleared === 0) {
+      return jsonResponse({ revision: state.revision, ...counts });
+    }
+
+    const next = clone(state);
+    next.faculty = prepared.faculty;
     next.revision += 1;
     next.updatedAt = new Date().toISOString();
     await this.storage.put("workflow", next);
@@ -203,6 +240,22 @@ export class WorkflowCoordinator {
       try {
         const body = await readJson(request, 10 * 1024 * 1024);
         return this.appendFaculty(body.faculty, migrationSecret);
+      } catch (error) {
+        return jsonResponse({ error: error.message }, 400);
+      }
+    }
+
+    if (path === "/api/admin/faculty/unfeature" && request.method === "POST") {
+      if (!(request.headers.get("content-type") || "").toLowerCase().startsWith("application/json")) {
+        return jsonResponse({ error: "JSON required" }, 415);
+      }
+      const authorization = request.headers.get("authorization") || "";
+      const migrationSecret = authorization.startsWith("Bearer ")
+        ? authorization.slice("Bearer ".length)
+        : "";
+      try {
+        const body = await readJson(request, 10 * 1024 * 1024);
+        return this.unfeatureFaculty(body.facultyIds, migrationSecret);
       } catch (error) {
         return jsonResponse({ error: error.message }, 400);
       }

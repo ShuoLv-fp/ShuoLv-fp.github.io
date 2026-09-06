@@ -188,5 +188,27 @@ describe("protected Worker", () => {
       skipped: 1,
       facultyTotal: 2
     });
+
+    expect((await SELF.fetch(`${origin}/api/admin/faculty/unfeature`)).status).toBe(404);
+    const rejectedUnfeature = await SELF.fetch(`${origin}/api/admin/faculty/unfeature`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer incorrect"
+      },
+      body: JSON.stringify({ facultyIds: ["fac_0123456789ab"] })
+    });
+    expect(rejectedUnfeature.status).toBe(403);
+
+    const unfeatured = await SELF.fetch(`${origin}/api/admin/faculty/unfeature`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer synthetic-migration-secret-32-bytes"
+      },
+      body: JSON.stringify({ facultyIds: ["fac_0123456789ab"] })
+    });
+    expect(unfeatured.status).toBe(200);
+    expect(await unfeatured.json()).toMatchObject({ cleared: 0, skipped: 1, featuredTotal: 0 });
   });
 });

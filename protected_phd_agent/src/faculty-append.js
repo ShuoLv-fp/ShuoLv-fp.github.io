@@ -1,5 +1,6 @@
 const MAX_BATCH = 250;
 const MAX_RECORD_BYTES = 75_000;
+const FACULTY_ID_PATTERN = /^fac_[a-z0-9]{12,32}$/;
 const FORBIDDEN_COUNTRIES = new Set([
   "canada",
   "ca",
@@ -93,7 +94,7 @@ function validateFacultyRecord(value, nowIso) {
 
   const record = structuredClone(value);
   for (const field of REQUIRED_STRINGS) requireString(record, field);
-  if (!/^fac_[a-z0-9]{12,32}$/.test(record.id)) {
+  if (!FACULTY_ID_PATTERN.test(record.id)) {
     throw new Error("invalid faculty id");
   }
   if (FORBIDDEN_COUNTRIES.has(normalizedText(record.country))) {
@@ -179,10 +180,6 @@ export function prepareFacultyAppend(existingRecords, submittedRecords, nowIso) 
   const identities = new Set(existingRecords.map(identityKey));
   const appended = [];
   let skipped = 0;
-  let nextRank = existingRecords.reduce(
-    (maximum, record) => Math.max(maximum, Number(record.featured_rank) || 0),
-    0
-  );
 
   for (const record of clean) {
     const existingId = existingIds.get(record.id);
@@ -200,13 +197,48 @@ export function prepareFacultyAppend(existingRecords, submittedRecords, nowIso) 
       continue;
     }
 
-    nextRank += 1;
-    const ranked = { ...record, featured_rank: nextRank };
-    appended.push(ranked);
-    existingIds.set(ranked.id, ranked);
+    appended.push(record);
+    existingIds.set(record.id, record);
     if (homepage) homepages.add(homepage);
     identities.add(identity);
   }
 
   return { appended, skipped };
+}
+
+export function prepareFacultyUnfeature(existingRecords, submittedIds) {
+  if (!Array.isArray(existingRecords)) throw new Error("invalid existing faculty");
+  if (!Array.isArray(submittedIds) || submittedIds.length === 0) {
+    throw new Error("faculty id batch must be a non-empty array");
+  }
+  if (submittedIds.length > MAX_BATCH) throw new Error("faculty id batch too large");
+
+  const seen = new Set();
+  for (const id of submittedIds) {
+    if (typeof id !== "string" || !FACULTY_ID_PATTERN.test(id)) {
+      throw new Error("invalid faculty id");
+    }
+    if (seen.has(id)) throw new Error("duplicate submitted faculty id");
+    seen.add(id);
+  }
+
+  const indices = new Map(existingRecords.map((record, index) => [record.id, index]));
+  for (const id of submittedIds) {
+    if (!indices.has(id)) throw new Error("faculty id not found");
+  }
+
+  const faculty = structuredClone(existingRecords);
+  let cleared = 0;
+  let skipped = 0;
+  for (const id of submittedIds) {
+    const record = faculty[indices.get(id)];
+    if (Number(record.featured_rank) > 0) {
+      delete record.featured_rank;
+      cleared += 1;
+    } else {
+      skipped += 1;
+    }
+  }
+
+  return { faculty, cleared, skipped };
 }
