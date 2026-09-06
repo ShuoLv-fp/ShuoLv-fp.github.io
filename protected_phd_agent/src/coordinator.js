@@ -1,6 +1,7 @@
 import { jsonResponse } from "./http.js";
 import { readJson } from "./http.js";
 import { authenticate, login, logout, requireMutationGuards } from "./auth.js";
+import { prepareFacultyAppend } from "./faculty-append.js";
 import { validatePatch } from "./validation.js";
 
 const COLLECTIONS = ["faculty", "programs", "applications", "artifacts"];
@@ -112,6 +113,46 @@ export class WorkflowCoordinator {
     return jsonResponse({ revision: state.revision }, 201);
   }
 
+  async appendFaculty(records, migrationSecret) {
+    if (!this.env.MIGRATION_SECRET
+      || !(await secretMatches(migrationSecret || "", this.env.MIGRATION_SECRET))) {
+      return jsonResponse({ error: "forbidden" }, 403);
+    }
+
+    const state = await this.storage.get("workflow");
+    if (!state) return jsonResponse({ error: "workflow not initialized" }, 404);
+
+    let prepared;
+    try {
+      prepared = prepareFacultyAppend(state.faculty, records, new Date().toISOString());
+    } catch (error) {
+      return jsonResponse({ error: error.message }, 400);
+    }
+
+    const counts = {
+      submitted: records.length,
+      appended: prepared.appended.length,
+      skipped: prepared.skipped,
+      previousFacultyTotal: state.faculty.length,
+      facultyTotal: state.faculty.length + prepared.appended.length,
+      featuredTotal: state.faculty.filter((record) => Number(record.featured_rank) > 0).length
+        + prepared.appended.length,
+      artifactTotal: state.artifacts.length
+    };
+
+    if (prepared.appended.length === 0) {
+      return jsonResponse({ revision: state.revision, ...counts });
+    }
+
+    const next = clone(state);
+    next.faculty.push(...prepared.appended);
+    next.revision += 1;
+    next.updatedAt = new Date().toISOString();
+    await this.storage.put("workflow", next);
+    await this.env.PHD_AGENT_DATA.put("snapshot:latest", JSON.stringify(next));
+    return jsonResponse({ revision: next.revision, ...counts });
+  }
+
   async exportSnapshot() {
     const state = await this.storage.get("workflow");
     if (!state) return jsonResponse({ error: "workflow not initialized" }, 404);
@@ -149,6 +190,22 @@ export class WorkflowCoordinator {
         return jsonResponse({ error: error.message }, 400);
       }
       return this.importOnce(seed, migrationSecret);
+    }
+
+    if (path === "/api/admin/faculty/append" && request.method === "POST") {
+      if (!(request.headers.get("content-type") || "").toLowerCase().startsWith("application/json")) {
+        return jsonResponse({ error: "JSON required" }, 415);
+      }
+      const authorization = request.headers.get("authorization") || "";
+      const migrationSecret = authorization.startsWith("Bearer ")
+        ? authorization.slice("Bearer ".length)
+        : "";
+      try {
+        const body = await readJson(request, 10 * 1024 * 1024);
+        return this.appendFaculty(body.faculty, migrationSecret);
+      } catch (error) {
+        return jsonResponse({ error: error.message }, 400);
+      }
     }
 
     const session = await authenticate(request, this.env, this.storage);

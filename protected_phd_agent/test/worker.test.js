@@ -16,6 +16,39 @@ function syntheticSeed() {
   };
 }
 
+function syntheticFaculty() {
+  return {
+    id: "fac_0123456789ab",
+    name: "Synthetic Researcher",
+    display_name: "Synthetic Researcher",
+    institution: "Example Institute of Technology",
+    institution_short: "EIT",
+    department: "Department of Computational Science",
+    country: "United Kingdom",
+    region: "Europe",
+    entry_type: "research_group",
+    homepage_url: "https://example.edu/lab/",
+    word_homepage_url: "https://example.edu/lab/",
+    research_area: "AI4Science/LLM",
+    research_summary: "Autonomous agents for scientific reasoning and discovery.",
+    keywords: ["llm agents", "ai for science"],
+    evidence: [{
+      title: "Official research group page",
+      url: "https://example.edu/lab/",
+      checked_on: "2026-09-07T00:00:00Z",
+      note: "Official institutional page confirms the current research focus."
+    }],
+    fit: {
+      total: 86,
+      confidence: "high",
+      dimensions: [{ name: "AI4Science / LLM Agents", matched_terms: ["llm agents"] }]
+    },
+    match_analysis: { summary: "Strong overlap with agentic scientific reasoning." },
+    email_addressee: "Professor Researcher",
+    source_document: "Independent official-web research"
+  };
+}
+
 async function authenticatedSession() {
   const response = await SELF.fetch(`${origin}/api/login`, {
     method: "POST",
@@ -99,5 +132,61 @@ describe("protected Worker", () => {
     });
     expect(accepted.status).toBe(200);
     expect((await accepted.json()).revision).toBe(2);
+  });
+
+  it("allows only secret-protected POST requests to the faculty append route", async () => {
+    const imported = await SELF.fetch(`${origin}/api/admin/import`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer synthetic-migration-secret-32-bytes"
+      },
+      body: JSON.stringify(syntheticSeed())
+    });
+    expect(imported.status).toBe(201);
+
+    expect((await SELF.fetch(`${origin}/api/admin/faculty/append`)).status).toBe(404);
+    expect((await SELF.fetch(`${origin}/api/admin/faculty/append`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ faculty: [syntheticFaculty()] })
+    })).status).toBe(404);
+
+    const rejected = await SELF.fetch(`${origin}/api/admin/faculty/append`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer incorrect"
+      },
+      body: JSON.stringify({ faculty: [syntheticFaculty()] })
+    });
+    expect(rejected.status).toBe(403);
+
+    const accepted = await SELF.fetch(`${origin}/api/admin/faculty/append`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer synthetic-migration-secret-32-bytes"
+      },
+      body: JSON.stringify({ faculty: [syntheticFaculty()] })
+    });
+    expect(accepted.status).toBe(200);
+    expect(await accepted.json()).toMatchObject({ appended: 1, skipped: 0, facultyTotal: 2 });
+
+    const repeated = await SELF.fetch(`${origin}/api/admin/faculty/append`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer synthetic-migration-secret-32-bytes"
+      },
+      body: JSON.stringify({ faculty: [syntheticFaculty()] })
+    });
+    expect(repeated.status).toBe(200);
+    expect(await repeated.json()).toMatchObject({
+      revision: 2,
+      appended: 0,
+      skipped: 1,
+      facultyTotal: 2
+    });
   });
 });

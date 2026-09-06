@@ -16,6 +16,40 @@ function syntheticSeed() {
   };
 }
 
+function syntheticFaculty(overrides = {}) {
+  return {
+    id: "fac_0123456789ab",
+    name: "Synthetic Researcher",
+    display_name: "Synthetic Researcher",
+    institution: "Example Institute of Technology",
+    institution_short: "EIT",
+    department: "Department of Computational Science",
+    country: "United Kingdom",
+    region: "Europe",
+    entry_type: "research_group",
+    homepage_url: "https://example.edu/lab/",
+    word_homepage_url: "https://example.edu/lab/",
+    research_area: "AI4Science/LLM",
+    research_summary: "Autonomous agents for scientific reasoning and discovery.",
+    keywords: ["llm agents", "ai for science"],
+    evidence: [{
+      title: "Official research group page",
+      url: "https://example.edu/lab/",
+      checked_on: "2026-09-07T00:00:00Z",
+      note: "Official institutional page confirms the current research focus."
+    }],
+    fit: {
+      total: 86,
+      confidence: "high",
+      dimensions: [{ name: "AI4Science / LLM Agents", matched_terms: ["llm agents"] }]
+    },
+    match_analysis: { summary: "Strong overlap with agentic scientific reasoning." },
+    email_addressee: "Professor Researcher",
+    source_document: "Independent official-web research",
+    ...overrides
+  };
+}
+
 function coordinatorFixture() {
   const storage = createMemoryStorage();
   const snapshots = [];
@@ -112,5 +146,97 @@ describe("WorkflowCoordinator", () => {
       syntheticSeed(),
       "synthetic-migration-secret-32-bytes"
     )).status).toBe(409);
+  });
+
+  it("requires the migration secret for faculty appends", async () => {
+    const { coordinator } = coordinatorFixture();
+    await coordinator.importOnce(syntheticSeed(), "synthetic-migration-secret-32-bytes");
+
+    const response = await coordinator.appendFaculty([syntheticFaculty()], "incorrect");
+
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ error: "forbidden" });
+  });
+
+  it("appends faculty atomically while preserving existing workflow data", async () => {
+    const { coordinator, snapshots } = coordinatorFixture();
+    await coordinator.importOnce(syntheticSeed(), "synthetic-migration-secret-32-bytes");
+    const before = await (await coordinator.exportSnapshot()).json();
+
+    const response = await coordinator.appendFaculty(
+      [syntheticFaculty()],
+      "synthetic-migration-secret-32-bytes"
+    );
+    const result = await response.json();
+    const after = await (await coordinator.exportSnapshot()).json();
+
+    expect(response.status).toBe(200);
+    expect(result).toMatchObject({
+      revision: 2,
+      submitted: 1,
+      appended: 1,
+      skipped: 0,
+      previousFacultyTotal: 1,
+      facultyTotal: 2,
+      featuredTotal: 1,
+      artifactTotal: 1
+    });
+    expect(after.revision).toBe(before.revision + 1);
+    expect(after.faculty[0]).toEqual(before.faculty[0]);
+    expect(after.faculty[1]).toMatchObject({
+      id: "fac_0123456789ab",
+      featured_rank: 1,
+      status: "discovered",
+      notes: ""
+    });
+    expect(after.profile).toEqual(before.profile);
+    expect(after.programs).toEqual(before.programs);
+    expect(after.applications).toEqual(before.applications);
+    expect(after.artifacts).toEqual(before.artifacts);
+    expect(snapshots).toHaveLength(2);
+  });
+
+  it("makes repeated faculty appends idempotent without changing the revision", async () => {
+    const { coordinator, snapshots } = coordinatorFixture();
+    await coordinator.importOnce(syntheticSeed(), "synthetic-migration-secret-32-bytes");
+    await coordinator.appendFaculty(
+      [syntheticFaculty()],
+      "synthetic-migration-secret-32-bytes"
+    );
+
+    const response = await coordinator.appendFaculty(
+      [syntheticFaculty()],
+      "synthetic-migration-secret-32-bytes"
+    );
+    const result = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(result).toMatchObject({
+      revision: 2,
+      submitted: 1,
+      appended: 0,
+      skipped: 1,
+      previousFacultyTotal: 2,
+      facultyTotal: 2,
+      featuredTotal: 1,
+      artifactTotal: 1
+    });
+    expect(snapshots).toHaveLength(2);
+  });
+
+  it("rejects the whole faculty batch when any record is invalid", async () => {
+    const { coordinator, snapshots } = coordinatorFixture();
+    await coordinator.importOnce(syntheticSeed(), "synthetic-migration-secret-32-bytes");
+
+    const response = await coordinator.appendFaculty(
+      [syntheticFaculty(), syntheticFaculty({ id: "fac_badrecord0001", country: "Canada" })],
+      "synthetic-migration-secret-32-bytes"
+    );
+    const after = await (await coordinator.exportSnapshot()).json();
+
+    expect(response.status).toBe(400);
+    expect(after.faculty).toHaveLength(1);
+    expect(after.revision).toBe(1);
+    expect(snapshots).toHaveLength(1);
   });
 });
