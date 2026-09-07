@@ -70,7 +70,7 @@ Run:
 
 ```sh
 PATH=/Users/shuolv/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
-  pnpm --dir protected_phd_agent vitest run test/faculty-list.test.js
+  pnpm --dir protected_phd_agent exec vitest run test/faculty-list.test.js
 ```
 
 Expected: FAIL because `public/faculty-list.js` does not exist.
@@ -162,7 +162,7 @@ Run:
 
 ```sh
 PATH=/Users/shuolv/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH \
-  pnpm --dir protected_phd_agent vitest run test/static.test.js test/worker.test.js
+  pnpm --dir protected_phd_agent exec vitest run test/static.test.js test/worker.test.js
 ```
 
 Expected: FAIL because the helper is not served and `app.js` still filters to featured records.
