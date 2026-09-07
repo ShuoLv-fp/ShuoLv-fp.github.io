@@ -72,6 +72,7 @@ describe("protected Worker", () => {
     expect((await SELF.fetch(`${origin}/login.js`)).status).toBe(200);
     expect((await SELF.fetch(`${origin}/app`)).status).toBe(401);
     expect((await SELF.fetch(`${origin}/app.js`)).status).toBe(401);
+    expect((await SELF.fetch(`${origin}/faculty-list.js`)).status).toBe(401);
     expect((await SELF.fetch(`${origin}/api/bootstrap`)).status).toBe(401);
     expect((await SELF.fetch(`${origin}/data/faculty.json`)).status).toBe(404);
   });
@@ -91,6 +92,7 @@ describe("protected Worker", () => {
 
     const { cookie } = await authenticatedSession();
     expect((await SELF.fetch(`${origin}/api/session`, { headers: { cookie } })).status).toBe(200);
+    expect((await SELF.fetch(`${origin}/faculty-list.js`, { headers: { cookie } })).status).toBe(200);
     expect((await SELF.fetch(`${origin}/api/bootstrap`, { headers: { cookie } })).status).toBe(404);
   });
 

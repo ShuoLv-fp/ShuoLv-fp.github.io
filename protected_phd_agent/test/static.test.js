@@ -14,14 +14,15 @@ async function authenticatedCookie() {
 
 async function uiSources() {
   const cookie = await authenticatedCookie();
-  const [login, loginJs, html, appJs, css] = await Promise.all([
+  const [login, loginJs, html, appJs, facultyListJs, css] = await Promise.all([
     SELF.fetch(`${origin}/`).then((response) => response.text()),
     SELF.fetch(`${origin}/login.js`).then((response) => response.text()),
     SELF.fetch(`${origin}/app`, { headers: { cookie } }).then((response) => response.text()),
     SELF.fetch(`${origin}/app.js`, { headers: { cookie } }).then((response) => response.text()),
+    SELF.fetch(`${origin}/faculty-list.js`, { headers: { cookie } }).then((response) => response.text()),
     SELF.fetch(`${origin}/style.css`).then((response) => response.text())
   ]);
-  return { login, loginJs, html, appJs, css };
+  return { login, loginJs, html, appJs, facultyListJs, css };
 }
 
 describe("private dossier UI", () => {
@@ -64,6 +65,16 @@ describe("private dossier UI", () => {
     expect(css).toContain("grid-template-rows: auto minmax(0, 1fr)");
     expect(css).toContain(".dossier-nav { min-height: 0; overflow-y: auto;");
     expect(css).toContain(".advisor-index { border-bottom: 1px solid var(--line); border-right: 0; display: block; height: auto; overflow: visible; position: static; }");
+  });
+
+  it("renders the complete ordered faculty collection instead of featured records only", async () => {
+    const { html, appJs, facultyListJs } = await uiSources();
+    expect(appJs).toContain('import { orderFaculty } from "./faculty-list.js";');
+    expect(appJs).toContain("return orderFaculty(state.faculty);");
+    expect(appJs).not.toContain(".filter((row) => Number(row.featured_rank) > 0)");
+    expect(appJs).toContain('"Advisor records"');
+    expect(html).toContain("ADVISOR INDEX");
+    expect(facultyListJs).toContain("export function orderFaculty(records)");
   });
 
   it("shows and immediately updates each advisor contact status in the curated index", async () => {

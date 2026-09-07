@@ -1,3 +1,5 @@
+import { orderFaculty } from "./faculty-list.js";
+
 const state = {
   authenticated: false,
   csrf: "",
@@ -239,9 +241,7 @@ function setSyncState(next, detail = "") {
 }
 
 function dossierRows() {
-  return state.faculty
-    .filter((row) => Number(row.featured_rank) > 0)
-    .sort((left, right) => Number(left.featured_rank) - Number(right.featured_rank));
+  return orderFaculty(state.faculty);
 }
 
 function advisorStatus(value) {
@@ -272,7 +272,7 @@ function renderDashboard() {
   const reviewed = state.artifacts.filter((item) => item.status === "reviewed").length;
   const shortlisted = dossiers.filter((item) => item.status === "shortlisted").length;
   const values = [
-    [dossiers.length, "Curated advisors"],
+    [dossiers.length, "Advisor records"],
     [state.artifacts.length, "Outreach drafts"],
     [reviewed, "Reviewed drafts"],
     [shortlisted, "Shortlisted"]
