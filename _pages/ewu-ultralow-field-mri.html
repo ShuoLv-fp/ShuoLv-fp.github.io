@@ -1,0 +1,393 @@
+---
+permalink: /research/ewu-ultralow-field-mri/
+title: "Wu 教授 AI 驱动低成本超低场 MRI 研究图谱"
+excerpt: "从便携硬件、无屏蔽抗干扰到 AI 重建与全身临床成像，系统梳理 Wu 教授团队的低成本超低场 MRI 研究。"
+author_profile: false
+lang: zh
+---
+
+<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/ewu-ultralow-field-mri.css">
+
+<main class="ulfl-reader">
+  <header class="reader-hero">
+    <a class="reader-back" href="{{ site.baseurl }}/zh/#research">← 返回 Shuo Lv 的研究主页</a>
+    <p class="reader-eyebrow">FIELD GUIDE · 0.05–0.055 T · 2021–2026</p>
+    <h1>把 MRI 带到磁共振室之外</h1>
+    <p class="reader-deck">这不是一张普通论文清单，而是一条从低成本磁体、开放环境中的电磁干扰，到 AI 重建和临床可用图像的完整信号链。页面收录 Wu 教授团队与这一目标直接相关的 18 篇同行评议论文，并用你的脑影像、个体化建模与基础模型研究作为阅读坐标。</p>
+    <div class="reader-meta" aria-label="阅读页概览">
+      <span>18 篇同行评议论文</span>
+      <span>5 条研究主线</span>
+      <span>6 张关键证据图</span>
+      <span>更新至 2026-09</span>
+    </div>
+    <div class="signal-rail" aria-label="研究信号链">
+      <div class="signal-step"><span class="signal-label">01 / FIELD</span><strong>低成本、低功耗的 0.05 T 磁体与线圈</strong></div>
+      <div class="signal-step"><span class="signal-label">02 / NOISE</span><strong>在没有 RF 屏蔽室时感知并消除 EMI</strong></div>
+      <div class="signal-step"><span class="signal-label">03 / AI</span><strong>用学习式重建补偿低信噪比与低分辨率</strong></div>
+      <div class="signal-step"><span class="signal-label">04 / CARE</span><strong>把脑、脊柱与全身影像推向床旁医疗</strong></div>
+    </div>
+  </header>
+
+  <nav class="reader-jumpnav" aria-label="页内导航">
+    <a href="#personal-lens">与你的研究连接</a>
+    <a href="#research-map">研究主线</a>
+    <a href="#reading-path">建议阅读顺序</a>
+    <a href="#papers">全部论文</a>
+    <a href="#figures">关键配图</a>
+    <a href="#limits">证据边界</a>
+  </nav>
+
+  <section class="reader-section" id="personal-lens">
+    <div class="section-heading">
+      <div>
+        <p class="section-eyebrow">YOUR LENS</p>
+        <h2>先用你的研究问题来读</h2>
+      </div>
+      <p>你的主页聚焦脑动力学、个体化分区、规范建模和 BrainLMM；因此这里不只按年份排序，更关注低场 MRI 如何成为这些方法的新数据入口。</p>
+    </div>
+    <div class="lens-grid">
+      <article class="lens-card">
+        <h3>人脑动力学与个体差异</h3>
+        <p>你的<a href="https://www.nature.com/articles/s41467-026-72931-6" target="_blank" rel="noopener noreferrer">小脑时空动力学研究</a>依赖对时间结构的精细描述。ULF MRI 当前以结构像为主，但静音、低负担和可重复扫描为纵向、自然状态及跨人群采样打开了入口。</p>
+      </article>
+      <article class="lens-card">
+        <h3>BrainLMM 与基础模型</h3>
+        <p><a href="https://ojs.aaai.org/index.php/AAAI/article/view/42413" target="_blank" rel="noopener noreferrer">BrainLMM</a>强调统一理解多种脑影像任务。这里的 M4Raw、多场强增强与零样本扩散先验，正好对应“原始数据—重建—下游理解”一体化基础模型的训练链。</p>
+      </article>
+      <article class="lens-card">
+        <h3>规范模型与临床泛化</h3>
+        <p>你的<a href="https://www.biorxiv.org/content/10.1101/2025.10.23.684286v1" target="_blank" rel="noopener noreferrer">自闭症规范建模工作</a>关注个体偏离与跨队列泛化。低场设备扩大可及性，却也引入场强、线圈、协议与站点偏移；如何建立 field-aware normative reference 是直接交叉点。</p>
+      </article>
+      <article class="lens-card">
+        <h3>AI Agent 与科研工作流</h3>
+        <p>你的<a href="{{ site.baseurl }}/zh/#projects">智能体项目</a>可进一步覆盖低场 MRI 的协议选择、扫描质控、重建不确定性、异常提示与随访编排；但每一步都需要保留原始测量、模型证据和人工复核。</p>
+      </article>
+    </div>
+    <aside class="inference-note"><strong>说明：</strong>以上交叉点是基于双方公开研究方向所作的研究推演，不是吴老师团队的既有结论。</aside>
+  </section>
+
+  <section class="reader-section" id="research-map">
+    <div class="section-heading">
+      <div>
+        <p class="section-eyebrow">RESEARCH MAP</p>
+        <h2>五条相互咬合的研究主线</h2>
+      </div>
+      <p>真正的创新不在单一网络或单一磁体，而在整条系统链：更弱的场、更开放的环境、更少的数据，仍能形成有临床意义的图像。</p>
+    </div>
+    <div class="track-grid">
+      <article class="track-card" style="--track-color:#1567a8">
+        <span class="track-code">A / PLATFORM</span>
+        <h3>低成本硬件与可及性</h3>
+        <p>从 0.055 T 脑扫描原型到 0.05 T 全身系统，目标是摆脱超导磁体、专用供电和屏蔽房。</p>
+      </article>
+      <article class="track-card" style="--track-color:#14a8b9">
+        <span class="track-code">B / AI RECON</span>
+        <h3>AI 重建与数据</h3>
+        <p>用超分辨率、部分傅里叶、无配对迁移和扩散先验抵消低场的 SNR、速度与分辨率约束。</p>
+      </article>
+      <article class="track-card" style="--track-color:#d17f22">
+        <span class="track-code">C / EMI</span>
+        <h3>无 RF 屏蔽抗干扰</h3>
+        <p>从外部传感器到直接信号预测、零空间运算和跨域网络，逐步减少部署时的额外硬件与标定。</p>
+      </article>
+      <article class="track-card" style="--track-color:#7b65b5">
+        <span class="track-code">D / PROTOCOL</span>
+        <h3>序列与临床对比</h3>
+        <p>MRA、磁化转移、bSSFP 与 DWI 扩展组织和血管对比，使低场从“能成像”走向“能回答问题”。</p>
+      </article>
+      <article class="track-card" style="--track-color:#607d8b">
+        <span class="track-code">E / SYNTHESIS</span>
+        <h3>综述与转化路线</h3>
+        <p>便携脑 MRI、低场软件解法与床旁卒中综述，明确硬件、图像形成、验证和临床工作流的共同瓶颈。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="reader-section" id="reading-path">
+    <div class="section-heading">
+      <div>
+        <p class="section-eyebrow">FAST ROUTE</p>
+        <h2>只读六篇时的最短路径</h2>
+      </div>
+      <p>先建立系统全貌，再看 AI 如何分别解决速度、空间分辨率、环境噪声和跨场强增强。</p>
+    </div>
+    <ol class="reading-path">
+      <li><a href="#paper-2021-scanner"><strong>0.055 T 脑 MRI 原型</strong><span>理解“低成本、无屏蔽”的硬件起点</span></a></li>
+      <li><a href="#paper-2024-whole-body"><strong>0.05 T 全身 MRI</strong><span>看整条技术链如何合并成临床平台</span></a></li>
+      <li><a href="#paper-2023-fast-brain"><strong>快速 3D 脑成像</strong><span>部分傅里叶与深度超分辨率联合</span></a></li>
+      <li><a href="#paper-2024-deep-dsp"><strong>Deep-DSP 抗 EMI</strong><span>直接从受污染 k-space 预测干净信号</span></a></li>
+      <li><a href="#paper-2026-nila"><strong>零样本扩散增强</strong><span>高场先验、不确定性和幻觉风险</span></a></li>
+      <li><a href="#paper-2026-stroke-review"><strong>床旁卒中路线图</strong><span>从技术原型回到临床决策与部署</span></a></li>
+    </ol>
+  </section>
+
+  <section class="reader-section" id="papers">
+    <div class="section-heading">
+      <div>
+        <p class="section-eyebrow">EVIDENCE INDEX</p>
+        <h2>18 篇论文，按主线筛选</h2>
+      </div>
+      <p>标题直达 DOI；展开每张卡片可查看方法、关键结果、与你研究的连接和阅读边界。</p>
+    </div>
+    <div class="paper-toolbar" role="group" aria-label="按研究主线筛选论文">
+      <button class="paper-filter" type="button" data-filter="all" aria-pressed="true">全部</button>
+      <button class="paper-filter" type="button" data-filter="platform" aria-pressed="false">平台与可及性</button>
+      <button class="paper-filter" type="button" data-filter="ai" aria-pressed="false">AI 与数据</button>
+      <button class="paper-filter" type="button" data-filter="emi" aria-pressed="false">抗 EMI</button>
+      <button class="paper-filter" type="button" data-filter="protocol" aria-pressed="false">序列与对比</button>
+      <button class="paper-filter" type="button" data-filter="review" aria-pressed="false">综述</button>
+      <span class="paper-count" id="paper-count" aria-live="polite">18 / 18 篇</span>
+    </div>
+
+    <div class="paper-list">
+      <article class="paper-card" id="paper-2021-scanner" data-doi="10.1038/s41467-021-27317-1" data-year="2021" data-tracks="platform protocol" style="--paper-color:#1567a8">
+        <div class="paper-head"><div><span class="paper-kicker">平台起点 · 脑 MRI</span><h3><a href="https://doi.org/10.1038/s41467-021-27317-1" target="_blank" rel="noopener noreferrer">A low-cost and shielding-free ultra-low-field brain MRI scanner</a></h3></div><span class="paper-year">2021</span></div>
+        <p class="paper-meta">Liu Y, Leong ATL, Zhao Y, et al., Wu EX · Nature Communications</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>用 0.055 T 永磁体、普通交流电源和无磁/射频屏蔽设计，证明低成本脑 MRI 可以在常规空间工作。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>构建基于 SmCo 永磁体的紧凑系统，完成 T1、T2、FLAIR-like 和 DWI 等脑成像，并加入电磁干扰抑制。</p></div>
+          <div><strong>关键结果</strong><p>设备安静、移动性强且无需屏蔽房；志愿者及初步肿瘤、卒中病例显示了结构和病灶可见性。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>它定义了后续 AI 的测量边界。对个体化脑表型而言，先关注几何一致性、组织对比和重复性，而非只看视觉锐度。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1038/s41467-021-27317-1" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/34907181/" target="_blank" rel="noopener noreferrer">PubMed</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8671508/" target="_blank" rel="noopener noreferrer">开放全文</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2023-m4raw" data-doi="10.1038/s41597-023-02181-4" data-year="2023" data-tracks="ai" style="--paper-color:#14a8b9">
+        <div class="paper-head"><div><span class="paper-kicker">相邻低场 · 开放数据</span><h3><a href="https://doi.org/10.1038/s41597-023-02181-4" target="_blank" rel="noopener noreferrer">M4Raw: A multi-contrast, multi-repetition, multi-channel MRI k-space dataset for low-field MRI research</a></h3></div><span class="paper-year">2023</span></div>
+        <p class="paper-meta">Lyu M, Mei L, Huang S, et al., Wu EX · Scientific Data · 0.3 T（相邻低场，非 &lt;0.1 T ULF）</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>将低场 AI 从单个实验推进到可复现基准：183 名健康受试者、三种对比、重复采集和多通道原始 k-space。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>在 0.3 T 系统采集多对比、多重复和多接收通道数据，整理出 1024 个训练体积与 240 个验证体积。</p></div>
+          <div><strong>关键结果</strong><p>数据支持重建、去噪、并行成像和多对比学习，可在统一原始数据上比较模型而非只比较最终图像。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>它最接近 BrainLMM 的数据基础，但健康样本与单一平台不足以代表床旁 ULF 的真实域偏移。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1038/s41597-023-02181-4" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/37164976/" target="_blank" rel="noopener noreferrer">PubMed</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10172399/" target="_blank" rel="noopener noreferrer">开放全文</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2023-dual-sr" data-doi="10.1002/mrm.29642" data-year="2023" data-tracks="ai protocol" style="--paper-color:#14a8b9">
+        <div class="paper-head"><div><span class="paper-kicker">AI 重建 · 超分辨率</span><h3><a href="https://doi.org/10.1002/mrm.29642" target="_blank" rel="noopener noreferrer">Pushing the limits of low-cost ultra-low-field MRI by dual-acquisition deep learning 3D superresolution</a></h3></div><span class="paper-year">2023</span></div>
+        <p class="paper-meta">Lau V, Xiao L, Zhao Y, et al., Wu EX · Magnetic Resonance in Medicine</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>以两次互补低分辨率采集和深度网络，把 3 mm ULF 图像重建为 1.5 mm 合成体素，总扫描时间控制在 20 分钟内。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>双方向采集提供互补空间信息；网络以 HCP 3 T 高分辨率图像模拟的低场数据训练，再用于真实 0.055 T 图像。</p></div>
+          <div><strong>关键结果</strong><p>相对单次采集与插值，皮层、脑室和小结构更清楚，建立“采样设计 + 学习重建”的协同路线。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>个体化分区需要真实边界。合成分辨率不等于新增测量信息，应以结构保持、跨域稳定和下游表型复现验证。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1002/mrm.29642" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/37010491/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2023-active-emi" data-doi="10.1002/nbm.4956" data-year="2023" data-tracks="emi ai" style="--paper-color:#d17f22">
+        <div class="paper-head"><div><span class="paper-kicker">抗 EMI · 主动感知</span><h3><a href="https://doi.org/10.1002/nbm.4956" target="_blank" rel="noopener noreferrer">Electromagnetic interference elimination via active sensing and deep learning prediction for radiofrequency shielding-free MRI</a></h3></div><span class="paper-year">2023 / 2024 issue</span></div>
+        <p class="paper-meta">Zhao Y, Xiao L, Liu Y, Leong ATL, Wu EX · NMR in Biomedicine</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>让外部线圈“听见”环境噪声，再由 CNN 预测接收线圈内的 EMI，是无屏蔽 MRI 的第一代学习式降噪链。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>多路 EMI 感知线圈同时记录环境信号，网络从两个时间窗口学习 EMI 到主接收通道污染的映射。</p></div>
+          <div><strong>关键结果</strong><p>0.055 T 无屏蔽成像的 SNR 可接近屏蔽笼结果，并在 1.5 T 做了初步可迁移性验证。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>这是一个多模态噪声建模问题。对下游脑模型，EMI 残差可能形成站点特征，需在表型建模前单独审计。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1002/nbm.4956" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/37088894/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2023-portable-review" data-doi="10.1038/s44222-023-00086-w" data-year="2023" data-tracks="review platform" style="--paper-color:#607d8b">
+        <div class="paper-head"><div><span class="paper-kicker">综述 · 便携脑成像</span><h3><a href="https://doi.org/10.1038/s44222-023-00086-w" target="_blank" rel="noopener noreferrer">Brain imaging with portable low-field MRI</a></h3></div><span class="paper-year">2023</span></div>
+        <p class="paper-meta">Kimberly WT, Sorby-Adams AJ, Webb AG, Wu EX, et al. · Nature Reviews Bioengineering</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>把便携低场脑 MRI 放入神经急症、重症、资源受限环境与纵向研究中，梳理其临床价值和工程瓶颈。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>综合硬件、序列、重建和床旁研究进展，比较不同低场/便携系统的成像能力与部署场景。</p></div>
+          <div><strong>关键结果</strong><p>价值不仅是降低成本，还包括在不能转运的患者旁重复成像；局限集中于 SNR、分辨率、协议和临床证据。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>可把它当作研究问题生成器：哪些脑表型值得以更低单次质量换取更高频率、更真实世界的纵向采样？</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1038/s44222-023-00086-w" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/37705717/" target="_blank" rel="noopener noreferrer">PubMed</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10497072/" target="_blank" rel="noopener noreferrer">开放全文</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2023-fast-brain" data-doi="10.1126/sciadv.adi9327" data-year="2023" data-tracks="ai protocol" style="--paper-color:#14a8b9">
+        <div class="paper-head"><div><span class="paper-kicker">AI 重建 · 快速 3D</span><h3><a href="https://doi.org/10.1126/sciadv.adi9327" target="_blank" rel="noopener noreferrer">Deep learning enabled fast 3D brain MRI at 0.055 tesla</a></h3></div><span class="paper-year">2023</span></div>
+        <p class="paper-meta">Man C, Lau V, Su S, et al., Wu EX · Science Advances</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>单次激励、2D 部分傅里叶和深度超分辨率协同，把 0.055 T 三维 T1/T2 脑成像压缩到约 2.5–3.2 分钟。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>以 0.7 部分傅里叶减少采样，再用 PF-SR 网络同时补全缺失 k-space 并将图像合成为 1.5 mm 各向同性体素。</p></div>
+          <div><strong>关键结果</strong><p>健康志愿者和小规模患者样本中，重建提升组织可见度，并显著缩短原本受 SNR 制约的 3D 扫描。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>更短扫描降低运动并利于大队列；但网络同时做补全与超分，误差来源耦合，宜用下游分区/测量一致性而非视觉评分单独验证。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1126/sciadv.adi9327" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/37738341/" target="_blank" rel="noopener noreferrer">PubMed</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10516503/" target="_blank" rel="noopener noreferrer">开放全文</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2024-deep-dsp" data-doi="10.1002/mrm.30046" data-year="2024" data-tracks="emi ai" style="--paper-color:#d17f22">
+        <div class="paper-head"><div><span class="paper-kicker">抗 EMI · 直接信号预测</span><h3><a href="https://doi.org/10.1002/mrm.30046" target="_blank" rel="noopener noreferrer">Robust electromagnetic interference elimination for radiofrequency shielding-free MRI through deep learning direct MR signal prediction</a></h3></div><span class="paper-year">2024</span></div>
+        <p class="paper-meta">Zhao Y, Xiao L, Hu J, Wu EX · Magnetic Resonance in Medicine</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>Deep-DSP 不再显式估计干扰传递函数，而用残差 U-Net 从受污染数据直接预测干净 MR 信号。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>将 EMI 去除写成直接信号预测任务；网络学习主通道与感知通道的关系，可减少传感器数量并免去专门 EMI 表征。</p></div>
+          <div><strong>关键结果</strong><p>在不同噪声条件下比传统方法更稳健，为 0.05 T 全身系统在普通房间部署提供关键软件模块。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>“直接预测干净信号”同时带来可解释性挑战：需要保存差分、频谱和失败告警，避免下游模型把抑噪伪影当作生物特征。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1002/mrm.30046" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/38376455/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2024-whole-body" data-doi="10.1126/science.adm7168" data-year="2024" data-tracks="platform ai emi protocol" style="--paper-color:#1567a8">
+        <div class="paper-head"><div><span class="paper-kicker">旗舰系统 · 全身 MRI</span><h3><a href="https://doi.org/10.1126/science.adm7168" target="_blank" rel="noopener noreferrer">Whole-body magnetic resonance imaging at 0.05 Tesla</a></h3></div><span class="paper-year">2024</span></div>
+        <p class="paper-meta">Zhao Y, Ding Y, Lau V, et al., Wu EX · Science</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>将 0.05 T 永磁体、墙插电源、无磁/RF 屏蔽、Deep-DSP 与 PF-SR 整合，覆盖脑、脊柱、心脏、腹部和四肢。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>搭建全身永磁系统和多部位线圈，以多种结构、扩散和动态序列采集；软件端联合 EMI 消除、部分傅里叶和超分辨率。</p></div>
+          <div><strong>关键结果</strong><p>在不使用传统 MRI 基础设施的条件下获得多器官、多对比图像，证明 ULF 不再局限于头部原型。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>这是最适合先读的系统论文。其临床图像展示覆盖面广，但诊断效能、读片一致性和多中心泛化仍需更大前瞻性研究。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1126/science.adm7168" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/38723062/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2024-mra" data-doi="10.1002/nbm.5213" data-year="2024" data-tracks="protocol" style="--paper-color:#7b65b5">
+        <div class="paper-head"><div><span class="paper-kicker">序列扩展 · 血管</span><h3><a href="https://doi.org/10.1002/nbm.5213" target="_blank" rel="noopener noreferrer">Ultra-low-field magnetic resonance angiography at 0.05 T</a></h3></div><span class="paper-year">2024</span></div>
+        <p class="paper-meta">Su S, Hu J, Ding Y, et al., Wu EX · NMR in Biomedicine</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>首次在 0.05 T 系统实现 time-of-flight MRA，使头颈主要血管在无造影条件下可见。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>针对超低场流入效应和低 SNR 优化 TOF 采集与重建，在年轻健康受试者中评估颅内及颈部血管显示。</p></div>
+          <div><strong>关键结果</strong><p>主要动脉结构可以辨认，说明低场除结构像外也能形成血流相关对比。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>血管信息可作为脑规范模型的生理协变量；当前证据主要来自健康年轻人，狭窄、闭塞和慢流条件仍是关键检验。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1002/nbm.5213" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/39032076/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2024-mt" data-doi="10.1002/mrm.30231" data-year="2024" data-tracks="protocol" style="--paper-color:#7b65b5">
+        <div class="paper-head"><div><span class="paper-kicker">序列扩展 · 磁化转移</span><h3><a href="https://doi.org/10.1002/mrm.30231" target="_blank" rel="noopener noreferrer">Ultra-low-field magnetization transfer imaging at 0.055 T</a></h3></div><span class="paper-year">2024</span></div>
+        <p class="paper-meta">Su S, Zhao Y, Ding Y, et al., Wu EX · Magnetic Resonance in Medicine</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>0.055 T 仍可产生明显磁化转移对比，并以极低 SAR 改善脑组织及部分病灶的边界显示。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>设计低场 MT 预饱和和成像协议，比较健康组织与初步临床病例中的 MTR/对比变化。</p></div>
+          <div><strong>关键结果</strong><p>报告的 SAR 约 0.0024 与 0.0008 W/kg，远低于 3.0 W/kg 限值，同时增强了部分病灶勾画。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>MT 提供结构像之外的组织敏感性，可能丰富个体表型；但定量稳定性、病理特异性和跨设备标定仍需验证。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1002/mrm.30231" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/39044654/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2024-perspective" data-doi="10.1002/ctm2.70071" data-year="2024" data-tracks="review platform" style="--paper-color:#607d8b">
+        <div class="paper-head"><div><span class="paper-kicker">评论 · 可及医疗</span><h3><a href="https://doi.org/10.1002/ctm2.70071" target="_blank" rel="noopener noreferrer">Reinventing magnetic resonance imaging for accessible healthcare: Whole-body imaging at 0.05 Tesla</a></h3></div><span class="paper-year">2024</span></div>
+        <p class="paper-meta">Wu EX, Feng X · Clinical and Translational Medicine</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>从可及医疗角度解释 0.05 T 全身 MRI 的系统价值：成本、能耗、基础设施和使用场景必须一起重构。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>围绕 Science 全身系统做转化视角的概念梳理，连接工程突破、全球影像资源不平等和潜在临床路径。</p></div>
+          <div><strong>关键结果</strong><p>强调“低场”不是对高场的简单降级，而是以部署范围、检查负担和总体成本为目标的另一种系统优化。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>适合作为申请书的临床动机来源，但它是观点/评论而非独立验证研究，证据权重应与原始实验论文区分。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1002/ctm2.70071" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/39439413/" target="_blank" rel="noopener noreferrer">PubMed</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11496770/" target="_blank" rel="noopener noreferrer">开放全文</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2025-snr-review" data-doi="10.1002/nbm.5268" data-year="2025" data-tracks="review ai" style="--paper-color:#607d8b">
+        <div class="paper-head"><div><span class="paper-kicker">综述 · 软件补偿</span><h3><a href="https://doi.org/10.1002/nbm.5268" target="_blank" rel="noopener noreferrer">MRI at low field: A review of software solutions for improving signal-to-noise ratio</a></h3></div><span class="paper-year">2025</span></div>
+        <p class="paper-meta">Ayde R, Vornehm M, Zhao Y, Knoll F, Wu EX, Sarracanie M · NMR in Biomedicine</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>系统梳理低场 SNR 软件工具，从采集、重建和后处理区分“获得更多信息”与“让图像看起来更好”。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>综合信号平均、稀疏/并行重建、去噪、超分辨率和深度学习等软件路线，讨论它们与低场物理约束的关系。</p></div>
+          <div><strong>关键结果</strong><p>指出软件可显著改善低场可用性，但性能依赖训练域、采集协议与评价指标，不能脱离数据形成过程理解。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>对基础模型尤其重要：优先保留原始域和变换链，避免把不同重建器的风格差异当作神经生物差异。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1002/nbm.5268" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/39375036/" target="_blank" rel="noopener noreferrer">PubMed</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11605168/" target="_blank" rel="noopener noreferrer">开放全文</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2025-unpaired" data-doi="10.1109/tmi.2025.3597401" data-year="2025" data-tracks="ai" style="--paper-color:#14a8b9">
+        <div class="paper-head"><div><span class="paper-kicker">相邻低场 · 无配对迁移</span><h3><a href="https://doi.org/10.1109/TMI.2025.3597401" target="_blank" rel="noopener noreferrer">An Unsupervised Learning Approach for Reconstructing 3T-Like Images From 0.3T MRI Without Paired Training Data</a></h3></div><span class="paper-year">2025</span></div>
+        <p class="paper-meta">Yang H, Liu S, Liu Y, et al., Wu EX, Lyu M · IEEE Transactions on Medical Imaging · 0.3 T（相邻低场）</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>用无配对生成式学习把 0.3 T 图像映射到 3 T-like 外观，绕过难以获得严格配准跨场强训练对的现实限制。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>在循环一致性框架中加入注意力与边缘保持模块，以无配对公开数据训练，并在配对 T1/T2/FLAIR 数据上验证。</p></div>
+          <div><strong>关键结果</strong><p>结构细节和感知质量优于多种对照方法，显示低场到高场外观迁移不必依赖同一受试者成对训练。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>这类结果与 BrainLMM 高度相关，也最需警惕“3 T-like ≠ 3 T truth”：病灶保持、拓扑一致和不确定性应先于美学质量。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1109/TMI.2025.3597401" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/40788786/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2025-bssfp" data-doi="10.1109/tbme.2025.3580111" data-year="2025" data-tracks="protocol platform" style="--paper-color:#7b65b5">
+        <div class="paper-head"><div><span class="paper-kicker">序列扩展 · 快速全身对比</span><h3><a href="https://doi.org/10.1109/TBME.2025.3580111" target="_blank" rel="noopener noreferrer">Ultra-Low-Field Balanced Steady-State Free Precession MRI at 0.05 T</a></h3></div><span class="paper-year">2025 online / 2026 issue</span></div>
+        <p class="paper-meta">Ding Y, Vardhanabhuti V, Huang F, et al., Wu EX · IEEE Transactions on Biomedical Engineering</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>将 bSSFP 带到 0.05 T，以约 2×2×6 mm 分辨率和每套约 5 分钟协议覆盖多个全身部位。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>针对低场条件优化 bSSFP，并在脑、脊柱、胸部、腹部、盆腔和膝部的健康志愿者中测试多平面对比。</p></div>
+          <div><strong>关键结果</strong><p>利用低场下相对友好的 B0/B1 和 SAR 条件，获得时间效率较高、组织/液体对比鲜明的全身图像。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>统一快速序列有利于规模化队列和多部位基础模型；临床异常的敏感性与不同体型下的稳定性仍待验证。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1109/TBME.2025.3580111" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/40522808/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2026-meeno" data-doi="10.1109/tbme.2026.3656493" data-year="2026" data-tracks="emi" style="--paper-color:#d17f22">
+        <div class="paper-head"><div><span class="paper-kicker">抗 EMI · 零空间运算</span><h3><a href="https://doi.org/10.1109/TBME.2026.3656493" target="_blank" rel="noopener noreferrer">Multi-channel EMI Elimination for Shielding-free MRI Using Null Operations</a></h3></div><span class="paper-year">2026</span></div>
+        <p class="paper-meta">Wang J, Wang H, Xiao L, Lyu M, Zhao Y, Liu Y, Wu EX · IEEE Transactions on Biomedical Engineering</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>MEENO 利用多接收通道间相关结构和零空间运算分离 EMI，可减少甚至不依赖外部噪声传感器。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>从多通道 MR 数据本身建立干扰子空间，通过 null operations 抑制共同 EMI 成分，降低额外感知硬件依赖。</p></div>
+          <div><strong>关键结果</strong><p>在屏蔽自由场景中显示稳健干扰去除，为线圈阵列和软件共同承担环境抗扰提供新路径。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>它更接近可解释信号处理，可与学习模型互补；需要关注真实 MR 信号与 EMI 子空间不完全可分时的组织信息损失。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1109/TBME.2026.3656493" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/41576126/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2026-deep-dsp2" data-doi="10.1002/mrm.70583" data-year="2026" data-tracks="emi ai" style="--paper-color:#d17f22">
+        <div class="paper-head"><div><span class="paper-kicker">抗 EMI · 跨域学习</span><h3><a href="https://doi.org/10.1002/mrm.70583" target="_blank" rel="noopener noreferrer">Deep-DSP²: Cross-Domain Deep Learning Direct MR Signal Prediction for Radiofrequency Shielding-Free MRI</a></h3></div><span class="paper-year">2026</span></div>
+        <p class="paper-meta">Hu J, Zhao Y, Leong ATL, Wu EX · Magnetic Resonance in Medicine</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>Deep-DSP² 同时在时间域和频谱域建模，面向人体运动或移动干扰源造成的动态耦合变化。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>以跨域 Transformer/U-Net 结构融合时序和频谱特征，直接预测干净 MR 信号，强化对非平稳 EMI 的适应。</p></div>
+          <div><strong>关键结果</strong><p>相对前代方法，在干扰源或耦合关系变化时保持更稳定的抑制效果，瞄准真实开放环境的动态噪声。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>可借鉴为 agent 的在线质控模块：检测域漂移、触发重采或切换算法；当前仍需外部跨站点与极端噪声验证。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1002/mrm.70583" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/42642849/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2026-nila" data-doi="10.1002/nbm.70373" data-year="2026" data-tracks="ai" style="--paper-color:#14a8b9">
+        <div class="paper-head"><div><span class="paper-kicker">AI 重建 · 零样本扩散先验</span><h3><a href="https://doi.org/10.1002/nbm.70373" target="_blank" rel="noopener noreferrer">Noise-Level Adaptive Diffusion Priors for Zero-Shot Low-Field MRI Quality Enhancement</a></h3></div><span class="paper-year">2026</span></div>
+        <p class="paper-meta">Cai J, Huang S, Wang Z, et al., Lyu M, Wu EX · NMR in Biomedicine</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>Nila 使用高场图像训练的扩散先验，在不为每台低场设备重新配对训练的情况下，按噪声水平增强 0.05–0.35 T 图像。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>将 noise-level adaptive 数据一致性与扩散先验结合；以相位增强适配 magnitude-only DICOM，并输出不确定性信息。</p></div>
+          <div><strong>关键结果</strong><p>在本地 0.05/0.3/3 T、公开 0.064 T 及 0.05/0.35 T 患者数据上展示跨场强、跨设备的零样本增强能力。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>这是与规范模型/基础模型最直接的接口。扩散先验可能把高场群体规律带入个体图像，因此应联合不确定性、病灶保持和原始数据一致性审阅。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1002/nbm.70373" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/42599222/" target="_blank" rel="noopener noreferrer">PubMed</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC13475394/" target="_blank" rel="noopener noreferrer">开放全文</a></div></details>
+      </article>
+
+      <article class="paper-card" id="paper-2026-stroke-review" data-doi="10.1161/strokeaha.126.052978" data-year="2026" data-tracks="review platform ai protocol" style="--paper-color:#607d8b">
+        <div class="paper-head"><div><span class="paper-kicker">综述 · 床旁卒中</span><h3><a href="https://doi.org/10.1161/STROKEAHA.126.052978" target="_blank" rel="noopener noreferrer">Ultra-Low-Field Brain MRI for Point-of-Care Applications: A Technology Review</a></h3></div><span class="paper-year">2026</span></div>
+        <p class="paper-meta">Wu EX, Zhao Y, Liu Y, et al. · Stroke</p>
+        <p class="paper-takeaway"><strong>一句话：</strong>以床旁卒中为牵引，把硬件、成像协议、数据驱动图像形成和自动分析收束为一条转化路线图。</p>
+        <details class="paper-details"><summary>展开：方法、意义与边界</summary><div class="paper-detail-grid">
+          <div><strong>方法</strong><p>面向 point-of-care 场景综述 ULF 脑 MRI 的磁体/线圈、序列、重建、分析与临床流程，并讨论未来验证要求。</p></div>
+          <div><strong>关键结果</strong><p>将技术目标从“图像能否生成”推进到“急性决策能否受益”，强调设备可达性与自动化必须同时设计。</p></div>
+          <div><strong>与你的连接 / 阅读提醒</strong><p>与你的临床 AI/agent 路线最贴近：可探索自动协议—质控—分割—规范偏离—转诊链，但任何决策支持都需前瞻性临床终点评估。</p></div>
+        </div><div class="paper-links"><a href="https://doi.org/10.1161/STROKEAHA.126.052978" target="_blank" rel="noopener noreferrer">DOI</a><a href="https://pubmed.ncbi.nlm.nih.gov/42478365/" target="_blank" rel="noopener noreferrer">PubMed</a></div></details>
+      </article>
+    </div>
+  </section>
+
+  <section class="reader-section" id="figures">
+    <div class="section-heading">
+      <div>
+        <p class="section-eyebrow">VISUAL EVIDENCE</p>
+        <h2>六张图看懂系统如何工作</h2>
+      </div>
+      <p>点击图片可放大。图片来自 BISP Lab 的官方研究页面；图注说明这张图在整条研究链中的作用。</p>
+    </div>
+    <div class="figure-grid">
+      <figure class="evidence-figure"><a href="{{ site.baseurl }}/images/ewu-ultralow-field-mri/whole-body-system.jpg" data-lightbox="ewu-ulfl" title="0.05 T 全身 MRI 系统、Deep-DSP 与 PF-SR 总览"><img src="{{ site.baseurl }}/images/ewu-ultralow-field-mri/whole-body-system.jpg" alt="0.05 T 全身 MRI 设备、无屏蔽抗干扰与 AI 重建流程图" loading="lazy"></a><figcaption><strong>系统总览：硬件、噪声和 AI 是一体的</strong>左侧是 0.05 T 全身扫描器，中部展示 Deep-DSP/PF-SR，右侧是多部位影像。<a href="https://www4.hku.hk/bisplab/images/research/research_area1/science_figure1.jpg" target="_blank" rel="noopener noreferrer">查看原图</a>。图源：BISP Lab / The University of Hong Kong</figcaption></figure>
+      <figure class="evidence-figure"><a href="{{ site.baseurl }}/images/ewu-ultralow-field-mri/whole-body-contrasts.jpg" data-lightbox="ewu-ulfl" title="0.05 T 腹部与盆腔多对比成像"><img src="{{ site.baseurl }}/images/ewu-ultralow-field-mri/whole-body-contrasts.jpg" alt="0.05 T 腹部和盆腔 T1、T2、扩散及 bSSFP 多对比图像" loading="lazy"></a><figcaption><strong>全身对比：从“能扫”到“能区分组织”</strong>腹部与盆腔的 T1、T2、DWI 和 bSSFP 说明序列生态同样决定临床价值。<a href="https://www4.hku.hk/bisplab/images/research/research_area1/science_figure3.jpg" target="_blank" rel="noopener noreferrer">查看原图</a>。图源：BISP Lab / The University of Hong Kong</figcaption></figure>
+      <figure class="evidence-figure"><a href="{{ site.baseurl }}/images/ewu-ultralow-field-mri/fast-brain-pipeline.jpg" data-lightbox="ewu-ulfl" title="0.055 T 快速三维脑 MRI 的 PF-SR 流程"><img src="{{ site.baseurl }}/images/ewu-ultralow-field-mri/fast-brain-pipeline.jpg" alt="部分傅里叶采集与深度超分辨率联合的快速三维脑 MRI 流程" loading="lazy"></a><figcaption><strong>快速脑成像：采样和网络共同设计</strong>部分傅里叶减少扫描量，PF-SR 同时补齐 k-space 并提升空间分辨率。<a href="https://www4.hku.hk/bisplab/images/research/research_area1/science_advanced0.jpg" target="_blank" rel="noopener noreferrer">查看原图</a>。图源：BISP Lab / The University of Hong Kong</figcaption></figure>
+      <figure class="evidence-figure"><a href="{{ site.baseurl }}/images/ewu-ultralow-field-mri/clinical-case-comparison.jpg" data-lightbox="ewu-ulfl" title="患者 0.055 T 原始、PF-SR 与 3 T 图像对照"><img src="{{ site.baseurl }}/images/ewu-ultralow-field-mri/clinical-case-comparison.jpg" alt="患者低场原始图、PF-SR 重建图与三特斯拉参考图的并列比较" loading="lazy"></a><figcaption><strong>临床病例：增强结果必须对照原始测量</strong>并排查看原始 0.055 T、PF-SR 和 3 T，有助于识别真正恢复的结构与可能的先验偏置。<a href="https://www4.hku.hk/bisplab/images/research/research_area1/science_advanced1.jpg" target="_blank" rel="noopener noreferrer">查看原图</a>。图源：BISP Lab / The University of Hong Kong</figcaption></figure>
+      <figure class="evidence-figure"><a href="{{ site.baseurl }}/images/ewu-ultralow-field-mri/emi-pipeline.jpg" data-lightbox="ewu-ulfl" title="主动 EMI 感知与深度学习预测流程"><img src="{{ site.baseurl }}/images/ewu-ultralow-field-mri/emi-pipeline.jpg" alt="外部电磁干扰感知线圈、时间窗口和卷积网络预测流程" loading="lazy"></a><figcaption><strong>无屏蔽的关键：同时测量环境</strong>辅助线圈记录 EMI，网络学习它如何进入主接收通道，再从 MR 信号中剥离。<a href="https://www4.hku.hk/bisplab/images/research/research_area1/nmr0.jpg" target="_blank" rel="noopener noreferrer">查看原图</a>。图源：BISP Lab / The University of Hong Kong</figcaption></figure>
+      <figure class="evidence-figure"><a href="{{ site.baseurl }}/images/ewu-ultralow-field-mri/emi-comparison.jpg" data-lightbox="ewu-ulfl" title="不同 EMI 消除方法的成像效果比较"><img src="{{ site.baseurl }}/images/ewu-ultralow-field-mri/emi-comparison.jpg" alt="原始干扰图像、传统 EMI 校正和学习式 EMI 消除结果对比" loading="lazy"></a><figcaption><strong>抗干扰证据：看残留纹理，不只看平均 SNR</strong>方法对照显示条纹与结构恢复差异；下游脑表型还需检查空间相关残差。<a href="https://www4.hku.hk/bisplab/images/research/research_area1/nmr1.jpg" target="_blank" rel="noopener noreferrer">查看原图</a>。图源：BISP Lab / The University of Hong Kong</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="reader-section" id="limits">
+    <div class="section-heading">
+      <div>
+        <p class="section-eyebrow">READ WITH CAUTION</p>
+        <h2>最值得追问的四个证据边界</h2>
+      </div>
+      <p>ULF MRI 的价值是真实的，但“可生成图像”“可见病灶”和“改善临床结局”属于不同证据层级。</p>
+    </div>
+    <div class="limits-grid">
+      <article class="limit-card"><h3>物理信息上限</h3><p>低场带来较低 SNR 和更长采集压力。超分、去噪和扩散先验能改善估计，却不能凭空创造未被测量的个体信息。</p></article>
+      <article class="limit-card"><h3>AI 保真与幻觉</h3><p>视觉接近 3 T 不等于病理等价。必须同时报告数据一致性、结构/病灶保持、失败样本、域外表现和不确定性。</p></article>
+      <article class="limit-card"><h3>临床样本与泛化</h3><p>多篇序列论文以健康志愿者和小规模初步病例为主。诊断敏感性、特异性、多中心一致性及公平性仍需前瞻性验证。</p></article>
+      <article class="limit-card"><h3>真实部署与治理</h3><p>无需屏蔽房不等于无需环境评估。EMI、操作培训、线圈适配、维护、数据安全、监管和转诊工作流共同决定实际可及性。</p></article>
+    </div>
+  </section>
+
+  <section class="reader-section" id="sources">
+    <div class="section-heading">
+      <div>
+        <p class="section-eyebrow">SCOPE & SOURCES</p>
+        <h2>检索口径与来源</h2>
+      </div>
+      <p>页面按研究链完整性筛选，并对 DOI、作者和发表信息做来源交叉核对。</p>
+    </div>
+    <div class="reader-sources">
+      <p><strong>收录口径：</strong>以 <a href="https://ece.hku.hk/people/ewu/" target="_blank" rel="noopener noreferrer">Wu 教授官方主页</a>、<a href="https://www4.hku.hk/bisplab/research-area1.html" target="_blank" rel="noopener noreferrer">BISP Lab ULF MRI 研究页</a>及实验室<a href="https://www4.hku.hk/bisplab/" target="_blank" rel="noopener noreferrer">论文目录</a>为起点，再以 PubMed 和 DOI 逐项核对；纳入截至 2026 年 9 月与“AI-powered low-cost ultra-low-field MRI for healthcare”直接相关的同行评议期刊论文和技术综述。</p>
+      <p><strong>边界说明：</strong>0.3 T 的 M4Raw 与无配对 3 T-like 重建被明确标为“相邻低场”，因为它们对数据与 AI 主线关键，但不属于通常 &lt;0.1 T 的 ULF。未计入 2022 APEMC 会议前驱工作（<a href="https://doi.org/10.1109/APEMC53576.2022.9888680" target="_blank" rel="noopener noreferrer">DOI</a>）和 2023 年 publisher correction（<a href="https://doi.org/10.1038/s44222-023-00100-1" target="_blank" rel="noopener noreferrer">DOI</a>），以免与正式研究论文重复计数。</p>
+      <p><strong>如何使用：</strong>本页是研究导航，不替代阅读全文或临床指南。带有“与你的连接”的内容是面向 Shuo Lv 研究方向的分析性解读；所有数值、实验设计和临床结论应回到链接中的原论文核查。</p>
+    </div>
+  </section>
+</main>
+
+<script src="{{ site.baseurl }}/assets/js/ewu-ultralow-field-mri.js"></script>
