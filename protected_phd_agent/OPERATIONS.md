@@ -3,6 +3,14 @@
 The faculty list is private application data. Never place research batches, exports,
 session keys, migration secrets, or the current production snapshot in this repository.
 
+## Private research briefings
+
+Research briefings live under the ignored `public/research/` directory so their analysis
+and figures are not added to the public Git repository. Keep that directory in the
+encrypted local backup. The deploy script verifies that the complete briefing bundle is
+present before uploading a new Worker version; if it is absent or incomplete, deployment
+stops before changing production.
+
 ## Validate a batch
 
 Run the validator before any upload. Both JSON files must live outside the Git

@@ -11,14 +11,17 @@ const state = {
   activeDossierId: null,
   activeView: "dossiers",
   syncState: "clean",
-  advisorFilter: ""
+  advisorFilter: "",
+  researchBriefingLoaded: false,
+  researchBriefingLoading: false
 };
 
 const viewTitles = {
   dashboard: "Application overview",
   dossiers: "Advisor dossiers",
   drafts: "Draft desk",
-  profile: "Applicant profile"
+  profile: "Applicant profile",
+  research: "Research briefings"
 };
 
 function element(tag, attributes = {}, children = []) {
@@ -595,6 +598,85 @@ function profileList(title, items = []) {
   return card;
 }
 
+function bindResearchFilters(root) {
+  const filters = Array.from(root.querySelectorAll(".paper-filter"));
+  const papers = Array.from(root.querySelectorAll(".paper-card"));
+  const count = root.querySelector("#paper-count");
+  if (!filters.length || !papers.length || !count) return;
+
+  const allowed = filters.map((button) => button.dataset.filter);
+  const applyFilter = (track, updateAddress) => {
+    const active = allowed.includes(track) ? track : "all";
+    let visible = 0;
+    for (const button of filters) {
+      button.setAttribute("aria-pressed", String(button.dataset.filter === active));
+    }
+    for (const paper of papers) {
+      const tracks = (paper.dataset.tracks || "").split(/\s+/);
+      const show = active === "all" || tracks.includes(active);
+      paper.hidden = !show;
+      if (show) visible += 1;
+    }
+    count.textContent = `${visible} / ${papers.length} 篇`;
+
+    if (updateAddress) {
+      const params = new URLSearchParams(window.location.search);
+      if (active === "all") params.delete("track");
+      else params.set("track", active);
+      const query = params.toString();
+      window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+    }
+  };
+
+  for (const button of filters) {
+    button.addEventListener("click", () => applyFilter(button.dataset.filter, true));
+  }
+  root.addEventListener("click", (event) => {
+    const link = event.target.closest('a[href^="#"]');
+    if (!link || !root.contains(link)) return;
+    const targetId = link.getAttribute("href").slice(1);
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#research/${targetId}`);
+  });
+
+  const initial = new URLSearchParams(window.location.search).get("track") || "all";
+  applyFilter(initial, false);
+}
+
+function scrollResearchAnchor() {
+  const [, anchor] = window.location.hash.replace("#", "").split("/", 2);
+  if (!anchor || !state.researchBriefingLoaded) return;
+  window.requestAnimationFrame(() => document.getElementById(anchor)?.scrollIntoView({ block: "start" }));
+}
+
+async function loadResearchBriefing() {
+  if (state.researchBriefingLoaded) {
+    scrollResearchAnchor();
+    return;
+  }
+  if (state.researchBriefingLoading) return;
+  state.researchBriefingLoading = true;
+  const container = document.getElementById("research-briefing");
+  try {
+    const response = await api("/research/ewu-ultralow-field-mri.html");
+    container.innerHTML = await response.text();
+    state.researchBriefingLoaded = true;
+    bindResearchFilters(container);
+    scrollResearchAnchor();
+  } catch (error) {
+    clear(container);
+    container.appendChild(element("div", { class: "research-loading" }, [
+      element("p", { class: "signal-label", text: "BRIEFING UNAVAILABLE" }),
+      element("h2", { text: error.message })
+    ]));
+  } finally {
+    state.researchBriefingLoading = false;
+  }
+}
+
 function openDossier(id) {
   state.activeDossierId = id;
   window.location.hash = "dossiers";
@@ -602,7 +684,7 @@ function openDossier(id) {
 }
 
 function route() {
-  const requested = window.location.hash.replace("#", "");
+  const requested = window.location.hash.replace("#", "").split("/", 1)[0];
   state.activeView = viewTitles[requested] ? requested : "dossiers";
   for (const view of document.querySelectorAll("[data-view]")) {
     view.hidden = view.dataset.view !== state.activeView;
@@ -618,6 +700,7 @@ function renderCurrentView() {
   if (state.activeView === "dashboard") renderDashboard();
   else if (state.activeView === "drafts") renderDrafts();
   else if (state.activeView === "profile") renderProfile();
+  else if (state.activeView === "research") loadResearchBriefing();
   else renderDossiers();
 }
 

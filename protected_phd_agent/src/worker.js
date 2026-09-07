@@ -79,7 +79,7 @@ export default {
 
     const protectedAsset = path === "/app"
       ? "/index.html"
-      : path === "/index.html" || path === "/app.js" || path.startsWith("/logos/")
+      : path === "/index.html" || path === "/app.js" || path.startsWith("/logos/") || path.startsWith("/research/")
         ? path
         : null;
     if (protectedAsset) {

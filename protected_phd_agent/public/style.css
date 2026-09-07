@@ -227,6 +227,14 @@ select:focus-visible {
 .sync-indicator[data-state="syncing"] { color: var(--signal); }
 
 .view { padding-top: 1.6rem; }
+.research-library-view { padding-top: 1.2rem; }
+.research-loading {
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  min-height: 240px;
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+.research-loading h2 { font: 650 clamp(1.6rem, 3vw, 2.6rem)/1.1 var(--display); margin: 0.5rem 0; }
 .view-heading { align-items: end; display: flex; gap: 2rem; justify-content: space-between; margin: 0.8rem 0 1.6rem; }
 .view-heading h2 { font: 650 clamp(1.8rem, 4vw, 3.3rem)/1 var(--display); margin: 0.35rem 0 0; }
 .view-heading > p { color: var(--muted); max-width: 430px; }

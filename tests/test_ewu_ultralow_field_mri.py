@@ -1,13 +1,14 @@
 from pathlib import Path
+import json
 import re
 import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PAGE = ROOT / "_pages" / "ewu-ultralow-field-mri.html"
-STYLE = ROOT / "assets" / "css" / "ewu-ultralow-field-mri.scss"
-SCRIPT = ROOT / "assets" / "js" / "ewu-ultralow-field-mri.js"
-IMAGE_DIR = ROOT / "images" / "ewu-ultralow-field-mri"
+PAGE = ROOT / "protected_phd_agent" / "public" / "research" / "ewu-ultralow-field-mri.html"
+STYLE = ROOT / "protected_phd_agent" / "public" / "research" / "ewu-ultralow-field-mri.css"
+SCRIPT = ROOT / "protected_phd_agent" / "public" / "app.js"
+IMAGE_DIR = ROOT / "protected_phd_agent" / "public" / "research" / "ewu-ultralow-field-mri"
 
 
 EXPECTED_DOIS = {
@@ -42,17 +43,26 @@ EXPECTED_IMAGES = {
 }
 
 
+class PrivateBriefingDeploymentTests(unittest.TestCase):
+    def test_private_briefing_is_not_committed_and_is_required_before_deploy(self):
+        gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
+        package = json.loads((ROOT / "protected_phd_agent" / "package.json").read_text(encoding="utf-8"))
+        self.assertIn("protected_phd_agent/public/research/", gitignore)
+        self.assertIn("verify-private-briefings.mjs", package["scripts"]["deploy"])
+
+
 class EwuUltraLowFieldMriReaderTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        if not PAGE.is_file():
+            raise unittest.SkipTest("private research briefing is not present in this checkout")
         cls.html = PAGE.read_text(encoding="utf-8")
         cls.script = SCRIPT.read_text(encoding="utf-8")
 
-    def test_page_is_a_chinese_jekyll_route_with_scoped_assets(self):
-        self.assertIn("permalink: /research/ewu-ultralow-field-mri/", self.html)
-        self.assertIn("lang: zh", self.html)
-        self.assertIn("/assets/css/ewu-ultralow-field-mri.css", self.html)
-        self.assertIn("/assets/js/ewu-ultralow-field-mri.js", self.html)
+    def test_page_is_private_agent_content_with_scoped_assets(self):
+        self.assertFalse((ROOT / "_pages" / "ewu-ultralow-field-mri.html").exists())
+        self.assertFalse((ROOT / "assets" / "css" / "ewu-ultralow-field-mri.scss").exists())
+        self.assertIn('class="ulfl-reader"', self.html)
         self.assertTrue(STYLE.is_file())
         self.assertTrue(SCRIPT.is_file())
 
@@ -86,7 +96,7 @@ class EwuUltraLowFieldMriReaderTests(unittest.TestCase):
 
     def test_important_figures_are_local_attributed_and_accessible(self):
         referenced = set(
-            re.findall(r'/images/ewu-ultralow-field-mri/([^"?]+)', self.html)
+            re.findall(r'/research/ewu-ultralow-field-mri/([^"?]+)', self.html)
         )
         self.assertEqual(EXPECTED_IMAGES, referenced)
         for image_name in EXPECTED_IMAGES:
@@ -104,7 +114,7 @@ class EwuUltraLowFieldMriReaderTests(unittest.TestCase):
                 self.assertIn('rel="noopener noreferrer"', link)
 
     def test_filter_script_is_local_and_progressive(self):
-        self.assertNotIn("fetch(", self.script)
+        self.assertIn('api("/research/ewu-ultralow-field-mri.html"', self.script)
         self.assertIn("aria-pressed", self.script)
         self.assertIn("paper.hidden", self.script)
         self.assertIn("URLSearchParams", self.script)
