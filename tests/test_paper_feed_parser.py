@@ -4,6 +4,7 @@ import unittest
 from paper_feed.parser import (
     DEFAULT_SENDERS,
     ScholarParseError,
+    _plain_blocks,
     decode_google_target,
     is_scholar_alert,
     parse_scholar_message,
@@ -128,6 +129,26 @@ Taylor Synthetic - Imaginary Journal, 2026
 This shape alone must not be parsed as a Scholar alert.
 """
         self.assertEqual(parse_scholar_message(raw), [])
+
+    def test_plain_text_extractor_stops_after_one_hundred_results(self):
+        result = "\n".join(
+            (
+                f"Synthetic Result {index}\n"
+                f"https://example.invalid/result-{index}\n"
+                f"Author {index} - Synthetic Venue, 2026\n"
+                f"Synthetic snippet {index}."
+            )
+            for index in range(101)
+        )
+        body = f"Google Scholar\n{result}"
+        raw = (
+            "From: scholaralerts-noreply@alerts.google.invalid\n"
+            "Subject: Scholar Alert - synthetic bulk result\n"
+            "Content-Type: text/plain; charset=UTF-8\n\n"
+            f"{body}"
+        ).encode()
+        self.assertEqual(len(_plain_blocks(body)), 100)
+        self.assertEqual(len(parse_scholar_message(raw)), 100)
 
 
 if __name__ == "__main__":

@@ -193,6 +193,8 @@ def _plain_blocks(plain: str) -> list[tuple[str, str, str, str]]:
         snippet = lines[index + 2] if index + 2 < len(lines) else ""
         if title and bibliographic and snippet and "unsubscribe" not in title.casefold():
             results.append((title, line, bibliographic, snippet))
+            if len(results) == MAX_RESULTS:
+                break
     return results
 
 
