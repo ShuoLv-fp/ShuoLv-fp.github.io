@@ -19,6 +19,7 @@ class PaperFeedWorkflowTests(unittest.TestCase):
         self.assertIn("contents: write", text)
         self.assertIn("group: paper-feed-update", text)
         self.assertIn("cancel-in-progress: false", text)
+        self.assertRegex(text, r"(?s)actions/checkout@v4.*?with:\s+ref: main\s+fetch-depth: 0")
 
     def test_manual_run_defaults_to_thirty_day_preview(self):
         text = self.workflow()
