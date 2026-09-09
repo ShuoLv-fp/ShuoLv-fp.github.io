@@ -75,7 +75,9 @@ SAFE_ERROR_CATEGORIES = {
     "unknown_error",
 }
 DOI_PATTERN = re.compile(r"10\.\d{4,9}/[-._;()/:a-z0-9]+$")
-ARXIV_PATTERN = re.compile(r"(?:\d{4}\.\d{4,5}(?:v\d+)?|[a-z-]+/\d{7}(?:v\d+)?)$")
+ARXIV_PATTERN = re.compile(
+    r"(?:\d{4}\.\d{4,5}(?:v\d+)?|[a-z-]+(?:\.[a-z-]+)*/\d{7}(?:v\d+)?)$"
+)
 HASH_RECORD_ID_PATTERN = re.compile(r"[0-9a-f]{24}$")
 UNAVAILABLE_CONCLUSIONS = {
     "en": "Summary temporarily unavailable",

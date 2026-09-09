@@ -56,6 +56,20 @@ class PaperFeedModelTests(unittest.TestCase):
             "arxiv:2401.12345",
         )
 
+    def test_stable_id_accepts_dotted_legacy_arxiv_categories(self):
+        for source, expected in (
+            (" math.GT/0309136 ", "arxiv:math.gt/0309136"),
+            ("arXiv:cs.AI/0101010", "arxiv:cs.ai/0101010"),
+        ):
+            with self.subTest(source=source):
+                self.assertEqual(stable_record_id(None, source, None, "Title"), expected)
+
+    def test_stable_id_rejects_malformed_dotted_legacy_arxiv_identifier(self):
+        self.assertRegex(
+            stable_record_id(None, "math.GT/030913", None, "Title"),
+            r"^title:[0-9a-f]{24}$",
+        )
+
     def test_stable_id_uses_exact_hash_format_for_https_url_fallback(self):
         record_id = stable_record_id(None, None, "https://example.test/paper/", "Title")
         self.assertRegex(record_id, r"^url:[0-9a-f]{24}$")
@@ -132,6 +146,7 @@ class PaperFeedModelTests(unittest.TestCase):
             "doi: message id",
             "doi:10.1000/ok\nnext",
             "arxiv:not-an-id",
+            "arxiv:math.gt/030913",
         ):
             with self.subTest(record_id=record_id):
                 with self.assertRaises(ValueError):
