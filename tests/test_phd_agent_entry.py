@@ -1,11 +1,15 @@
 from pathlib import Path
 import unittest
 
+from tests.test_ewu_ultralow_field_mri import parse_top_level_config
+
 
 class PhdAgentEntryTests(unittest.TestCase):
     def test_both_lean_images_use_one_configured_protected_url(self):
-        config = Path("_config.yml").read_text(encoding="utf-8")
-        self.assertRegex(config, r"(?m)^phd_agent_url\s*:")
+        config = parse_top_level_config(Path("_config.yml").read_text(encoding="utf-8"))
+        self.assertEqual(
+            "https://shuo-phd-agent-gateway.pages.dev", config["phd_agent_url"]
+        )
         for path in (
             Path("_pages/includes/technical_skills.md"),
             Path("_pages/includes/zh/technical_skills.md"),
@@ -16,15 +20,14 @@ class PhdAgentEntryTests(unittest.TestCase):
             self.assertIn("[Lean](https://lean-lang.org/)", text)
 
     def test_private_directories_are_excluded_from_jekyll(self):
-        config = Path("_config.yml").read_text(encoding="utf-8")
+        config = parse_top_level_config(Path("_config.yml").read_text(encoding="utf-8"))
         for path in ("phd_application_agent", "phd-advisor-summary", "protected_phd_agent"):
-            self.assertIn(f"  - {path}", config)
+            self.assertIn(path, config["exclude"])
 
     def test_public_site_uses_the_deployed_private_gateway(self):
-        config = Path("_config.yml").read_text(encoding="utf-8")
-        self.assertIn(
-            'phd_agent_url           : "https://shuo-phd-agent-gateway.pages.dev"',
-            config,
+        config = parse_top_level_config(Path("_config.yml").read_text(encoding="utf-8"))
+        self.assertEqual(
+            "https://shuo-phd-agent-gateway.pages.dev", config["phd_agent_url"]
         )
         self.assertFalse(Path("protected_phd_agent").exists())
 

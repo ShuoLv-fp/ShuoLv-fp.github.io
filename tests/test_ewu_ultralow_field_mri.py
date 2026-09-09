@@ -1,5 +1,6 @@
 from pathlib import Path
 import re
+import textwrap
 import unittest
 
 
@@ -42,14 +43,62 @@ EXPECTED_IMAGES = {
 }
 
 
+def parse_top_level_config(text):
+    """Parse the top-level scalar and list values needed by public-boundary tests."""
+    config = {}
+    current_list = None
+    for raw_line in text.splitlines():
+        line = raw_line.split("#", 1)[0].rstrip()
+        if not line:
+            continue
+        key_match = re.match(r"^([A-Za-z0-9_]+)\s*:\s*(.*)$", line)
+        if key_match:
+            key, value = key_match.groups()
+            if value:
+                config[key] = value.strip().strip('"\'')
+                current_list = None
+            else:
+                config[key] = []
+                current_list = key
+            continue
+        list_match = re.match(r"^\s+-\s+(.+)$", line)
+        if current_list and list_match:
+            config[current_list].append(list_match.group(1).strip().strip('"\''))
+        else:
+            current_list = None
+    return config
+
+
 class PrivateBriefingDeploymentTests(unittest.TestCase):
+    def test_config_parser_ignores_comments(self):
+        config = parse_top_level_config(
+            textwrap.dedent(
+                """
+            # exclude:
+            #   - protected_phd_agent
+            exclude:
+              - actual_private_directory
+            phd_agent_url: "https://shuo-phd-agent-gateway.pages.dev"
+            # phd_agent_url: "https://example.invalid"
+                """
+            )
+        )
+        self.assertEqual(["actual_private_directory"], config["exclude"])
+        self.assertEqual(
+            "https://shuo-phd-agent-gateway.pages.dev", config["phd_agent_url"]
+        )
+
     def test_private_briefing_is_absent_from_the_public_checkout(self):
         self.assertFalse((ROOT / "protected_phd_agent").exists())
+        for public_root in (ROOT / "_pages", ROOT / "assets"):
+            with self.subTest(public_root=public_root):
+                self.assertEqual([], list(public_root.rglob("*ewu*")))
         self.assertFalse((ROOT / "_pages" / "ewu-ultralow-field-mri.html").exists())
         self.assertFalse((ROOT / "assets" / "css" / "ewu-ultralow-field-mri.scss").exists())
+        self.assertFalse((ROOT / "assets" / "images" / "research" / "ewu-ultralow-field-mri").exists())
 
-        config = (ROOT / "_config.yml").read_text(encoding="utf-8")
-        self.assertIn("  - protected_phd_agent", config)
+        config = parse_top_level_config((ROOT / "_config.yml").read_text(encoding="utf-8"))
+        self.assertIn("protected_phd_agent", config["exclude"])
 
 
 class EwuUltraLowFieldMriReaderTests(unittest.TestCase):
