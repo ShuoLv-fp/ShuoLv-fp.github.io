@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import html
 import ipaddress
 import json
 import re
@@ -22,6 +21,12 @@ MAX_REDIRECTS = 3
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 REQUEST_TIMEOUT = httpx.Timeout(connect=10.0, read=20.0, write=10.0, pool=10.0)
 USER_AGENT = "ShuoLv-paper-feed/1.0 (+https://shuolv.github.io/)"
+LANDING_ALLOWED_HOSTS = (
+    "acm.org", "arxiv.org", "biorxiv.org", "cell.com", "frontiersin.org",
+    "ieee.org", "link.springer.com", "medrxiv.org", "nature.com", "nih.gov",
+    "plos.org", "pmc.ncbi.nlm.nih.gov", "sciencedirect.com", "science.org",
+    "springer.com", "wiley.com",
+)
 _DOI_PATTERN = re.compile(r"10\.\d{4,9}/[-._;()/:A-Z0-9]+", re.IGNORECASE)
 _ARXIV_PATTERN = re.compile(r"(?:arxiv(?:\.org/(?:abs|pdf)/)?\s*:?\s*)?((?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z-]+)?/\d{7})(?:v\d+)?)", re.IGNORECASE)
 _PMID_PATTERN = re.compile(r"pubmed\.ncbi\.nlm\.nih\.gov/(\d+)|\bpmid\s*:\s*(\d+)", re.IGNORECASE)
@@ -77,6 +82,15 @@ def is_safe_public_url(url: str) -> bool:
             return bool(addresses) and all(address_is_public(item[4][0]) for item in addresses)
     except (OSError, ValueError):
         return False
+
+
+def _is_trusted_landing_url(url: str) -> bool:
+    try:
+        parts = urlsplit(url)
+        host = (parts.hostname or "").rstrip(".").casefold()
+    except (TypeError, ValueError):
+        return False
+    return parts.scheme == "https" and any(host == domain or host.endswith(f".{domain}") for domain in LANDING_ALLOWED_HOSTS) and is_safe_public_url(url)
 
 
 def metadata_from_candidate(candidate: PaperCandidate) -> PaperMetadata:
@@ -180,7 +194,7 @@ def _openalex_metadata(base: PaperMetadata, client: httpx.Client) -> PaperMetada
 
 def _landing_metadata(base: PaperMetadata, client: httpx.Client) -> PaperMetadata | None:
     url = base.canonical_url
-    if not is_safe_public_url(url):
+    if not _is_trusted_landing_url(url):
         return None
     for _ in range(MAX_REDIRECTS + 1):
         response = _bounded_request(client, url)
@@ -192,7 +206,7 @@ def _landing_metadata(base: PaperMetadata, client: httpx.Client) -> PaperMetadat
             if not target:
                 return None
             url = urljoin(url, target)
-            if not is_safe_public_url(url):
+            if not _is_trusted_landing_url(url):
                 return None
             continue
         if status != 200:
@@ -211,8 +225,8 @@ def _landing_metadata(base: PaperMetadata, client: httpx.Client) -> PaperMetadat
 def enrich_candidate(candidate: PaperCandidate, client: httpx.Client) -> PaperMetadata:
     """Enrich in fixed source order; network failures return safe local evidence."""
     metadata = metadata_from_candidate(candidate)
-    doi = _doi(candidate.doi) or _doi(candidate.canonical_url) or _doi(candidate.title)
-    arxiv_id = _arxiv(candidate.arxiv_id) or _arxiv(candidate.canonical_url)
+    doi = _doi(candidate.doi) or _doi(candidate.canonical_url) or _doi(candidate.title) or _doi(candidate.snippet)
+    arxiv_id = _arxiv(candidate.arxiv_id) or _arxiv(candidate.canonical_url) or _arxiv(candidate.title) or _arxiv(candidate.snippet)
     pmid = _pmid(candidate.canonical_url) or _pmid(candidate.title)
     for adapter, identifier in ((_crossref, doi), (_arxiv_metadata, arxiv_id), (_pubmed_metadata, pmid)):
         if identifier:
@@ -227,4 +241,4 @@ def enrich_candidate(candidate: PaperCandidate, client: httpx.Client) -> PaperMe
         if metadata.evidence_type == "abstract":
             return metadata
     result = _landing_metadata(metadata, client)
-    return result if result and result.evidence_type == "abstract" else metadata
+    return result or metadata

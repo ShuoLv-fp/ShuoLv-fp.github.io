@@ -62,6 +62,15 @@ class MetadataTests(unittest.TestCase):
         self.assertEqual(metadata.evidence_type, "abstract")
         self.assertEqual(metadata.abstract, "Public abstract text.")
 
+    def test_extracts_doi_from_candidate_snippet(self):
+        def handler(request):
+            self.assertEqual(request.url.host, "api.crossref.org")
+            return httpx.Response(200, json={"message": {"title": ["Snippet DOI"], "abstract": "Public abstract text."}})
+
+        with self.mock_client(handler) as client:
+            metadata = enrich_candidate(self.candidate(snippet="See doi:10.1000/from-snippet."), client)
+        self.assertEqual(metadata.title, "Snippet DOI")
+
     def test_arxiv_fallback_uses_atom_abstract(self):
         def handler(request):
             self.assertEqual(str(request.url), "https://export.arxiv.org/api/query?id_list=2401.12345")
@@ -136,8 +145,8 @@ class MetadataTests(unittest.TestCase):
     @patch("paper_feed.metadata.is_safe_public_url", return_value=True)
     def test_landing_page_fallback_follows_guarded_redirect_and_reads_public_meta(self, _safe):
         def handler(request):
-            if request.url.host == "papers.example":
-                return httpx.Response(302, headers={"location": "https://publisher.example/paper"})
+            if request.url.host == "www.nature.com":
+                return httpx.Response(302, headers={"location": "https://link.springer.com/paper"})
             return httpx.Response(200, text="""
                 <meta name='citation_title' content='Landing title'>
                 <meta name='citation_author' content='Ada Lovelace'>
@@ -146,9 +155,31 @@ class MetadataTests(unittest.TestCase):
             """)
 
         with self.mock_client(handler) as client:
-            metadata = enrich_candidate(self.candidate(), client)
+            metadata = enrich_candidate(self.candidate(canonical_url="https://www.nature.com/article"), client)
         self.assertEqual(metadata.title, "Landing title")
         self.assertEqual(metadata.evidence_type, "abstract")
+
+    @patch("paper_feed.metadata.is_safe_public_url", return_value=True)
+    def test_landing_keeps_its_bibliographic_metadata_without_abstract(self, _safe):
+        def handler(request):
+            return httpx.Response(200, text="<meta name='citation_title' content='Landing title'><meta name='citation_author' content='Ada Lovelace'>")
+
+        with self.mock_client(handler) as client:
+            metadata = enrich_candidate(self.candidate(canonical_url="https://www.nature.com/article"), client)
+        self.assertEqual(metadata.title, "Landing title")
+        self.assertEqual(metadata.authors, ("Ada Lovelace",))
+        self.assertEqual((metadata.abstract, metadata.evidence_type), ("Email snippet.", "snippet"))
+
+    @patch("paper_feed.metadata.is_safe_public_url", return_value=True)
+    def test_untrusted_landing_host_is_never_requested(self, _safe):
+        def handler(request):
+            if request.url.host == "api.openalex.org":
+                return httpx.Response(404)
+            self.fail("untrusted landing URL must not be fetched")
+
+        with self.mock_client(handler) as client:
+            metadata = enrich_candidate(self.candidate(canonical_url="https://attacker.example/paper"), client)
+        self.assertEqual(metadata.evidence_type, "snippet")
 
     @patch("paper_feed.metadata.is_safe_public_url", return_value=True)
     def test_landing_rejects_more_than_three_redirects(self, _safe):
