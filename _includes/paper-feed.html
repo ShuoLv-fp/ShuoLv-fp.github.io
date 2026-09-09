@@ -1,6 +1,15 @@
 <div class="paper-feed" data-paper-feed data-lang="{{ page.lang }}" data-feed-url="{{ site.baseurl }}/assets/data/paper-feed.json">
+  <header class="paper-feed__header">
+    <p class="paper-feed__kicker">{% if page.lang == 'zh' %}七日研究阅读{% else %}Seven-day research reading{% endif %}</p>
+    <h1 class="paper-feed__title">{% if page.lang == 'zh' %}学术速递{% else %}Paper Feed{% endif %}</h1>
+    <p class="paper-feed__intro">{% if page.lang == 'zh' %}按与你现有研究的关联程度整理，保留所有论文。{% else %}Organized by connection to current research, with every paper retained.{% endif %}</p>
+  </header>
   <p class="paper-feed__status" data-paper-feed-status aria-live="polite">{% if page.lang == 'zh' %}正在加载论文…{% else %}Loading papers…{% endif %}</p>
-  <div class="paper-feed__pager-slot" data-paper-feed-pager></div>
+  <div class="paper-feed__toolbar">
+    <p class="paper-feed__range" data-paper-feed-range aria-live="polite"></p>
+    <div class="paper-feed__pager-slot" data-paper-feed-pager></div>
+  </div>
   <div class="paper-feed__days" data-paper-feed-days></div>
   <div class="paper-feed__pager-slot" data-paper-feed-pager></div>
+  <noscript><p class="paper-feed__status">{% if page.lang == 'zh' %}请启用 JavaScript 以查看论文列表。{% else %}Enable JavaScript to view the paper list.{% endif %}</p></noscript>
 </div>

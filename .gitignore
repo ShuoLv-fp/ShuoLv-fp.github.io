@@ -4,5 +4,6 @@ push.sh
 **/__pycache__/
 **/*.pyc
 .worktrees/
+.superpowers/
 /phd_application_agent/
 /phd-advisor-summary/
