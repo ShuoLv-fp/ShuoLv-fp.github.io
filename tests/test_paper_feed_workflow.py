@@ -33,6 +33,7 @@ class PaperFeedWorkflowTests(unittest.TestCase):
             'node-version: "20"',
             "ruby-version: \"3.1\"",
             "pip install --requirement paper_feed/requirements.txt",
+            "pip install --requirement tests/requirements.txt",
             "python -m unittest discover",
             "node --test tests/js/*.test.js",
             "bundle exec jekyll build",
