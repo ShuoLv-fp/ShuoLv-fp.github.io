@@ -1,0 +1,17 @@
+From: scholaralerts-noreply@alerts.google.invalid
+To: reader@example.invalid
+Subject: Scholar Alert - nested footer regression
+Date: Tue, 09 Sep 2026 09:00:00 +0000
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+<html><body>
+  <div class="gse_alrt_wrapper">
+    <table class="gse_alrt">
+      <tr class="gse_alrt_title"><td><a href="https://scholar.google.com/scholar_url?url=https%3A%2F%2Fexample.invalid%2Fsurvives">Result Survives Nested Footer</a></td></tr>
+      <tr><td class="gse_alrt_meta">Riley Invented - Synthetic Results, 2026</td></tr>
+      <tr><td class="gse_alrt_snippet">This valid result must survive its sibling footer.</td></tr>
+    </table>
+    <div class="gse_alrt_footer">Unsubscribe from this synthetic alert.</div>
+  </div>
+</body></html>

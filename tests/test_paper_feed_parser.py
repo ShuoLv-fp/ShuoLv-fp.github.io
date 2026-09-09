@@ -1,7 +1,12 @@
 from pathlib import Path
 import unittest
 
-from paper_feed.parser import ScholarParseError, is_scholar_alert, parse_scholar_message
+from paper_feed.parser import (
+    ScholarParseError,
+    decode_google_target,
+    is_scholar_alert,
+    parse_scholar_message,
+)
 
 
 FIXTURES = Path("tests/fixtures")
@@ -10,7 +15,7 @@ FIXTURES = Path("tests/fixtures")
 class ScholarParserTests(unittest.TestCase):
     def test_html_alert_yields_only_paper_fields(self):
         raw = (FIXTURES / "scholar_alert.html.eml").read_bytes()
-        self.assertTrue(is_scholar_alert(raw, ("scholaralerts-noreply@google.com",), ("Scholar Alert",)))
+        self.assertTrue(is_scholar_alert(raw, ("scholaralerts-noreply@alerts.google.invalid",), ("Scholar Alert",)))
         papers = parse_scholar_message(raw)
         self.assertEqual(len(papers), 2)
         self.assertEqual(papers[0].title, "Foundation Models for Brain Dynamics")
@@ -20,7 +25,7 @@ class ScholarParserTests(unittest.TestCase):
 
     def test_unrelated_email_is_rejected(self):
         raw = b"From: newsletter@example.invalid\nSubject: Weekly news\n\nHello"
-        self.assertFalse(is_scholar_alert(raw, ("scholaralerts-noreply@google.com",), ("Scholar Alert",)))
+        self.assertFalse(is_scholar_alert(raw, ("scholaralerts-noreply@alerts.google.invalid",), ("Scholar Alert",)))
 
     def test_plain_text_alert_is_supported(self):
         papers = parse_scholar_message((FIXTURES / "scholar_alert.txt.eml").read_bytes())
@@ -28,7 +33,7 @@ class ScholarParserTests(unittest.TestCase):
         self.assertTrue(papers[0].canonical_url.startswith("https://"))
 
     def test_plain_text_is_used_when_html_has_no_results(self):
-        raw = b"""From: scholaralerts-noreply@google.com
+        raw = b"""From: scholaralerts-noreply@alerts.google.invalid
 Subject: Scholar Alert - synthetic result
 MIME-Version: 1.0
 Content-Type: multipart/alternative; boundary=part
@@ -36,6 +41,7 @@ Content-Type: multipart/alternative; boundary=part
 --part
 Content-Type: text/plain; charset=UTF-8
 
+Google Scholar
 Fallback Paper
 https://example.invalid/fallback-paper
 Taylor Synthetic - Imaginary Journal, 2026
@@ -50,7 +56,7 @@ Content-Type: text/html; charset=UTF-8
         self.assertEqual(papers[0].canonical_url, "https://example.invalid/fallback-paper")
 
     def test_recognized_alert_with_a_malformed_result_raises_typed_error(self):
-        raw = b"""From: scholaralerts-noreply@google.com
+        raw = b"""From: scholaralerts-noreply@alerts.google.invalid
 Subject: Scholar Alert - synthetic result
 Content-Type: text/html; charset=UTF-8
 
@@ -58,6 +64,41 @@ Content-Type: text/html; charset=UTF-8
 """
         with self.assertRaises(ScholarParseError):
             parse_scholar_message(raw)
+
+    def test_footer_child_does_not_remove_its_valid_result_wrapper(self):
+        papers = parse_scholar_message((FIXTURES / "scholar_alert_footer_wrapper.eml").read_bytes())
+        self.assertEqual(len(papers), 1)
+        self.assertEqual(papers[0].title, "Result Survives Nested Footer")
+
+    def test_google_redirect_requires_exact_google_host_or_subdomain(self):
+        target = "https%3A%2F%2Fexample.invalid%2Fpaper"
+        self.assertEqual(
+            decode_google_target(f"https://google.com/scholar_url?url={target}"),
+            "https://example.invalid/paper",
+        )
+        self.assertEqual(
+            decode_google_target(f"https://scholar.google.com/scholar_url?url={target}"),
+            "https://example.invalid/paper",
+        )
+        for deceptive_url in (
+            f"https://notgoogle.com/scholar_url?url={target}",
+            f"https://google.com.evil.invalid/scholar_url?url={target}",
+            f"https://google.com@evil.invalid/scholar_url?url={target}",
+            "https://google.com/scholar_url?url=http%3A%2F%2Fexample.invalid%2Fpaper",
+        ):
+            self.assertEqual(decode_google_target(deceptive_url), "")
+
+    def test_plain_text_shape_without_scholar_marker_is_rejected(self):
+        raw = b"""From: scholaralerts-noreply@alerts.google.invalid
+Subject: Scholar Alert - unrelated synthetic mail
+Content-Type: text/plain; charset=UTF-8
+
+Unrelated Four Line Message
+https://example.invalid/unrelated
+Taylor Synthetic - Imaginary Journal, 2026
+This shape alone must not be parsed as a Scholar alert.
+"""
+        self.assertEqual(parse_scholar_message(raw), [])
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup, Tag
 from paper_feed.models import PaperCandidate
 
 
-DEFAULT_SENDERS = ("scholaralerts-noreply@google.com",)
+DEFAULT_SENDERS = ("scholaralerts-noreply@alerts.google.invalid",)
 DEFAULT_SUBJECT_TERMS = ("Scholar Alert",)
 MAX_RESULTS = 100
 
@@ -29,10 +29,15 @@ class ScholarParseError(ValueError):
 
 def decode_google_target(url: str) -> str:
     parts = urlsplit(url)
-    if parts.netloc.endswith("google.com") and parts.path.endswith("/scholar_url"):
+    host = parts.hostname.casefold() if parts.hostname else ""
+    is_google_host = host == "google.com" or host.endswith(".google.com")
+    has_credentials = parts.username is not None or parts.password is not None
+    if parts.path.endswith("/scholar_url"):
+        if not (parts.scheme == "https" and is_google_host and not has_credentials):
+            return ""
         target = parse_qs(parts.query).get("url", [""])[0]
         return target if target.startswith("https://") else ""
-    return url if url.startswith("https://") else ""
+    return url if parts.scheme == "https" and not has_credentials else ""
 
 
 def clean_text(value: str, limit: int) -> str:
@@ -128,11 +133,14 @@ def _html_blocks(html: str) -> list[tuple[str, str, str, str]]:
     for node in soup.select("script, style, form"):
         node.decompose()
     for node in soup.find_all(["img", "div", "table", "p", "span"]):
+        if node.parent is None:
+            continue
         classes = " ".join(node.get("class", []))
         marker = f"{classes} {node.get('id', '')} {node.get_text(' ', strip=True)}".casefold()
-        if "footer" in marker or "unsubscribe" in marker or (
+        has_result_card = node.select_one(".gse_alrt_title") is not None
+        if not has_result_card and ("footer" in marker or "unsubscribe" in marker or (
             node.name == "img" and (node.get("width") == "1" or node.get("height") == "1")
-        ):
+        )):
             node.decompose()
     results = []
     for title_node in soup.select(".gse_alrt_title")[:MAX_RESULTS]:
@@ -154,6 +162,8 @@ def _class_text(container: Tag | None, class_name: str, limit: int) -> str:
 
 
 def _plain_blocks(plain: str) -> list[tuple[str, str, str, str]]:
+    if "google scholar" not in plain.casefold():
+        return []
     lines = [clean_text(line, 4000) for line in plain.splitlines()]
     results = []
     for index, line in enumerate(lines):
