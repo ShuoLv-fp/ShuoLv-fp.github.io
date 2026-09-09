@@ -1,5 +1,4 @@
 from pathlib import Path
-import json
 import unittest
 
 
@@ -21,21 +20,13 @@ class PhdAgentEntryTests(unittest.TestCase):
         for path in ("phd_application_agent", "phd-advisor-summary", "protected_phd_agent"):
             self.assertIn(f"  - {path}", config)
 
-    def test_pages_gateway_forwards_to_private_worker(self):
-        config = json.loads(
-            Path("protected_phd_agent/pages-gateway/wrangler.jsonc").read_text(encoding="utf-8")
+    def test_public_site_uses_the_deployed_private_gateway(self):
+        config = Path("_config.yml").read_text(encoding="utf-8")
+        self.assertIn(
+            'phd_agent_url           : "https://shuo-phd-agent-gateway.pages.dev"',
+            config,
         )
-        self.assertEqual("./dist", config["pages_build_output_dir"])
-        self.assertEqual(
-            [{"binding": "PHD_AGENT_SERVICE", "service": "shuo-phd-agent"}],
-            config["services"],
-        )
-        gateway = Path(
-            "protected_phd_agent/pages-gateway/dist/_worker.js"
-        ).read_text(encoding="utf-8")
-        self.assertIn("env.PHD_AGENT_SERVICE.fetch(request)", gateway)
-        self.assertNotIn("WORKFLOW_PASSWORD", gateway)
-        self.assertNotIn("faculty", gateway.lower())
+        self.assertFalse(Path("protected_phd_agent").exists())
 
 
 if __name__ == "__main__":

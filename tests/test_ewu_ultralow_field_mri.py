@@ -1,5 +1,4 @@
 from pathlib import Path
-import json
 import re
 import unittest
 
@@ -44,11 +43,13 @@ EXPECTED_IMAGES = {
 
 
 class PrivateBriefingDeploymentTests(unittest.TestCase):
-    def test_private_briefing_is_not_committed_and_is_required_before_deploy(self):
-        gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
-        package = json.loads((ROOT / "protected_phd_agent" / "package.json").read_text(encoding="utf-8"))
-        self.assertIn("protected_phd_agent/public/research/", gitignore)
-        self.assertIn("verify-private-briefings.mjs", package["scripts"]["deploy"])
+    def test_private_briefing_is_absent_from_the_public_checkout(self):
+        self.assertFalse((ROOT / "protected_phd_agent").exists())
+        self.assertFalse((ROOT / "_pages" / "ewu-ultralow-field-mri.html").exists())
+        self.assertFalse((ROOT / "assets" / "css" / "ewu-ultralow-field-mri.scss").exists())
+
+        config = (ROOT / "_config.yml").read_text(encoding="utf-8")
+        self.assertIn("  - protected_phd_agent", config)
 
 
 class EwuUltraLowFieldMriReaderTests(unittest.TestCase):
