@@ -18,13 +18,13 @@
             {% if link.url contains 'http' %}
               <li class="masthead__menu-item"><a href="{{ link.url }}" target="_blank">{{ link.title }}</a></li>
             {% else %}
-              <li class="masthead__menu-item"><a href="{{ site.baseurl }}{{ link.url }}">{{ link.title }}</a></li>
+              <li class="masthead__menu-item{% if link.url == page.permalink %} active{% endif %}"><a href="{{ site.baseurl }}{{ link.url }}">{{ link.title }}</a></li>
             {% endif %}
           {% endfor %}
           {% if page.lang == 'zh' %}
-            <li class="masthead__menu-item lang-switch"><a href="{{ site.baseurl }}/">EN</a></li>
+            <li class="masthead__menu-item lang-switch"><a{% if page.alternate_url %} data-paper-feed-alternate{% endif %} href="{{ site.baseurl }}{{ page.alternate_url | default: '/' }}">EN</a></li>
           {% else %}
-            <li class="masthead__menu-item lang-switch"><a href="{{ site.baseurl }}/zh/">中文</a></li>
+            <li class="masthead__menu-item lang-switch"><a{% if page.alternate_url %} data-paper-feed-alternate{% endif %} href="{{ site.baseurl }}{{ page.alternate_url | default: '/zh/' }}">中文</a></li>
           {% endif %}
         </ul>
         <ul class="hidden-links hidden"></ul>

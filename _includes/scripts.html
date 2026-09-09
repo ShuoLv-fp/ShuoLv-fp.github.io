@@ -1,6 +1,9 @@
 <script src="{{ site.baseurl }}/assets/js/main.min.js"></script>
 <script src="{{ site.baseurl }}/assets/js/dark-mode.js"></script>
 <script src="{{ site.baseurl }}/assets/js/site-custom.js"></script>
+{% if page.paper_feed %}
+<script src="{{ site.baseurl }}/assets/js/paper-feed.js"></script>
+{% endif %}
 
 {% include analytics.html %}
 {% include fetch_google_scholar_stats.html %}
