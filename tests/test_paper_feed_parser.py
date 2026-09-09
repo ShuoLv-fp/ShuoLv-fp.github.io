@@ -50,6 +50,20 @@ Content-Type: text/html; charset=UTF-8
         self.assertEqual(len(papers), 1)
         self.assertTrue(papers[0].canonical_url.startswith("https://"))
 
+    def test_alert_date_uses_asia_shanghai_calendar_day(self):
+        raw = b"""From: scholaralerts-noreply@alerts.google.invalid
+Subject: Scholar Alert - synthetic result
+Date: Wed, 09 Sep 2026 00:30:00 +0800
+Content-Type: text/plain; charset=UTF-8
+
+Google Scholar
+Timezone Boundary Paper
+https://example.invalid/timezone-paper
+Taylor Synthetic - Imaginary Journal, 2026
+Synthetic public evidence.
+"""
+        self.assertEqual(parse_scholar_message(raw)[0].alert_date, "2026-09-09")
+
     def test_plain_text_is_used_when_html_has_no_results(self):
         raw = b"""From: scholaralerts-noreply@alerts.google.invalid
 Subject: Scholar Alert - synthetic result

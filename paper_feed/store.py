@@ -207,11 +207,12 @@ def validate_public_record(payload: Mapping[str, Any]) -> None:
     _validate_stable_record_id(payload["record_id"])
     _non_empty_string(payload["title"], "title", MAX_LENGTHS["title"])
     authors = payload["authors"]
-    if not isinstance(authors, list) or not authors:
+    if not isinstance(authors, list):
         raise ValueError("invalid authors")
     for author in authors:
         _non_empty_string(author, "author", MAX_LENGTHS["author"])
-    _non_empty_string(payload["venue"], "venue", MAX_LENGTHS["venue"])
+    if not isinstance(payload["venue"], str) or len(payload["venue"]) > MAX_LENGTHS["venue"]:
+        raise ValueError("invalid venue")
     if payload["year"] is not None and (
         not isinstance(payload["year"], int) or not 1000 <= payload["year"] <= 9999
     ):

@@ -10,15 +10,15 @@
   var copy = {
     en: {
       loading: "Loading papers…", error: "The paper feed could not be loaded. Please try again later.", empty: "No papers were selected for this seven-day window.",
-      unavailable: "Summary unavailable.", evidence: "Evidence", original: "Original paper", previous: "Previous 7 days", next: "Next 7 days",
+      unavailable: "Summary unavailable.", evidence: "Evidence", original: "Original paper", previous: "Previous 7 days", next: "Next 7 days", latest: "Latest",
       high: "High relevance", transferable: "Transferable", weak: "Background", conclusion: "Core conclusion", points: "Key points", connection: "Research connection", tags: "Topics",
-      abstract: "abstract", snippet: "snippet", metadata: "metadata", unavailableEvidence: "unavailable", range: "Reading window"
+      abstract: "Public abstract", snippet: "Email snippet", metadata: "Metadata only", unavailableEvidence: "Unavailable", range: "Reading window"
     },
     zh: {
       loading: "正在加载论文…", error: "论文速递暂时无法加载，请稍后再试。", empty: "这个七天窗口暂无入选论文。",
-      unavailable: "摘要暂不可用。", evidence: "证据", original: "查看原文", previous: "前 7 天", next: "后 7 天",
+      unavailable: "摘要暂不可用。", evidence: "证据", original: "查看原文", previous: "前 7 天", next: "后 7 天", latest: "最新",
       high: "高度相关", transferable: "可迁移", weak: "背景参考", conclusion: "核心结论", points: "关键要点", connection: "研究关联", tags: "主题",
-      abstract: "摘要", snippet: "片段", metadata: "元数据", unavailableEvidence: "不可用", range: "阅读区间"
+      abstract: "公开摘要", snippet: "邮件片段", metadata: "仅元数据", unavailableEvidence: "不可用", range: "阅读区间"
     }
   };
 
@@ -68,6 +68,8 @@
       var bRank = Object.prototype.hasOwnProperty.call(relevanceRank, b.relevance) ? relevanceRank[b.relevance] : 99;
       var byRelevance = aRank - bRank;
       if (byRelevance) return byRelevance;
+      var byIngested = String(b.ingested_at || "").localeCompare(String(a.ingested_at || ""));
+      if (byIngested) return byIngested;
       var byTitle = String(a.title || "").localeCompare(String(b.title || ""));
       return byTitle || left.index - right.index;
     });
@@ -82,6 +84,7 @@
 
   function windowUrl(pathname, start) { return pathname + "?start=" + encodeURIComponent(isoDate(start)); }
   function canGoNext(start, today) { return addDays(start, 7).getTime() <= latestStart(today).getTime(); }
+  function isLatest(start, today) { return start.getTime() === latestStart(today).getTime(); }
   function safeExternalLink(url) {
     var parsed;
     try { parsed = new URL(url); } catch (_) { throw new Error("unsafe paper URL"); }
@@ -161,7 +164,11 @@
     var labels = copy[lang] || copy.en;
     var pager = element(document, "nav", "paper-feed__pager");
     pager.setAttribute("aria-label", lang === "zh" ? "论文窗口导航" : "Paper window navigation");
-    [[addDays(start, -7), labels.previous, false], [addDays(start, 7), labels.next, !canGoNext(start, today)]].forEach(function (entry) {
+    [
+      [addDays(start, -7), labels.previous, false],
+      [addDays(start, 7), labels.next, !canGoNext(start, today)],
+      [latestStart(today), labels.latest, isLatest(start, today)]
+    ].forEach(function (entry) {
       var button = element(document, "button", "paper-feed__pager-button", entry[1]);
       button.type = "button";
       button.disabled = entry[2];
@@ -213,5 +220,5 @@
 
   if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded", boot);
 
-  return { addDays: addDays, canGoNext: canGoNext, dateFromIso: dateFromIso, isoDate: isoDate, parseStart: parseStart, safeExternalLink: safeExternalLink, selectWindow: selectWindow, sortAndGroup: sortAndGroup, windowUrl: windowUrl, render: render };
+  return { addDays: addDays, canGoNext: canGoNext, dateFromIso: dateFromIso, isLatest: isLatest, isoDate: isoDate, parseStart: parseStart, safeExternalLink: safeExternalLink, selectWindow: selectWindow, sortAndGroup: sortAndGroup, windowUrl: windowUrl, render: render };
 }));

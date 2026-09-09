@@ -33,16 +33,16 @@ test("malformed, impossible, and future starts fall back to the latest window", 
   assert.equal(PaperFeed.isoDate(PaperFeed.parseStart("?start=2026-09-03", today)), "2026-09-03");
 });
 
-test("sorting keeps date descending, relevance ascending, and equal titles stable", () => {
+test("sorting keeps date descending, relevance ascending, ingestion descending, and equal records stable", () => {
   const grouped = PaperFeed.sortAndGroup([
     { alert_date: "2026-09-05", relevance: "weak", title: "Zed" },
-    { alert_date: "2026-09-05", relevance: "high", title: "Alpha", record_id: "first" },
-    { alert_date: "2026-09-05", relevance: "high", title: "Alpha", record_id: "second" },
+    { alert_date: "2026-09-05", relevance: "high", ingested_at: "2026-09-05T01:00:00Z", title: "Alpha", record_id: "first" },
+    { alert_date: "2026-09-05", relevance: "high", ingested_at: "2026-09-05T02:00:00Z", title: "Zulu", record_id: "second" },
     { alert_date: "2026-09-05", relevance: "transferable", title: "Beta" },
     { alert_date: "2026-09-06", relevance: "weak", title: "Earlier group" },
   ]);
   assert.deepEqual(grouped.map((group) => group.date), ["2026-09-06", "2026-09-05"]);
-  assert.deepEqual(grouped[1].papers.map((paper) => paper.record_id || paper.title), ["first", "second", "Beta", "Zed"]);
+  assert.deepEqual(grouped[1].papers.map((paper) => paper.record_id || paper.title), ["second", "first", "Beta", "Zed"]);
 });
 
 test("seven-day pager URLs preserve the selected range and stop after latest start", () => {
@@ -51,6 +51,8 @@ test("seven-day pager URLs preserve the selected range and stop after latest sta
   assert.equal(PaperFeed.isoDate(PaperFeed.addDays(start, 7)), "2026-09-03");
   assert.equal(PaperFeed.canGoNext(start, today), true);
   assert.equal(PaperFeed.canGoNext(PaperFeed.dateFromIso("2026-09-03"), today), false);
+  assert.equal(PaperFeed.isLatest(PaperFeed.dateFromIso("2026-09-03"), today), true);
+  assert.equal(PaperFeed.isLatest(start, today), false);
 });
 
 test("only HTTPS original links are accepted", () => {

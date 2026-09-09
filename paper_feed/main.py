@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import tempfile
 from typing import Callable
+from zoneinfo import ZoneInfo
 
 import httpx
 
@@ -30,13 +31,14 @@ from paper_feed.store import (
     write_feed_atomic,
     write_retries_atomic,
 )
-from paper_feed.summarizer import summarize
+from paper_feed.summarizer import SummaryError, summarize
 
 
 PUBLIC_RESEARCH_PROFILE = (
     "Public research spans human brain dynamics, neuroimaging, and AI; complex systems, "
     "network and contagion dynamics; and LLM agents for AI4Science and formal verification."
 )
+SHANGHAI = ZoneInfo(TIMEZONE)
 
 
 class PipelineError(RuntimeError):
@@ -89,11 +91,11 @@ def _fallback_record(candidate: PaperCandidate, record_id: str, timestamp: str) 
     def clean(value: object, limit: int, fallback: str) -> str:
         return " ".join(str(value or "").split())[:limit].strip() or fallback
 
-    authors = tuple(clean(author, MAX_LENGTHS["author"], "Unknown author") for author in candidate.authors if str(author).strip())
+    authors = tuple(clean(author, MAX_LENGTHS["author"], "") for author in candidate.authors if str(author).strip())
     return PaperRecord(
         record_id=record_id,
-        title=clean(candidate.title, MAX_LENGTHS["title"], "Untitled paper"), authors=authors or ("Unknown author",),
-        venue=clean(candidate.venue, MAX_LENGTHS["venue"], "Unavailable venue"), year=candidate.year,
+        title=clean(candidate.title, MAX_LENGTHS["title"], "Untitled paper"), authors=authors,
+        venue=clean(candidate.venue, MAX_LENGTHS["venue"], ""), year=candidate.year,
         canonical_url=candidate.canonical_url.strip(), alert_date=candidate.alert_date,
         ingested_at=timestamp, evidence_type="unavailable", relevance="weak",
         en=LocalizedSummary("Summary temporarily unavailable", (), "", ()),
@@ -104,7 +106,7 @@ def _fallback_record(candidate: PaperCandidate, record_id: str, timestamp: str) 
 def _ready_record(metadata: PaperMetadata, candidate: PaperCandidate, summary: PaperSummary, record_id: str, timestamp: str) -> PaperRecord:
     return PaperRecord(
         record_id=record_id, title=metadata.title, authors=metadata.authors,
-        venue=metadata.venue or candidate.venue or "Unavailable venue", year=metadata.year,
+        venue=metadata.venue or candidate.venue, year=metadata.year,
         canonical_url=metadata.canonical_url, alert_date=candidate.alert_date,
         ingested_at=timestamp, evidence_type=metadata.evidence_type, relevance=summary.relevance,
         en=summary.en, zh=summary.zh, status="ready",
@@ -141,6 +143,81 @@ def _paths_alias(left: Path, right: Path) -> bool:
         return left.samefile(right)
     except OSError:
         return False
+
+
+def _identity_aliases(
+    doi: str | None, arxiv_id: str | None, canonical_url: str | None, title: str
+) -> set[str]:
+    """Return every safe scholarly alias without inventing private identifiers."""
+    aliases = {stable_record_id(None, None, None, title)}
+    for value in (
+        stable_record_id(doi, None, None, title) if doi else "",
+        stable_record_id(None, arxiv_id, None, title) if arxiv_id else "",
+        stable_record_id(None, None, canonical_url, title) if canonical_url else "",
+    ):
+        if value and not (value.startswith("title:") and value in aliases):
+            aliases.add(value)
+    return aliases
+
+
+def _candidate_aliases(candidate: PaperCandidate) -> set[str]:
+    return _identity_aliases(
+        candidate.doi, candidate.arxiv_id, candidate.canonical_url, candidate.title
+    )
+
+
+def _identifier(alias: str, prefix: str) -> str | None:
+    return alias if alias.startswith(prefix) else None
+
+
+def _candidates_match(left: PaperCandidate, right: PaperCandidate) -> bool:
+    left_aliases, right_aliases = _candidate_aliases(left), _candidate_aliases(right)
+    for prefix in ("doi:", "arxiv:"):
+        left_id = next((_identifier(alias, prefix) for alias in left_aliases if alias.startswith(prefix)), None)
+        right_id = next((_identifier(alias, prefix) for alias in right_aliases if alias.startswith(prefix)), None)
+        if left_id and right_id and left_id != right_id:
+            return False
+    return bool(left_aliases & right_aliases)
+
+
+def _deduplicate_candidates(candidates: list[PaperCandidate]) -> list[list[PaperCandidate]]:
+    """Group candidates sharing a DOI, arXiv ID, URL, or normalized title."""
+    groups: list[list[PaperCandidate]] = []
+    for candidate in candidates:
+        matching = [index for index, group in enumerate(groups) if any(
+            _candidates_match(candidate, member) for member in group
+        )]
+        if not matching:
+            groups.append([candidate])
+            continue
+        target = matching[0]
+        groups[target].append(candidate)
+        for index in reversed(matching[1:]):
+            groups[target].extend(groups.pop(index))
+    return groups
+
+
+def _candidate_preference(candidate: PaperCandidate) -> tuple[int, str, str]:
+    identifier = stable_record_id(
+        candidate.doi, candidate.arxiv_id, candidate.canonical_url, candidate.title
+    )
+    rank = 0 if identifier.startswith("doi:") else 1 if identifier.startswith("arxiv:") else 2 if identifier.startswith("url:") else 3
+    return rank, identifier, " ".join(candidate.title.casefold().split())
+
+
+def _candidate_from_fallback(record: PaperRecord) -> PaperCandidate:
+    doi = record.record_id[4:] if record.record_id.startswith("doi:") else None
+    arxiv_id = record.record_id[6:] if record.record_id.startswith("arxiv:") else None
+    return PaperCandidate(
+        title=record.title,
+        authors=record.authors,
+        venue=record.venue,
+        year=record.year,
+        canonical_url=record.canonical_url,
+        alert_date=record.alert_date,
+        doi=doi,
+        arxiv_id=arxiv_id,
+    )
 
 
 def _stage_and_publish(feed_path: Path, retry_path: Path, records: list[PaperRecord], retries: dict[str, RetryEntry], timestamp: str) -> None:
@@ -191,16 +268,12 @@ def run_pipeline(
     try:
         existing_payload = load_feed(feed_path)
         retries = load_retries(retry_path)
-        candidates: list[PaperCandidate] = []
+        mail_candidates: list[PaperCandidate] = []
         for message in raw_messages:
-            candidates.extend(parse_scholar_message(message))
+            mail_candidates.extend(parse_scholar_message(message))
     except (OSError, ValueError, json.JSONDecodeError, ScholarParseError) as error:
         raise PipelineError("input validation failed") from error
 
-    unique: dict[str, PaperCandidate] = {}
-    for candidate in candidates:
-        identifier = stable_record_id(candidate.doi, candidate.arxiv_id, candidate.canonical_url, candidate.title)
-        unique.setdefault(identifier, candidate)
     original_retries = dict(retries)
     records = [
         PaperRecord(
@@ -212,22 +285,42 @@ def run_pipeline(
         ) for paper in existing_payload["papers"]
     ]
     by_id = {record.record_id: record for record in records}
+    candidates = list(mail_candidates)
+    candidates.extend(
+        _candidate_from_fallback(record)
+        for record in records
+        if record.status == "summary_unavailable"
+    )
+    candidate_groups = _deduplicate_candidates(candidates)
+    mail_duplicate_count = len(mail_candidates) - len(_deduplicate_candidates(mail_candidates))
     existing_aliases: dict[str, str] = {}
+    legacy_aliases: dict[str, set[str]] = {}
     for record in sorted(records, key=lambda item: item.record_id):
-        if record.status != "ready" or not record.record_id.startswith(("doi:", "arxiv:")):
-            continue
-        for alias in (
-            stable_record_id(None, None, record.canonical_url, record.title),
-            stable_record_id(None, None, None, record.title),
-        ):
-            existing_aliases.setdefault(alias, record.record_id)
-    timestamp, today = _timestamp(now), now.astimezone(timezone.utc).date().isoformat()
+        aliases = _identity_aliases(None, None, record.canonical_url, record.title)
+        if record.status == "ready" and record.record_id.startswith(("doi:", "arxiv:")):
+            for alias in aliases:
+                existing_aliases.setdefault(alias, record.record_id)
+        if record.record_id.startswith(("url:", "title:")):
+            for alias in aliases:
+                legacy_aliases.setdefault(alias, set()).add(record.record_id)
+    timestamp, today = _timestamp(now), now.astimezone(SHANGHAI).date().isoformat()
     summarized = deferred = metadata_only = new = 0
-    resolved: dict[str, list[tuple[str, PaperCandidate, PaperMetadata]]] = {}
+    resolved: dict[str, list[tuple[str, PaperCandidate, PaperMetadata, set[str]]]] = {}
     unresolved: list[tuple[str, PaperCandidate, Exception]] = []
     post_enrichment_duplicates = 0
-    for preliminary_id, candidate in unique.items():
-        canonical_ready_id = existing_aliases.get(preliminary_id)
+    for candidate_group in candidate_groups:
+        candidate = min(candidate_group, key=_candidate_preference)
+        aliases = set().union(*(_candidate_aliases(item) for item in candidate_group))
+        preliminary_id = stable_record_id(
+            candidate.doi, candidate.arxiv_id, candidate.canonical_url, candidate.title
+        )
+        canonical_ready_id = next(
+            (existing_aliases[alias] for alias in sorted(aliases) if alias in existing_aliases),
+            None,
+        )
+        explicit_identifier = preliminary_id.startswith(("doi:", "arxiv:"))
+        if explicit_identifier and canonical_ready_id != preliminary_id:
+            canonical_ready_id = None
         if canonical_ready_id is not None:
             continue
         try:
@@ -239,15 +332,16 @@ def run_pipeline(
         group = resolved.setdefault(record_id, [])
         if group:
             post_enrichment_duplicates += 1
-        group.append((preliminary_id, candidate, metadata))
+        metadata_aliases = _identity_aliases(
+            metadata.doi, metadata.arxiv_id, metadata.canonical_url, metadata.title
+        )
+        group.append((preliminary_id, candidate, metadata, aliases | metadata_aliases))
 
     def reconcile_identity(preliminary_id: str, canonical_id: str) -> None:
         """Migrate a legacy URL fallback/retry to a resolved DOI/arXiv identity."""
         if preliminary_id == canonical_id:
             return
-        legacy = by_id.get(preliminary_id)
-        if legacy is not None and legacy.status != "ready":
-            by_id.pop(preliminary_id)
+        by_id.pop(preliminary_id, None)
         legacy_retry = retries.pop(preliminary_id, None)
         if legacy_retry is None:
             return
@@ -285,25 +379,42 @@ def run_pipeline(
         record_failure(record_id, candidate, error)
 
     for record_id, group in sorted(resolved.items()):
-        for preliminary_id, _candidate, _metadata in sorted(group, key=lambda item: item[0]):
-            reconcile_identity(preliminary_id, record_id)
-        _preliminary_id, candidate, metadata = min(group, key=lambda item: item[0])
-        old = by_id.get(record_id)
+        group_aliases = set().union(*(item[3] for item in group))
+        matching_legacy_ids = set().union(*(
+            legacy_aliases.get(alias, set()) for alias in group_aliases
+        ))
+        effective_id = record_id
+        if not record_id.startswith(("doi:", "arxiv:")) and matching_legacy_ids:
+            ready_legacy = sorted(
+                legacy_id for legacy_id in matching_legacy_ids
+                if by_id.get(legacy_id) is not None and by_id[legacy_id].status == "ready"
+            )
+            if ready_legacy:
+                continue
+            effective_id = sorted(matching_legacy_ids)[0]
+        for legacy_id in sorted(matching_legacy_ids):
+            reconcile_identity(legacy_id, effective_id)
+        for preliminary_id, _candidate, _metadata, _aliases in sorted(group, key=lambda item: item[0]):
+            reconcile_identity(preliminary_id, effective_id)
+        _preliminary_id, candidate, metadata, _aliases = min(group, key=lambda item: item[0])
+        old = by_id.get(effective_id)
         if old is not None and old.status == "ready":
             continue
         if old is None:
             new += 1
         try:
+            if metadata.evidence_type == "unavailable" or not metadata.abstract.strip():
+                raise SummaryError("no_evidence")
             summary = _invoke_summarizer(summarizer, metadata, settings)
-            record = _ready_record(metadata, candidate, summary, record_id, timestamp)
+            record = _ready_record(metadata, candidate, summary, effective_id, timestamp)
             validate_public_record(record.to_public_dict())
         except Exception as error:
-            record_failure(record_id, candidate, error)
+            record_failure(effective_id, candidate, error)
             continue
         else:
-            retries.pop(record_id, None)
+            retries.pop(effective_id, None)
             summarized += 1
-        by_id[record_id] = record
+        by_id[effective_id] = record
 
     final_records = _sort_records(list(by_id.values()))
     state_changed = final_records != _sort_records(records) or retries != original_retries
@@ -314,7 +425,7 @@ def run_pipeline(
         write_feed_atomic(preview_path, final_records, generated_at)
     if publish and changed:
         _stage_and_publish(Path(feed_path), Path(retry_path), final_records, retries, generated_at)
-    return RunSummary(len(raw_messages), len(candidates), len(candidates) - len(unique) + post_enrichment_duplicates, new, summarized, deferred, metadata_only, changed)
+    return RunSummary(len(raw_messages), len(mail_candidates), mail_duplicate_count + post_enrichment_duplicates, new, summarized, deferred, metadata_only, changed)
 
 
 def _fixture_functions():
@@ -343,7 +454,8 @@ def main(argv: list[str] | None = None) -> int:
     settings = Settings.from_env(require_credentials=args.source == "imap")
     now = datetime.now(timezone.utc)
     if args.source == "imap":
-        messages = fetch_alert_messages(settings, (now - timedelta(days=args.lookback_days)).date())
+        shanghai_today = now.astimezone(SHANGHAI).date()
+        messages = fetch_alert_messages(settings, shanghai_today - timedelta(days=args.lookback_days))
         summary = run_pipeline(settings, messages, root / "assets/data/paper-feed.json", root / "paper_feed/state/retries.json", args.publish, now, args.preview_output)
     else:
         messages = [(root / "tests/fixtures/scholar_alert.txt.eml").read_bytes()]

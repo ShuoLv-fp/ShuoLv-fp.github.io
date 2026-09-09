@@ -139,6 +139,11 @@ class PaperFeedModelTests(unittest.TestCase):
     def test_public_record_allows_unknown_year(self):
         validate_public_record(replace(self.sample(), year=None).to_public_dict())
 
+    def test_public_record_allows_missing_authors_and_venue(self):
+        validate_public_record(
+            replace(self.sample(), authors=(), venue="").to_public_dict()
+        )
+
     def test_public_record_rejects_nonstable_and_private_record_ids(self):
         for record_id in (
             "arbitrary",

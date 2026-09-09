@@ -6,12 +6,12 @@ and alert provenance are never copied into a :class:`PaperCandidate`.
 
 from __future__ import annotations
 
-from datetime import timezone
 from email import policy
 from email.parser import BytesParser
 from email.utils import parseaddr, parsedate_to_datetime
 import re
 from urllib.parse import parse_qs, urlsplit
+from zoneinfo import ZoneInfo
 
 from bs4 import BeautifulSoup, Tag
 
@@ -21,6 +21,7 @@ from paper_feed.models import PaperCandidate
 DEFAULT_SENDERS = ("scholaralerts-noreply@google.com",)
 DEFAULT_SUBJECT_TERMS = ("Scholar Alert",)
 MAX_RESULTS = 100
+SHANGHAI = ZoneInfo("Asia/Shanghai")
 
 
 class ScholarParseError(ValueError):
@@ -217,6 +218,8 @@ def _alert_date(value: str) -> str:
         return ""
     if parsed is None:
         return ""
-    if parsed.tzinfo is not None:
-        parsed = parsed.astimezone(timezone.utc)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=SHANGHAI)
+    else:
+        parsed = parsed.astimezone(SHANGHAI)
     return parsed.date().isoformat()

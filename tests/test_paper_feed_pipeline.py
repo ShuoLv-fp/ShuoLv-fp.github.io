@@ -59,7 +59,7 @@ class PaperFeedPipelineTests(unittest.TestCase):
 
     def invoke_pipeline(self, messages=None, **changes):
         return run_pipeline(
-            self.settings, messages or self.messages, self.feed_path, self.retry_path,
+            self.settings, self.messages if messages is None else messages, self.feed_path, self.retry_path,
             publish=changes.pop("publish", True), now=self.now,
             enricher=changes.pop("enricher", self.enricher),
             summarizer=changes.pop("summarizer", self.summarizer), **changes,
@@ -126,6 +126,51 @@ Google Scholar: synthetic public evidence.
         self.assertEqual(paper["evidence_type"], "unavailable")
         self.invoke_pipeline(enricher=fails)
         self.assertEqual(next(iter(json.loads(self.retry_path.read_text())["retries"].values()))["attempts"], 4)
+
+    def test_aged_out_fallback_is_retried_without_a_current_alert(self):
+        def fails(_candidate):
+            raise RuntimeError("private upstream text")
+
+        for _ in range(3):
+            self.invoke_pipeline(enricher=fails)
+        fallback = json.loads(self.feed_path.read_text())["papers"][0]
+        self.assertEqual(fallback["status"], "summary_unavailable")
+
+        result = self.invoke_pipeline(messages=[])
+        refreshed = json.loads(self.feed_path.read_text())["papers"]
+        self.assertEqual(result.summarized, 1)
+        self.assertEqual(len(refreshed), 1)
+        self.assertEqual(refreshed[0]["status"], "ready")
+
+    def test_empty_evidence_is_never_sent_to_the_summarizer(self):
+        calls = 0
+
+        def no_evidence(candidate):
+            return PaperMetadata(
+                candidate.title, candidate.authors, candidate.venue, candidate.year,
+                candidate.canonical_url, None, None, "", "unavailable",
+            )
+
+        def must_not_run(_metadata):
+            nonlocal calls
+            calls += 1
+            return self.summarizer(_metadata)
+
+        for _ in range(3):
+            self.invoke_pipeline(enricher=no_evidence, summarizer=must_not_run)
+        paper = json.loads(self.feed_path.read_text())["papers"][0]
+        self.assertEqual(calls, 0)
+        self.assertEqual(paper["status"], "summary_unavailable")
+
+    def test_retry_dates_use_asia_shanghai_calendar_day(self):
+        self.now = datetime(2026, 9, 9, 16, 30, tzinfo=timezone.utc)
+
+        def fails(_candidate):
+            raise RuntimeError("private upstream text")
+
+        self.invoke_pipeline(enricher=fails)
+        retry = next(iter(json.loads(self.retry_path.read_text())["retries"].values()))
+        self.assertEqual(retry["last_attempt_date"], "2026-09-10")
 
     def test_pipeline_wide_parse_or_invalid_existing_feed_failure_preserves_both_files(self):
         for messages, feed in (
@@ -204,6 +249,62 @@ Google Scholar: synthetic public evidence.
         self.assertEqual(len(payload["papers"]), 1)
         self.assertEqual(payload["papers"][0]["record_id"], "doi:10.1000/shared")
         self.assertEqual(json.loads(self.retry_path.read_text())["retries"], {})
+
+    def test_equal_titles_on_distinct_urls_are_deduplicated_before_enrichment(self):
+        messages = [
+            self.alert_message("Same normalized title", "https://one.example.invalid/paper"),
+            self.alert_message("  SAME   normalized TITLE  ", "https://two.example.invalid/paper"),
+        ]
+
+        def without_identifier(candidate):
+            return PaperMetadata(
+                candidate.title, candidate.authors, candidate.venue, candidate.year,
+                candidate.canonical_url, None, None, "Synthetic public abstract.", "abstract",
+            )
+
+        result = self.invoke_pipeline(messages=messages, enricher=without_identifier)
+        papers = json.loads(self.feed_path.read_text())["papers"]
+        self.assertEqual(result.duplicates, 1)
+        self.assertEqual(len(papers), 1)
+
+    def test_ready_url_identity_migrates_when_a_doi_is_discovered(self):
+        message = self.alert_message("Later identified paper", "https://identity.example.invalid/paper")
+
+        def without_identifier(candidate):
+            return PaperMetadata(
+                candidate.title, candidate.authors, candidate.venue, candidate.year,
+                candidate.canonical_url, None, None, "Synthetic public abstract.", "abstract",
+            )
+
+        self.invoke_pipeline(messages=[message], enricher=without_identifier)
+        self.assertTrue(json.loads(self.feed_path.read_text())["papers"][0]["record_id"].startswith("url:"))
+
+        def with_identifier(candidate):
+            return PaperMetadata(
+                candidate.title, candidate.authors, candidate.venue, candidate.year,
+                candidate.canonical_url, "10.1000/later", None,
+                "Synthetic public abstract.", "abstract",
+            )
+
+        self.invoke_pipeline(messages=[message], enricher=with_identifier)
+        self.assertEqual(
+            [paper["record_id"] for paper in json.loads(self.feed_path.read_text())["papers"]],
+            ["doi:10.1000/later"],
+        )
+
+    def test_ready_record_preserves_genuinely_missing_authors_and_venue(self):
+        message = self.alert_message("Sparse metadata paper", "https://sparse.example.invalid/paper", authors="", venue="")
+
+        def sparse(candidate):
+            return PaperMetadata(
+                candidate.title, (), "", None, candidate.canonical_url, None, None,
+                "Synthetic public abstract.", "abstract",
+            )
+
+        self.invoke_pipeline(messages=[message], enricher=sparse)
+        paper = json.loads(self.feed_path.read_text())["papers"][0]
+        self.assertEqual(paper["authors"], [])
+        self.assertEqual(paper["venue"], "")
 
     def test_url_fallback_is_migrated_to_canonical_doi_after_later_success(self):
         message = self.alert_message("Migrating paper", "https://migrate.example.invalid/paper")

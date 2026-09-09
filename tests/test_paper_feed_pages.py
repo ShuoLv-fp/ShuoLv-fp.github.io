@@ -28,6 +28,11 @@ class PaperFeedPageTests(unittest.TestCase):
         self.assertNotIn("innerHTML =", script)
         self.assertIn("textContent", script)
 
+    def test_renderer_includes_latest_control_and_precise_evidence_labels(self):
+        script = (ROOT / "assets/js/paper-feed.js").read_text()
+        for marker in ("Latest", "最新", "Public abstract", "公开摘要", "Email snippet", "邮件片段"):
+            self.assertIn(marker, script)
+
     def test_feed_has_one_page_heading_and_coherent_dynamic_heading_levels(self):
         include = (ROOT / "_includes/paper-feed.html").read_text()
         script = (ROOT / "assets/js/paper-feed.js").read_text()
