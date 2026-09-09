@@ -162,16 +162,27 @@ class SummarizerTests(unittest.TestCase):
             two_sentences["zh"]["research_connection"],
         )
 
-    def test_validator_rejects_three_or_overlong_research_connection_sentences(self):
+    def test_validator_rejects_three_sentence_research_connections_in_both_languages(self):
         three_sentences = json.loads(json.dumps(VALID_RESPONSE))
         three_sentences["en"]["research_connection"] = "First useful link. Second useful link. Third useful link."
         with self.assertRaisesRegex(SummaryError, "schema_error"):
             validate_summary_payload(three_sentences)
 
-        overly_long = json.loads(json.dumps(VALID_RESPONSE))
-        overly_long["zh"]["research_connection"] = "这是一段提供研究关联的说明" * 40 + "。"
+        chinese_three_sentences = json.loads(json.dumps(VALID_RESPONSE))
+        chinese_three_sentences["zh"]["research_connection"] = "这是第一个关联。 这是第二个关联。 这是第三个关联。"
         with self.assertRaisesRegex(SummaryError, "schema_error"):
-            validate_summary_payload(overly_long)
+            validate_summary_payload(chinese_three_sentences)
+
+    def test_validator_rejects_unterminated_or_overlong_research_connection_sentences(self):
+        unterminated = json.loads(json.dumps(VALID_RESPONSE))
+        unterminated["en"]["research_connection"] = "This is a long run-on connection without terminal punctuation " * 4
+        with self.assertRaisesRegex(SummaryError, "schema_error"):
+            validate_summary_payload(unterminated)
+
+        overlong_sentence = json.loads(json.dumps(VALID_RESPONSE))
+        overlong_sentence["zh"]["research_connection"] = "这是一段提供研究关联的说明" * 15 + "。"
+        with self.assertRaisesRegex(SummaryError, "schema_error"):
+            validate_summary_payload(overlong_sentence)
 
 
 if __name__ == "__main__":
