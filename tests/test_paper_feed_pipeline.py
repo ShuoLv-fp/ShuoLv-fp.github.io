@@ -7,7 +7,8 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from paper_feed.main import PipelineError, _sort_records, run_pipeline
+from paper_feed.main import PipelineError, _invoke_summarizer, _sort_records, run_pipeline
+from paper_feed.summarizer import summarize
 from paper_feed.models import LocalizedSummary, PaperMetadata, PaperRecord, PaperSummary
 from paper_feed.settings import Settings
 
@@ -63,6 +64,19 @@ class PaperFeedPipelineTests(unittest.TestCase):
             enricher=changes.pop("enricher", self.enricher),
             summarizer=changes.pop("summarizer", self.summarizer), **changes,
         )
+
+    @staticmethod
+    def alert_message(title, url, authors="Dana Placeholder", venue="Imaginary Computing Review"):
+        return f"""From: scholaralerts-noreply@alerts.google.invalid
+Subject: Scholar Alert - synthetic result
+Date: Tue, 09 Sep 2026 09:00:00 +0000
+Content-Type: text/plain; charset=UTF-8
+
+{title}
+{url}
+{authors} - {venue}, 2026
+Google Scholar: synthetic public evidence.
+""".encode()
 
     def test_dry_run_never_changes_files_and_writes_sanitized_preview(self):
         before_feed = self.feed_path.read_bytes()
@@ -170,6 +184,81 @@ class PaperFeedPipelineTests(unittest.TestCase):
         self.assertEqual([item.record_id for item in _sort_records(records)], [
             "doi:10.1000/late", "doi:10.1000/early", "doi:10.1000/transfer", "doi:10.1000/old",
         ])
+
+    def test_distinct_candidate_urls_reconciled_to_same_enriched_doi_publish_one_card(self):
+        messages = [
+            self.alert_message("First alert", "https://one.example.invalid/paper"),
+            self.alert_message("Second alert", "https://two.example.invalid/paper"),
+        ]
+
+        def same_doi(candidate):
+            return PaperMetadata(candidate.title, candidate.authors, candidate.venue, candidate.year,
+                                 candidate.canonical_url, "10.1000/shared", None,
+                                 "Synthetic public abstract.", "abstract")
+
+        result = self.invoke_pipeline(messages=messages, enricher=same_doi)
+        payload = json.loads(self.feed_path.read_text())
+        self.assertEqual(result.new, 1)
+        self.assertEqual(result.summarized, 1)
+        self.assertEqual(len(payload["papers"]), 1)
+        self.assertEqual(payload["papers"][0]["record_id"], "doi:10.1000/shared")
+        self.assertEqual(json.loads(self.retry_path.read_text())["retries"], {})
+
+    def test_third_long_metadata_failure_is_bounded_fallback_without_blocking_other_paper(self):
+        long_message = self.alert_message(
+            "T" * 900, "https://long.example.invalid/paper", "A" * 700, "V" * 1400,
+        )
+
+        def fails_long(candidate):
+            if candidate.title.startswith("T"):
+                raise RuntimeError("private failure")
+            return self.enricher(candidate)
+
+        for _ in range(3):
+            self.invoke_pipeline(messages=[long_message, self.messages[0]], enricher=fails_long)
+        papers = json.loads(self.feed_path.read_text())["papers"]
+        fallback = next(paper for paper in papers if paper["status"] == "summary_unavailable")
+        self.assertLessEqual(len(fallback["title"]), 500)
+        self.assertLessEqual(len(fallback["authors"][0]), 200)
+        self.assertLessEqual(len(fallback["venue"]), 300)
+        self.assertEqual(len([paper for paper in papers if paper["status"] == "ready"]), 1)
+
+    def test_dry_run_preview_alias_never_overwrites_official_files(self):
+        for preview_path in (self.feed_path, self.retry_path):
+            with self.subTest(preview_path=preview_path.name):
+                before_feed, before_retries = self.feed_path.read_bytes(), self.retry_path.read_bytes()
+                with self.assertRaises(PipelineError):
+                    self.invoke_pipeline(publish=False, preview_path=preview_path)
+                self.assertEqual(self.feed_path.read_bytes(), before_feed)
+                self.assertEqual(self.retry_path.read_bytes(), before_retries)
+
+    def test_model_call_receives_three_public_research_strands_only(self):
+        captured = {}
+        response = {
+            "relevance": "weak",
+            "en": {"core_conclusion": "Conclusion.", "key_points": ["One.", "Two."], "research_connection": "Connection.", "tags": ["Tag"]},
+            "zh": {"core_conclusion": "结论。", "key_points": ["一。", "二。"], "research_connection": "研究关联。", "tags": ["标签"]},
+        }
+
+        class Client:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def post(self, _url, **kwargs):
+                captured.update(kwargs["json"])
+                import httpx
+                return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps(response)}}]})
+
+        metadata = self.enricher(type("Candidate", (), {"title": "Paper", "authors": ("Author",), "venue": "Venue", "year": 2026, "canonical_url": "https://example.invalid/paper"})())
+        with patch("paper_feed.main.httpx.Client", return_value=Client()):
+            _invoke_summarizer(summarize, metadata, self.settings)
+        profile = json.loads(captured["messages"][1]["content"])["research_profile"].casefold()
+        for phrase in ("brain dynamics", "neuroimaging", "complex systems", "contagion", "llm agents", "ai4science", "formal verification"):
+            self.assertIn(phrase, profile)
+        self.assertNotIn("recipient", json.dumps(captured))
 
 
 if __name__ == "__main__":

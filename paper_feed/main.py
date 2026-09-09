@@ -22,6 +22,7 @@ from paper_feed.store import (
     SAFE_ERROR_CATEGORIES,
     SCHEMA_VERSION,
     TIMEZONE,
+    MAX_LENGTHS,
     load_feed,
     load_retries,
     stable_record_id,
@@ -32,7 +33,10 @@ from paper_feed.store import (
 from paper_feed.summarizer import summarize
 
 
-PUBLIC_RESEARCH_PROFILE = "Public research interests in neuroscience, neuroimaging, and machine learning."
+PUBLIC_RESEARCH_PROFILE = (
+    "Public research spans human brain dynamics, neuroimaging, and AI; complex systems, "
+    "network and contagion dynamics; and LLM agents for AI4Science and formal verification."
+)
 
 
 class PipelineError(RuntimeError):
@@ -82,12 +86,15 @@ def _error_category(error: Exception, fallback: str) -> str:
 
 
 def _fallback_record(candidate: PaperCandidate, record_id: str, timestamp: str) -> PaperRecord:
-    authors = tuple(" ".join(author.split()) for author in candidate.authors if author.strip())
+    def clean(value: object, limit: int, fallback: str) -> str:
+        return " ".join(str(value or "").split())[:limit].strip() or fallback
+
+    authors = tuple(clean(author, MAX_LENGTHS["author"], "Unknown author") for author in candidate.authors if str(author).strip())
     return PaperRecord(
         record_id=record_id,
-        title=" ".join(candidate.title.split()), authors=authors,
-        venue=" ".join(candidate.venue.split()) or "Unavailable venue", year=candidate.year,
-        canonical_url=candidate.canonical_url, alert_date=candidate.alert_date,
+        title=clean(candidate.title, MAX_LENGTHS["title"], "Untitled paper"), authors=authors or ("Unknown author",),
+        venue=clean(candidate.venue, MAX_LENGTHS["venue"], "Unavailable venue"), year=candidate.year,
+        canonical_url=candidate.canonical_url.strip(), alert_date=candidate.alert_date,
         ingested_at=timestamp, evidence_type="unavailable", relevance="weak",
         en=LocalizedSummary("Summary temporarily unavailable", (), "", ()),
         zh=LocalizedSummary("摘要暂不可用", (), "", ()), status="summary_unavailable",
@@ -124,6 +131,16 @@ def _feed_payload(records: list[PaperRecord], timestamp: str) -> dict:
     for paper in payload["papers"]:
         validate_public_record(paper)
     return payload
+
+
+def _paths_alias(left: Path, right: Path) -> bool:
+    left, right = Path(left), Path(right)
+    if left.resolve() == right.resolve():
+        return True
+    try:
+        return left.samefile(right)
+    except OSError:
+        return False
 
 
 def _stage_and_publish(feed_path: Path, retry_path: Path, records: list[PaperRecord], retries: dict[str, RetryEntry], timestamp: str) -> None:
@@ -167,6 +184,10 @@ def run_pipeline(
     enricher: Callable = enrich_candidate, summarizer: Callable = summarize,
 ) -> RunSummary:
     """Parse all alerts first, isolate per-paper errors, and publish only valid state."""
+    if preview_path is not None and (
+        _paths_alias(preview_path, feed_path) or _paths_alias(preview_path, retry_path)
+    ):
+        raise PipelineError("preview path conflicts with official state")
     try:
         existing_payload = load_feed(feed_path)
         retries = load_retries(retry_path)
@@ -193,28 +214,57 @@ def run_pipeline(
     by_id = {record.record_id: record for record in records}
     timestamp, today = _timestamp(now), now.astimezone(timezone.utc).date().isoformat()
     summarized = deferred = metadata_only = new = 0
-    for record_id, candidate in unique.items():
+    resolved: dict[str, tuple[str, PaperCandidate, PaperMetadata]] = {}
+    unresolved: list[tuple[str, PaperCandidate, Exception]] = []
+    for preliminary_id, candidate in unique.items():
+        try:
+            metadata = _invoke_enricher(enricher, candidate)
+        except Exception as error:
+            unresolved.append((preliminary_id, candidate, error))
+            continue
+        record_id = stable_record_id(metadata.doi, metadata.arxiv_id, metadata.canonical_url, metadata.title)
+        previous = resolved.get(record_id)
+        if previous is None or preliminary_id < previous[0]:
+            resolved[record_id] = (preliminary_id, candidate, metadata)
+
+    def record_failure(record_id: str, candidate: PaperCandidate, error: Exception) -> None:
+        nonlocal deferred, metadata_only
+        previous = retries.get(record_id, RetryEntry(0, today, "unknown_error"))
+        retry = RetryEntry(previous.attempts + 1, today, _error_category(error, "metadata_error"))
+        retries[record_id] = retry
+        if retry.attempts < 3:
+            deferred += 1
+            return
+        try:
+            record = _fallback_record(candidate, record_id, timestamp)
+            validate_public_record(record.to_public_dict())
+        except Exception:
+            deferred += 1
+            return
+        by_id[record_id] = record
+        metadata_only += 1
+
+    for record_id, candidate, error in unresolved:
+        old = by_id.get(record_id)
+        if old is not None and old.status == "ready":
+            continue
+        if old is None:
+            new += 1
+        record_failure(record_id, candidate, error)
+
+    for record_id, (_preliminary_id, candidate, metadata) in sorted(resolved.items()):
         old = by_id.get(record_id)
         if old is not None and old.status == "ready":
             continue
         if old is None:
             new += 1
         try:
-            metadata = _invoke_enricher(enricher, candidate)
             summary = _invoke_summarizer(summarizer, metadata, settings)
             record = _ready_record(metadata, candidate, summary, record_id, timestamp)
             validate_public_record(record.to_public_dict())
         except Exception as error:
-            previous = retries.get(record_id, RetryEntry(0, today, "unknown_error"))
-            retry = RetryEntry(previous.attempts + 1, today, _error_category(error, "metadata_error"))
-            retries[record_id] = retry
-            if retry.attempts >= 3:
-                record = _fallback_record(candidate, record_id, timestamp)
-                validate_public_record(record.to_public_dict())
-                metadata_only += 1
-            else:
-                deferred += 1
-                continue
+            record_failure(record_id, candidate, error)
+            continue
         else:
             retries.pop(record_id, None)
             summarized += 1
@@ -223,8 +273,7 @@ def run_pipeline(
     final_records = _sort_records(list(by_id.values()))
     state_changed = final_records != _sort_records(records) or retries != original_retries
     generated_at = timestamp if state_changed else existing_payload["generated_at"]
-    desired = _feed_payload(final_records, generated_at or timestamp)
-    current = _feed_payload(_sort_records(records), existing_payload["generated_at"] or timestamp)
+    _feed_payload(final_records, generated_at or timestamp)
     changed = state_changed
     if preview_path is not None:
         write_feed_atomic(preview_path, final_records, generated_at)
