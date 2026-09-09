@@ -79,6 +79,9 @@ include:
   - _pages
   - files
 exclude:
+  - paper_feed
+  - tests
+  - .superpowers
   - docs
   - google_scholar_crawler
   - phd_application_agent
