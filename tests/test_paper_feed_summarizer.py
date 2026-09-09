@@ -54,6 +54,7 @@ class SummarizerTests(unittest.TestCase):
         self.assertIn("untrusted", messages[0]["content"])
         self.assertIn("ignore", messages[0]["content"].casefold())
         self.assertIn("same facts", messages[0]["content"])
+        self.assertIn("1 or 2 short sentences", messages[0]["content"])
         self.assertIn("Actual finding.", serialized)
         for forbidden in ("message_id", "recipient", "sender", "subscription_author", "imap_uid"):
             self.assertNotIn(forbidden, serialized)
@@ -143,6 +144,34 @@ class SummarizerTests(unittest.TestCase):
         with_wrong_count["en"]["key_points"] = ["only one"]
         with self.assertRaisesRegex(SummaryError, "schema_error"):
             validate_summary_payload(with_wrong_count)
+
+    def test_validator_accepts_one_or_two_short_research_connection_sentences(self):
+        one_sentence = json.loads(json.dumps(VALID_RESPONSE))
+        two_sentences = json.loads(json.dumps(VALID_RESPONSE))
+        two_sentences["en"]["research_connection"] = (
+            "It studies a related neural system. It offers a useful comparison."
+        )
+        two_sentences["zh"]["research_connection"] = "它研究相关的神经系统。它提供了有用的比较。"
+
+        self.assertEqual(
+            validate_summary_payload(one_sentence).en.research_connection,
+            one_sentence["en"]["research_connection"],
+        )
+        self.assertEqual(
+            validate_summary_payload(two_sentences).zh.research_connection,
+            two_sentences["zh"]["research_connection"],
+        )
+
+    def test_validator_rejects_three_or_overlong_research_connection_sentences(self):
+        three_sentences = json.loads(json.dumps(VALID_RESPONSE))
+        three_sentences["en"]["research_connection"] = "First useful link. Second useful link. Third useful link."
+        with self.assertRaisesRegex(SummaryError, "schema_error"):
+            validate_summary_payload(three_sentences)
+
+        overly_long = json.loads(json.dumps(VALID_RESPONSE))
+        overly_long["zh"]["research_connection"] = "这是一段提供研究关联的说明" * 40 + "。"
+        with self.assertRaisesRegex(SummaryError, "schema_error"):
+            validate_summary_payload(overly_long)
 
 
 if __name__ == "__main__":
