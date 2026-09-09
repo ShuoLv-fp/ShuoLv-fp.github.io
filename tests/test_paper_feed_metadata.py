@@ -183,32 +183,51 @@ class MetadataTests(unittest.TestCase):
 
     @patch("paper_feed.metadata.is_safe_public_url", return_value=True)
     def test_landing_rejects_more_than_three_redirects(self, _safe):
+        calls = []
+
         def handler(request):
+            calls.append(str(request.url))
+            if request.url.host == "api.openalex.org":
+                return httpx.Response(404)
             number = int(request.url.path.rsplit("/", 1)[-1])
-            return httpx.Response(302, headers={"location": f"https://papers.example/{number + 1}"})
+            return httpx.Response(302, headers={"location": f"https://www.nature.com/{number + 1}"})
 
         with self.mock_client(handler) as client:
-            metadata = enrich_candidate(self.candidate(canonical_url="https://papers.example/0"), client)
+            metadata = enrich_candidate(self.candidate(canonical_url="https://www.nature.com/0"), client)
         self.assertEqual(metadata.evidence_type, "snippet")
         self.assertEqual(metadata.abstract, "Email snippet.")
+        self.assertEqual(calls[0].split("/")[2], "api.openalex.org")
+        self.assertEqual(calls[1:], [f"https://www.nature.com/{number}" for number in range(4)])
 
     @patch("paper_feed.metadata.is_safe_public_url", return_value=True)
     def test_landing_rejects_oversized_response_body(self, _safe):
+        calls = []
+
         def handler(request):
+            calls.append(request.url.host)
+            if request.url.host == "api.openalex.org":
+                return httpx.Response(404)
             return httpx.Response(200, content=b"x" * (MAX_RESPONSE_BYTES + 1))
 
         with self.mock_client(handler) as client:
-            metadata = enrich_candidate(self.candidate(), client)
+            metadata = enrich_candidate(self.candidate(canonical_url="https://www.nature.com/article"), client)
         self.assertEqual(metadata.evidence_type, "snippet")
+        self.assertEqual(calls, ["api.openalex.org", "www.nature.com"])
 
     @patch("paper_feed.metadata.is_safe_public_url", return_value=True)
     def test_network_timeout_returns_safe_snippet_fallback(self, _safe):
+        calls = []
+
         def handler(request):
+            calls.append(request.url.host)
+            if request.url.host == "api.openalex.org":
+                return httpx.Response(404)
             raise httpx.ReadTimeout("timed out", request=request)
 
         with self.mock_client(handler) as client:
-            metadata = enrich_candidate(self.candidate(), client)
+            metadata = enrich_candidate(self.candidate(canonical_url="https://www.nature.com/article"), client)
         self.assertEqual((metadata.abstract, metadata.evidence_type), ("Email snippet.", "snippet"))
+        self.assertEqual(calls, ["api.openalex.org", "www.nature.com"])
 
     def test_metadata_from_candidate_uses_cleaned_snippet_only_when_available(self):
         snippet = metadata_from_candidate(self.candidate(snippet="  Email\n snippet.  "))
