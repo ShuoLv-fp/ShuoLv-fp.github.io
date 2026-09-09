@@ -2,6 +2,7 @@ from pathlib import Path
 import unittest
 
 from paper_feed.parser import (
+    DEFAULT_SENDERS,
     ScholarParseError,
     decode_google_target,
     is_scholar_alert,
@@ -22,6 +23,22 @@ class ScholarParserTests(unittest.TestCase):
         self.assertEqual(papers[0].canonical_url, "https://example.invalid/paper-one")
         self.assertFalse(hasattr(papers[0], "message_id"))
         self.assertFalse(hasattr(papers[0], "trigger_author"))
+
+    def test_production_filter_accepts_the_real_scholar_sender(self):
+        raw = b"""From: scholaralerts-noreply@google.com
+Subject: Scholar Alert - synthetic result
+Content-Type: text/html; charset=UTF-8
+
+<table><tr class="gse_alrt_title"><td><a href="https://example.invalid/paper">Selected result</a></td></tr></table>
+"""
+        self.assertTrue(is_scholar_alert(raw, ("scholaralerts-noreply@google.com",), ("Scholar Alert",)))
+        self.assertEqual(DEFAULT_SENDERS, ("scholaralerts-noreply@google.com",))
+        self.assertEqual(len(parse_scholar_message(raw)), 1)
+
+    def test_fixture_filtering_and_parsing_use_separate_responsibilities(self):
+        raw = (FIXTURES / "scholar_alert.html.eml").read_bytes()
+        self.assertTrue(is_scholar_alert(raw, ("scholaralerts-noreply@alerts.google.invalid",), ("Scholar Alert",)))
+        self.assertEqual(len(parse_scholar_message(raw)), 2)
 
     def test_unrelated_email_is_rejected(self):
         raw = b"From: newsletter@example.invalid\nSubject: Weekly news\n\nHello"
@@ -84,9 +101,21 @@ Content-Type: text/html; charset=UTF-8
             f"https://notgoogle.com/scholar_url?url={target}",
             f"https://google.com.evil.invalid/scholar_url?url={target}",
             f"https://google.com@evil.invalid/scholar_url?url={target}",
+            f"https://google.com:invalid/scholar_url?url={target}",
             "https://google.com/scholar_url?url=http%3A%2F%2Fexample.invalid%2Fpaper",
+            "https://google.com/scholar_url?url=https%3A%2F%2Fuser%3Asecret%40example.invalid%2Fpaper",
         ):
             self.assertEqual(decode_google_target(deceptive_url), "")
+
+    def test_malformed_url_in_recognized_result_raises_typed_error(self):
+        raw = b"""From: scholaralerts-noreply@alerts.google.invalid
+Subject: Scholar Alert - synthetic result
+Content-Type: text/html; charset=UTF-8
+
+<table><tr class="gse_alrt_title"><td><a href="https://scholar.google.com/scholar_url?url=https%3A%2F%2F%5Bbad">Broken URL</a></td></tr></table>
+"""
+        with self.assertRaises(ScholarParseError):
+            parse_scholar_message(raw)
 
     def test_plain_text_shape_without_scholar_marker_is_rejected(self):
         raw = b"""From: scholaralerts-noreply@alerts.google.invalid

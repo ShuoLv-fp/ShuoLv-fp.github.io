@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup, Tag
 from paper_feed.models import PaperCandidate
 
 
-DEFAULT_SENDERS = ("scholaralerts-noreply@alerts.google.invalid",)
+DEFAULT_SENDERS = ("scholaralerts-noreply@google.com",)
 DEFAULT_SUBJECT_TERMS = ("Scholar Alert",)
 MAX_RESULTS = 100
 
@@ -28,7 +28,12 @@ class ScholarParseError(ValueError):
 
 
 def decode_google_target(url: str) -> str:
-    parts = urlsplit(url)
+    if not _is_safe_https_url(url):
+        return ""
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return ""
     host = parts.hostname.casefold() if parts.hostname else ""
     is_google_host = host == "google.com" or host.endswith(".google.com")
     has_credentials = parts.username is not None or parts.password is not None
@@ -36,8 +41,24 @@ def decode_google_target(url: str) -> str:
         if not (parts.scheme == "https" and is_google_host and not has_credentials):
             return ""
         target = parse_qs(parts.query).get("url", [""])[0]
-        return target if target.startswith("https://") else ""
-    return url if parts.scheme == "https" and not has_credentials else ""
+        return target if _is_safe_https_url(target) else ""
+    return url if _is_safe_https_url(url) else ""
+
+
+def _is_safe_https_url(url: str) -> bool:
+    try:
+        parts = urlsplit(url)
+        host = parts.hostname
+        parts.port
+    except ValueError:
+        return False
+    return (
+        parts.scheme == "https"
+        and bool(host)
+        and parts.username is None
+        and parts.password is None
+        and not any(character.isspace() for character in url)
+    )
 
 
 def clean_text(value: str, limit: int) -> str:
@@ -69,10 +90,8 @@ def is_scholar_alert(
 
 
 def parse_scholar_message(raw_message: bytes) -> list[PaperCandidate]:
-    """Return public candidates from a valid Scholar alert, or none if unrelated."""
+    """Parse a selected Scholar-shaped message, or return none if its body is unrelated."""
     message = _message(raw_message)
-    if not _header_matches(message, DEFAULT_SENDERS, DEFAULT_SUBJECT_TERMS):
-        return []
     html, plain = _message_bodies(message)
     blocks = _result_blocks(html, plain)
     if not blocks:
