@@ -292,6 +292,32 @@ Google Scholar: synthetic public evidence.
             ["doi:10.1000/later"],
         )
 
+    def test_ready_url_alias_is_not_duplicated_when_alternate_url_enrichment_fails(self):
+        first = self.alert_message(
+            "Stable paper title", "https://identity.example.invalid/original"
+        )
+
+        def without_identifier(candidate):
+            return PaperMetadata(
+                candidate.title, candidate.authors, candidate.venue, candidate.year,
+                candidate.canonical_url, None, None, "Synthetic public abstract.", "abstract",
+            )
+
+        self.invoke_pipeline(messages=[first], enricher=without_identifier)
+        alternate = self.alert_message(
+            "Stable paper title", "https://identity.example.invalid/alternate"
+        )
+
+        def fails(_candidate):
+            raise RuntimeError("private transient failure")
+
+        for _ in range(3):
+            self.invoke_pipeline(messages=[alternate], enricher=fails)
+        papers = json.loads(self.feed_path.read_text())["papers"]
+        self.assertEqual(len(papers), 1)
+        self.assertEqual(papers[0]["status"], "ready")
+        self.assertEqual(json.loads(self.retry_path.read_text())["retries"], {})
+
     def test_ready_record_preserves_genuinely_missing_authors_and_venue(self):
         message = self.alert_message("Sparse metadata paper", "https://sparse.example.invalid/paper", authors="", venue="")
 

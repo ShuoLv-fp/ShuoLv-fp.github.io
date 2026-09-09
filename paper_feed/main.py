@@ -306,7 +306,7 @@ def run_pipeline(
     timestamp, today = _timestamp(now), now.astimezone(SHANGHAI).date().isoformat()
     summarized = deferred = metadata_only = new = 0
     resolved: dict[str, list[tuple[str, PaperCandidate, PaperMetadata, set[str]]]] = {}
-    unresolved: list[tuple[str, PaperCandidate, Exception]] = []
+    unresolved: list[tuple[str, PaperCandidate, Exception, set[str]]] = []
     post_enrichment_duplicates = 0
     for candidate_group in candidate_groups:
         candidate = min(candidate_group, key=_candidate_preference)
@@ -326,7 +326,7 @@ def run_pipeline(
         try:
             metadata = _invoke_enricher(enricher, candidate)
         except Exception as error:
-            unresolved.append((preliminary_id, candidate, error))
+            unresolved.append((preliminary_id, candidate, error, aliases))
             continue
         record_id = stable_record_id(metadata.doi, metadata.arxiv_id, metadata.canonical_url, metadata.title)
         group = resolved.setdefault(record_id, [])
@@ -370,7 +370,15 @@ def run_pipeline(
         by_id[record_id] = record
         metadata_only += 1
 
-    for record_id, candidate, error in unresolved:
+    for record_id, candidate, error, aliases in unresolved:
+        matching_legacy_ids = set().union(*(
+            legacy_aliases.get(alias, set()) for alias in aliases
+        ))
+        if any(
+            by_id.get(legacy_id) is not None and by_id[legacy_id].status == "ready"
+            for legacy_id in matching_legacy_ids
+        ):
+            continue
         old = by_id.get(record_id)
         if old is not None and old.status == "ready":
             continue
