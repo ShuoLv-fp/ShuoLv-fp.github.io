@@ -44,6 +44,32 @@ class PaperFeedModelTests(unittest.TestCase):
             "doi:10.1000/example",
         )
 
+    def test_stable_id_strips_whitespace_before_normalizing_doi(self):
+        self.assertEqual(
+            stable_record_id("  https://doi.org/10.1000/EXAMPLE  ", None, None, "Title"),
+            "doi:10.1000/example",
+        )
+
+    def test_stable_id_prefers_normalized_arxiv_identifier(self):
+        self.assertEqual(
+            stable_record_id(None, "  arXiv:2401.12345  ", "https://x.test", "Title"),
+            "arxiv:2401.12345",
+        )
+
+    def test_stable_id_uses_exact_hash_format_for_https_url_fallback(self):
+        record_id = stable_record_id(None, None, "https://example.test/paper/", "Title")
+        self.assertRegex(record_id, r"^url:[0-9a-f]{24}$")
+
+    def test_stable_id_uses_title_hash_for_http_url(self):
+        record_id = stable_record_id(None, None, "http://example.test/paper", "Title")
+        self.assertRegex(record_id, r"^title:[0-9a-f]{24}$")
+
+    def test_stable_id_title_fallback_has_exact_hash_format(self):
+        self.assertRegex(
+            stable_record_id(None, None, None, "A Public Paper"),
+            r"^title:[0-9a-f]{24}$",
+        )
+
     def test_stable_id_title_fallback_is_deterministic(self):
         self.assertEqual(
             stable_record_id(None, None, None, "  A   Public PAPER  "),
@@ -78,26 +104,55 @@ class PaperFeedModelTests(unittest.TestCase):
                 write_feed_atomic(path, [invalid], "2026-09-09T01:00:00Z")
             self.assertEqual(path.read_bytes(), before)
 
-    def test_metadata_only_fallback_accepts_unavailable_evidence_and_empty_points(self):
+    def test_metadata_only_fallback_accepts_the_minimal_unavailable_shape(self):
         fallback = replace(
             self.sample(),
             evidence_type="unavailable",
             status="summary_unavailable",
-            en=LocalizedSummary("Summary temporarily unavailable", (), "Connection", ("Brain",)),
-            zh=LocalizedSummary("摘要暂不可用", (), "研究关联", ("脑科学",)),
+            en=LocalizedSummary("Summary temporarily unavailable", (), "", ()),
+            zh=LocalizedSummary("摘要暂不可用", (), "", ()),
         )
         validate_public_record(fallback.to_public_dict())
+
+    def test_ready_records_keep_required_localized_content(self):
+        incomplete = replace(
+            self.sample(),
+            en=LocalizedSummary("Conclusion", (), "", ()),
+        )
+        with self.assertRaises(ValueError):
+            validate_public_record(incomplete.to_public_dict())
 
     def test_public_record_allows_unknown_year(self):
         validate_public_record(replace(self.sample(), year=None).to_public_dict())
 
-    def test_retry_state_rejects_private_ids_and_unsanitized_categories(self):
+    def test_public_record_rejects_nonstable_and_private_record_ids(self):
+        for record_id in (
+            "arbitrary",
+            "<mail@example.test>",
+            "doi: message id",
+            "doi:10.1000/ok\nnext",
+            "arxiv:not-an-id",
+        ):
+            with self.subTest(record_id=record_id):
+                with self.assertRaises(ValueError):
+                    validate_public_record(replace(self.sample(), record_id=record_id).to_public_dict())
+
+    def test_retry_state_rejects_invalid_record_id(self):
         with TemporaryDirectory() as directory:
             path = Path(directory) / "retries.json"
             with self.assertRaises(ValueError):
                 write_retries_atomic(
                     path,
-                    {"recipient@example.test": RetryEntry(1, "2026-09-09", "raw alert body")},
+                    {"recipient@example.test": RetryEntry(1, "2026-09-09", "timeout")},
+                )
+
+    def test_retry_state_rejects_unsanitized_error_category(self):
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "retries.json"
+            with self.assertRaises(ValueError):
+                write_retries_atomic(
+                    path,
+                    {"doi:10.1000/example": RetryEntry(1, "2026-09-09", "raw alert body")},
                 )
 
 

@@ -74,23 +74,37 @@ SAFE_ERROR_CATEGORIES = {
     "no_evidence",
     "unknown_error",
 }
+DOI_PATTERN = re.compile(r"10\.\d{4,9}/[-._;()/:a-z0-9]+$")
+ARXIV_PATTERN = re.compile(r"(?:\d{4}\.\d{4,5}(?:v\d+)?|[a-z-]+/\d{7}(?:v\d+)?)$")
+HASH_RECORD_ID_PATTERN = re.compile(r"[0-9a-f]{24}$")
+UNAVAILABLE_CONCLUSIONS = {
+    "en": "Summary temporarily unavailable",
+    "zh": "摘要暂不可用",
+}
 
 
 def stable_record_id(
     doi: Optional[str], arxiv_id: Optional[str], canonical_url: Optional[str], title: str
 ) -> str:
     if doi:
-        value = doi.lower().removeprefix("https://doi.org/").removeprefix("doi:").strip()
-        return f"doi:{value}"
+        value = doi.strip().lower().removeprefix("https://doi.org/").removeprefix("doi:").strip()
+        if DOI_PATTERN.fullmatch(value):
+            return f"doi:{value}"
     if arxiv_id:
-        value = arxiv_id.lower().removeprefix("arxiv:").strip()
-        return f"arxiv:{value}"
+        value = arxiv_id.strip().lower().removeprefix("arxiv:").strip()
+        if ARXIV_PATTERN.fullmatch(value):
+            return f"arxiv:{value}"
     if canonical_url:
-        parts = urlsplit(canonical_url)
-        canonical = urlunsplit(
-            (parts.scheme.lower(), parts.netloc.lower(), parts.path.rstrip("/"), parts.query, "")
-        )
-        return "url:" + hashlib.sha256(canonical.encode()).hexdigest()[:24]
+        try:
+            _validate_public_url(canonical_url.strip())
+        except ValueError:
+            pass
+        else:
+            parts = urlsplit(canonical_url.strip())
+            canonical = urlunsplit(
+                (parts.scheme.lower(), parts.netloc.lower(), parts.path.rstrip("/"), parts.query, "")
+            )
+            return "url:" + hashlib.sha256(canonical.encode()).hexdigest()[:24]
     normalized = " ".join(title.casefold().split())
     return "title:" + hashlib.sha256(normalized.encode()).hexdigest()[:24]
 
@@ -148,19 +162,35 @@ def _validate_no_forbidden_keys(value: Any) -> None:
 def _validate_localized_summary(value: Any, language: str, ready: bool) -> None:
     if not isinstance(value, Mapping) or set(value) != LOCALIZED_SUMMARY_KEYS:
         raise ValueError(f"invalid {language} summary schema")
-    _non_empty_string(value["core_conclusion"], f"{language}.core_conclusion", MAX_LENGTHS["core_conclusion"])
-    _non_empty_string(
-        value["research_connection"],
-        f"{language}.research_connection",
-        MAX_LENGTHS["research_connection"],
-    )
     key_points = value["key_points"]
-    if not isinstance(key_points, list) or (len(key_points) not in (2, 3) if ready else len(key_points) > 3):
+    tags = value["tags"]
+    if ready:
+        _non_empty_string(
+            value["core_conclusion"], f"{language}.core_conclusion", MAX_LENGTHS["core_conclusion"]
+        )
+        _non_empty_string(
+            value["research_connection"],
+            f"{language}.research_connection",
+            MAX_LENGTHS["research_connection"],
+        )
+        if not isinstance(key_points, list) or len(key_points) not in (2, 3):
+            raise ValueError(f"invalid {language}.key_points")
+        if not isinstance(tags, list) or not 1 <= len(tags) <= 5:
+            raise ValueError(f"invalid {language}.tags")
+    else:
+        if value["core_conclusion"] != UNAVAILABLE_CONCLUSIONS[language]:
+            raise ValueError(f"invalid {language}.core_conclusion")
+        if not isinstance(value["research_connection"], str) or len(value["research_connection"]) > MAX_LENGTHS["research_connection"]:
+            raise ValueError(f"invalid {language}.research_connection")
+        if not isinstance(key_points, list) or len(key_points) > 3:
+            raise ValueError(f"invalid {language}.key_points")
+        if not isinstance(tags, list) or len(tags) > 5:
+            raise ValueError(f"invalid {language}.tags")
+    if not isinstance(key_points, list):
         raise ValueError(f"invalid {language}.key_points")
     for point in key_points:
         _non_empty_string(point, f"{language}.key_point", MAX_LENGTHS["key_point"])
-    tags = value["tags"]
-    if not isinstance(tags, list) or not 1 <= len(tags) <= 5:
+    if not isinstance(tags, list):
         raise ValueError(f"invalid {language}.tags")
     for tag in tags:
         _non_empty_string(tag, f"{language}.tag", MAX_LENGTHS["tag"])
@@ -172,7 +202,7 @@ def validate_public_record(payload: Mapping[str, Any]) -> None:
     _validate_no_forbidden_keys(payload)
     if set(payload) != PUBLIC_RECORD_KEYS:
         raise ValueError("invalid public record schema")
-    _non_empty_string(payload["record_id"], "record_id", MAX_LENGTHS["record_id"])
+    _validate_stable_record_id(payload["record_id"])
     _non_empty_string(payload["title"], "title", MAX_LENGTHS["title"])
     authors = payload["authors"]
     if not isinstance(authors, list) or not authors:
@@ -300,14 +330,14 @@ def write_feed_atomic(
     _write_json_atomic(path, payload)
 
 
-def _validate_retry_record_id(value: Any) -> None:
+def _validate_stable_record_id(value: Any) -> None:
     _non_empty_string(value, "record_id", MAX_LENGTHS["record_id"])
     if value.startswith("doi:"):
-        valid = re.fullmatch(r"10\.\d{4,9}/[^\s@]+", value[4:])
+        valid = DOI_PATTERN.fullmatch(value[4:])
     elif value.startswith("arxiv:"):
-        valid = re.fullmatch(r"[A-Za-z0-9./-]+", value[6:])
+        valid = ARXIV_PATTERN.fullmatch(value[6:])
     elif value.startswith(("url:", "title:")):
-        valid = re.fullmatch(r"[0-9a-f]{24}", value.split(":", 1)[1])
+        valid = HASH_RECORD_ID_PATTERN.fullmatch(value.split(":", 1)[1])
     else:
         valid = None
     if valid is None:
@@ -335,7 +365,7 @@ def load_retries(path: Union[Path, str]) -> dict[str, RetryEntry]:
         raise ValueError("unsupported retries envelope")
     entries: dict[str, RetryEntry] = {}
     for record_id, entry in payload["retries"].items():
-        _validate_retry_record_id(record_id)
+        _validate_stable_record_id(record_id)
         entries[record_id] = _validate_retry_entry(entry)
     return entries
 
@@ -347,6 +377,6 @@ def write_retries_atomic(path: Union[Path, str], entries: Mapping[str, RetryEntr
     }
     loadable_entries = payload["retries"]
     for record_id, entry in loadable_entries.items():
-        _validate_retry_record_id(record_id)
+        _validate_stable_record_id(record_id)
         _validate_retry_entry(entry)
     _write_json_atomic(path, payload)
