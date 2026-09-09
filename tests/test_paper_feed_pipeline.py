@@ -228,6 +228,36 @@ Google Scholar: synthetic public evidence.
         self.assertNotIn(old_id, retries)
         self.assertEqual(retries, {})
 
+    def test_two_url_fallbacks_resolving_to_one_doi_remove_all_legacy_state(self):
+        messages = [
+            self.alert_message("First legacy paper", "https://legacy-one.example.invalid/paper"),
+            self.alert_message("Second legacy paper", "https://legacy-two.example.invalid/paper"),
+        ]
+
+        def fails(_candidate):
+            raise RuntimeError("transient failure")
+
+        for _ in range(3):
+            self.invoke_pipeline(messages=messages, enricher=fails)
+        old_papers = json.loads(self.feed_path.read_text())["papers"]
+        old_retries = json.loads(self.retry_path.read_text())["retries"]
+        self.assertEqual(len(old_papers), 2)
+        self.assertEqual(len(old_retries), 2)
+
+        def resolves_shared_doi(candidate):
+            return PaperMetadata(candidate.title, candidate.authors, candidate.venue, candidate.year,
+                                 candidate.canonical_url, "10.1000/converged", None,
+                                 "Synthetic public abstract.", "abstract")
+
+        result = self.invoke_pipeline(messages=messages, enricher=resolves_shared_doi)
+        papers = json.loads(self.feed_path.read_text())["papers"]
+        retries = json.loads(self.retry_path.read_text())["retries"]
+        self.assertEqual(result.duplicates, 1)
+        self.assertEqual([(paper["record_id"], paper["status"]) for paper in papers], [
+            ("doi:10.1000/converged", "ready"),
+        ])
+        self.assertEqual(retries, {})
+
     def test_existing_ready_canonical_record_skips_transient_url_enrichment_failure(self):
         message = self.alert_message("Known paper", "https://known.example.invalid/paper")
 

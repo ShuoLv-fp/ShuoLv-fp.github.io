@@ -223,7 +223,7 @@ def run_pipeline(
             existing_aliases.setdefault(alias, record.record_id)
     timestamp, today = _timestamp(now), now.astimezone(timezone.utc).date().isoformat()
     summarized = deferred = metadata_only = new = 0
-    resolved: dict[str, tuple[str, PaperCandidate, PaperMetadata]] = {}
+    resolved: dict[str, list[tuple[str, PaperCandidate, PaperMetadata]]] = {}
     unresolved: list[tuple[str, PaperCandidate, Exception]] = []
     post_enrichment_duplicates = 0
     for preliminary_id, candidate in unique.items():
@@ -236,11 +236,10 @@ def run_pipeline(
             unresolved.append((preliminary_id, candidate, error))
             continue
         record_id = stable_record_id(metadata.doi, metadata.arxiv_id, metadata.canonical_url, metadata.title)
-        previous = resolved.get(record_id)
-        if previous is not None:
+        group = resolved.setdefault(record_id, [])
+        if group:
             post_enrichment_duplicates += 1
-        if previous is None or preliminary_id < previous[0]:
-            resolved[record_id] = (preliminary_id, candidate, metadata)
+        group.append((preliminary_id, candidate, metadata))
 
     def reconcile_identity(preliminary_id: str, canonical_id: str) -> None:
         """Migrate a legacy URL fallback/retry to a resolved DOI/arXiv identity."""
@@ -253,7 +252,11 @@ def run_pipeline(
         if legacy_retry is None:
             return
         current_retry = retries.get(canonical_id)
-        if current_retry is None or legacy_retry.attempts > current_retry.attempts:
+        if current_retry is None or (
+            legacy_retry.attempts, legacy_retry.last_attempt_date, legacy_retry.error_category
+        ) > (
+            current_retry.attempts, current_retry.last_attempt_date, current_retry.error_category
+        ):
             retries[canonical_id] = legacy_retry
 
     def record_failure(record_id: str, candidate: PaperCandidate, error: Exception) -> None:
@@ -281,8 +284,10 @@ def run_pipeline(
             new += 1
         record_failure(record_id, candidate, error)
 
-    for record_id, (preliminary_id, candidate, metadata) in sorted(resolved.items()):
-        reconcile_identity(preliminary_id, record_id)
+    for record_id, group in sorted(resolved.items()):
+        for preliminary_id, _candidate, _metadata in sorted(group, key=lambda item: item[0]):
+            reconcile_identity(preliminary_id, record_id)
+        _preliminary_id, candidate, metadata = min(group, key=lambda item: item[0])
         old = by_id.get(record_id)
         if old is not None and old.status == "ready":
             continue
