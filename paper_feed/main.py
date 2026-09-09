@@ -212,11 +212,24 @@ def run_pipeline(
         ) for paper in existing_payload["papers"]
     ]
     by_id = {record.record_id: record for record in records}
+    existing_aliases: dict[str, str] = {}
+    for record in sorted(records, key=lambda item: item.record_id):
+        if record.status != "ready" or not record.record_id.startswith(("doi:", "arxiv:")):
+            continue
+        for alias in (
+            stable_record_id(None, None, record.canonical_url, record.title),
+            stable_record_id(None, None, None, record.title),
+        ):
+            existing_aliases.setdefault(alias, record.record_id)
     timestamp, today = _timestamp(now), now.astimezone(timezone.utc).date().isoformat()
     summarized = deferred = metadata_only = new = 0
     resolved: dict[str, tuple[str, PaperCandidate, PaperMetadata]] = {}
     unresolved: list[tuple[str, PaperCandidate, Exception]] = []
+    post_enrichment_duplicates = 0
     for preliminary_id, candidate in unique.items():
+        canonical_ready_id = existing_aliases.get(preliminary_id)
+        if canonical_ready_id is not None:
+            continue
         try:
             metadata = _invoke_enricher(enricher, candidate)
         except Exception as error:
@@ -224,8 +237,24 @@ def run_pipeline(
             continue
         record_id = stable_record_id(metadata.doi, metadata.arxiv_id, metadata.canonical_url, metadata.title)
         previous = resolved.get(record_id)
+        if previous is not None:
+            post_enrichment_duplicates += 1
         if previous is None or preliminary_id < previous[0]:
             resolved[record_id] = (preliminary_id, candidate, metadata)
+
+    def reconcile_identity(preliminary_id: str, canonical_id: str) -> None:
+        """Migrate a legacy URL fallback/retry to a resolved DOI/arXiv identity."""
+        if preliminary_id == canonical_id:
+            return
+        legacy = by_id.get(preliminary_id)
+        if legacy is not None and legacy.status != "ready":
+            by_id.pop(preliminary_id)
+        legacy_retry = retries.pop(preliminary_id, None)
+        if legacy_retry is None:
+            return
+        current_retry = retries.get(canonical_id)
+        if current_retry is None or legacy_retry.attempts > current_retry.attempts:
+            retries[canonical_id] = legacy_retry
 
     def record_failure(record_id: str, candidate: PaperCandidate, error: Exception) -> None:
         nonlocal deferred, metadata_only
@@ -252,7 +281,8 @@ def run_pipeline(
             new += 1
         record_failure(record_id, candidate, error)
 
-    for record_id, (_preliminary_id, candidate, metadata) in sorted(resolved.items()):
+    for record_id, (preliminary_id, candidate, metadata) in sorted(resolved.items()):
+        reconcile_identity(preliminary_id, record_id)
         old = by_id.get(record_id)
         if old is not None and old.status == "ready":
             continue
@@ -279,7 +309,7 @@ def run_pipeline(
         write_feed_atomic(preview_path, final_records, generated_at)
     if publish and changed:
         _stage_and_publish(Path(feed_path), Path(retry_path), final_records, retries, generated_at)
-    return RunSummary(len(raw_messages), len(candidates), len(candidates) - len(unique), new, summarized, deferred, metadata_only, changed)
+    return RunSummary(len(raw_messages), len(candidates), len(candidates) - len(unique) + post_enrichment_duplicates, new, summarized, deferred, metadata_only, changed)
 
 
 def _fixture_functions():

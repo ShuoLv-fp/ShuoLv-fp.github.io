@@ -198,11 +198,58 @@ Google Scholar: synthetic public evidence.
 
         result = self.invoke_pipeline(messages=messages, enricher=same_doi)
         payload = json.loads(self.feed_path.read_text())
+        self.assertEqual(result.duplicates, 1)
         self.assertEqual(result.new, 1)
         self.assertEqual(result.summarized, 1)
         self.assertEqual(len(payload["papers"]), 1)
         self.assertEqual(payload["papers"][0]["record_id"], "doi:10.1000/shared")
         self.assertEqual(json.loads(self.retry_path.read_text())["retries"], {})
+
+    def test_url_fallback_is_migrated_to_canonical_doi_after_later_success(self):
+        message = self.alert_message("Migrating paper", "https://migrate.example.invalid/paper")
+
+        def fails(_candidate):
+            raise RuntimeError("transient failure")
+
+        for _ in range(3):
+            self.invoke_pipeline(messages=[message], enricher=fails)
+        old_id = json.loads(self.feed_path.read_text())["papers"][0]["record_id"]
+        self.assertTrue(old_id.startswith("url:"))
+
+        def resolves_doi(candidate):
+            return PaperMetadata(candidate.title, candidate.authors, candidate.venue, candidate.year,
+                                 candidate.canonical_url, "10.1000/migrated", None,
+                                 "Synthetic public abstract.", "abstract")
+
+        self.invoke_pipeline(messages=[message], enricher=resolves_doi)
+        papers = json.loads(self.feed_path.read_text())["papers"]
+        retries = json.loads(self.retry_path.read_text())["retries"]
+        self.assertEqual([paper["record_id"] for paper in papers], ["doi:10.1000/migrated"])
+        self.assertNotIn(old_id, retries)
+        self.assertEqual(retries, {})
+
+    def test_existing_ready_canonical_record_skips_transient_url_enrichment_failure(self):
+        message = self.alert_message("Known paper", "https://known.example.invalid/paper")
+
+        def resolves_doi(candidate):
+            return PaperMetadata(candidate.title, candidate.authors, candidate.venue, candidate.year,
+                                 candidate.canonical_url, "10.1000/known", None,
+                                 "Synthetic public abstract.", "abstract")
+
+        self.invoke_pipeline(messages=[message], enricher=resolves_doi)
+        before_feed, before_retries = self.feed_path.read_bytes(), self.retry_path.read_bytes()
+        calls = 0
+
+        def transient_failure(_candidate):
+            nonlocal calls
+            calls += 1
+            raise RuntimeError("transient failure")
+
+        result = self.invoke_pipeline(messages=[message], enricher=transient_failure)
+        self.assertEqual(calls, 0)
+        self.assertFalse(result.changed)
+        self.assertEqual(self.feed_path.read_bytes(), before_feed)
+        self.assertEqual(self.retry_path.read_bytes(), before_retries)
 
     def test_third_long_metadata_failure_is_bounded_fallback_without_blocking_other_paper(self):
         long_message = self.alert_message(
