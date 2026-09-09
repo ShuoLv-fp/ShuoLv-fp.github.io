@@ -1,0 +1,25 @@
+From: scholaralerts-noreply@google.com
+To: reader@example.invalid
+Subject: Scholar Alert - synthetic neuroscience results
+Date: Tue, 09 Sep 2026 09:00:00 +0000
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+<html><body>
+  <table class="gse_alrt">
+    <tr class="gse_alrt_title"><td>
+      <a href="https://scholar.google.com/scholar_url?url=https%3A%2F%2Fexample.invalid%2Fpaper-one">Foundation Models for Brain Dynamics</a>
+    </td></tr>
+    <tr><td class="gse_alrt_meta">Ada Inventor, Ben Example - Synthetic Neuroinformatics, 2026</td></tr>
+    <tr><td class="gse_alrt_snippet">An invented study of robust latent dynamics in simulated neural signals.</td></tr>
+  </table>
+  <table class="gse_alrt">
+    <tr class="gse_alrt_title"><td>
+      <a href="https://scholar.google.com/scholar_url?url=https%3A%2F%2Fexample.invalid%2Fpaper-two">Probabilistic Maps of Imaginary Cortex</a>
+    </td></tr>
+    <tr><td class="gse_alrt_meta">Casey Researcher - Fictional Imaging Letters, 2025</td></tr>
+    <tr><td class="gse_alrt_snippet">A synthetic benchmark for spatial uncertainty under controlled conditions.</td></tr>
+  </table>
+  <img width="1" height="1" src="https://tracking.example.invalid/pixel" />
+  <div class="gse_alrt_footer">Synthetic footer — unsubscribe</div>
+</body></html>
