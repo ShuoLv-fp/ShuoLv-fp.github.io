@@ -101,7 +101,7 @@
       <h2 id="technical-toolkit-title">Technical toolkit</h2>
     </div>
     <dl class="toolkit-list">
-      <div><dt>Programming</dt><dd><a href="https://www.python.org/">Python</a><span>C++</span><span>Java</span><span>R</span><a href="https://lean-lang.org/">Lean</a><span>HTML</span></dd></div>
+      <div><dt>Programming</dt><dd><a href="https://www.python.org/">Python</a><span>C++</span><span>Java</span><span>R</span><a href="https://lean-lang.org/">Lean</a><a href="{{ site.phd_agent_url }}" aria-label="Open private PhD application workflow" rel="nofollow">PhD application workflow</a><span>HTML</span></dd></div>
       <div><dt>Machine learning</dt><dd><a href="https://pytorch.org/">PyTorch</a><span>scikit-learn</span><span>Hugging Face</span><span>NumPy / SciPy</span><span>Pandas</span><span>PyTorch Geometric</span></dd></div>
       <div><dt>Agents &amp; language models</dt><dd><span>LangChain</span><span>LangGraph</span><span>LlamaIndex</span><span>vLLM</span><span>Ollama</span><span>MCP</span><span>Multi-Agent Orchestration</span><span>Test-Time Scaling</span></dd></div>
       <div><dt>Neuroimaging &amp; research</dt><dd><span>fMRIPrep</span><span>Nilearn</span><span>FSL</span><span>PLINK</span><span>LaTeX</span><span>Git</span></dd></div>

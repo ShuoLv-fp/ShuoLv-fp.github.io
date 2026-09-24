@@ -385,6 +385,11 @@
     box-shadow: none;
   }
 
+  .capability-card:hover {
+    box-shadow: none;
+    transform: none;
+  }
+
   .evidence-link {
     border: 0;
     padding: 0;

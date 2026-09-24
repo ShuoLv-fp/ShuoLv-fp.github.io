@@ -5,7 +5,7 @@ from tests.test_ewu_ultralow_field_mri import parse_top_level_config
 
 
 class PhdAgentEntryTests(unittest.TestCase):
-    def test_both_lean_images_use_one_configured_protected_url(self):
+    def test_both_skills_toolkits_preserve_gateway_and_direct_lean_links(self):
         config = parse_top_level_config(Path("_config.yml").read_text(encoding="utf-8"))
         self.assertEqual(
             "https://shuo-phd-agent-gateway.pages.dev", config["phd_agent_url"]
@@ -17,7 +17,7 @@ class PhdAgentEntryTests(unittest.TestCase):
             text = path.read_text(encoding="utf-8")
             self.assertIn('href="{{ site.phd_agent_url }}"', text)
             self.assertEqual(1, text.count('href="{{ site.phd_agent_url }}"'))
-            self.assertIn("[Lean](https://lean-lang.org/)", text)
+            self.assertIn('<a href="https://lean-lang.org/">Lean</a>', text)
 
     def test_private_directories_are_excluded_from_jekyll(self):
         config = parse_top_level_config(Path("_config.yml").read_text(encoding="utf-8"))
