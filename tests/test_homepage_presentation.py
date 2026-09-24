@@ -125,6 +125,24 @@ class HomepagePresentationTests(unittest.TestCase):
         self.assertIn('@import "skills";', entrypoint)
         self.assertTrue(partial.is_file())
 
+    def test_skills_layout_is_wide_and_vertically_compact(self):
+        styles = Path("_sass/_skills.scss").read_text(encoding="utf-8")
+        capabilities = re.search(
+            r"\.skills-capabilities\s*\{(?P<body>.*?)\}",
+            styles,
+            flags=re.DOTALL,
+        )
+
+        self.assertIsNotNone(capabilities)
+        self.assertIn(
+            "grid-template-columns: repeat(3, minmax(0, 1fr));",
+            capabilities.group("body"),
+        )
+        self.assertIn("@media (max-width: 1120px)", styles)
+        self.assertIn(".capability-card:last-child", styles)
+        self.assertIn("grid-column: span 2;", styles)
+        self.assertIn("padding: 0.95rem 1rem 0.9rem;", styles)
+
     def test_skills_exploration_text_and_focus_contrast(self):
         stylesheet = Path("_sass/_skills.scss").read_text(encoding="utf-8")
 
