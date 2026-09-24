@@ -63,6 +63,68 @@ class HomepagePresentationTests(unittest.TestCase):
                     )
                 )
 
+    def test_skills_sections_use_evidence_driven_structure(self):
+        for path in (
+            Path("_pages/includes/technical_skills.md"),
+            Path("_pages/includes/zh/technical_skills.md"),
+        ):
+            with self.subTest(path=path):
+                text = path.read_text(encoding="utf-8")
+                self.assertIn('class="skills-profile"', text)
+                self.assertIn('class="skills-capabilities"', text)
+                self.assertEqual(text.count('class="capability-card"'), 3)
+                self.assertIn('class="exploration-grid"', text)
+                self.assertEqual(text.count('class="exploration-card"'), 3)
+                self.assertIn('class="technical-toolkit"', text)
+
+    def test_skills_sections_connect_claims_to_evidence(self):
+        for path in (
+            Path("_pages/includes/technical_skills.md"),
+            Path("_pages/includes/zh/technical_skills.md"),
+        ):
+            with self.subTest(path=path):
+                text = path.read_text(encoding="utf-8")
+                self.assertEqual(text.count('class="evidence-row"'), 3)
+                self.assertGreaterEqual(text.count('class="evidence-link"'), 6)
+                self.assertIn('href="#publications"', text)
+                self.assertIn('href="#projects"', text)
+
+    def test_skills_sections_use_text_statuses_without_level_bars(self):
+        for path in (
+            Path("_pages/includes/technical_skills.md"),
+            Path("_pages/includes/zh/technical_skills.md"),
+        ):
+            with self.subTest(path=path):
+                text = path.read_text(encoding="utf-8")
+                self.assertEqual(text.count('class="capability-status"'), 6)
+                self.assertNotIn("skill-bar", text)
+                self.assertNotIn("aria-valuenow", text)
+
+    def test_skills_content_is_localized(self):
+        english = Path("_pages/includes/technical_skills.md").read_text(
+            encoding="utf-8"
+        )
+        chinese = Path("_pages/includes/zh/technical_skills.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("Demonstrated capabilities", english)
+        self.assertIn("Computational Neuroscience &amp; Neuroimaging", english)
+        self.assertIn("Exploring next", english)
+        self.assertIn("Technical toolkit", english)
+
+        self.assertIn("已验证的能力", chinese)
+        self.assertIn("计算神经科学与神经影像", chinese)
+        self.assertIn("正在探索", chinese)
+        self.assertIn("技术工具箱", chinese)
+
+    def test_skills_stylesheet_is_imported(self):
+        entrypoint = Path("assets/css/main.scss").read_text(encoding="utf-8")
+        partial = Path("_sass/_skills.scss")
+
+        self.assertIn('@import "skills";', entrypoint)
+        self.assertTrue(partial.is_file())
+
 
 if __name__ == "__main__":
     unittest.main()
