@@ -125,6 +125,63 @@ class HomepagePresentationTests(unittest.TestCase):
         self.assertIn('@import "skills";', entrypoint)
         self.assertTrue(partial.is_file())
 
+    def test_skills_exploration_text_and_focus_contrast(self):
+        stylesheet = Path("_sass/_skills.scss").read_text(encoding="utf-8")
+
+        def declarations(selector):
+            match = re.search(
+                rf"(?m)^{re.escape(selector)}\s*\{{([^{{}}]*)\}}",
+                stylesheet,
+            )
+            self.assertIsNotNone(match, selector)
+            return dict(
+                re.findall(r"([\w-]+)\s*:\s*([^;]+);", match.group(1))
+            )
+
+        def luminance(hex_color):
+            channels = [
+                int(hex_color[index : index + 2], 16) / 255
+                for index in (1, 3, 5)
+            ]
+            linear = [
+                channel / 12.92
+                if channel <= 0.04045
+                else ((channel + 0.055) / 1.055) ** 2.4
+                for channel in channels
+            ]
+            return sum(weight * channel for weight, channel in zip(
+                (0.2126, 0.7152, 0.0722), linear
+            ))
+
+        def contrast(first, second):
+            lighter, darker = sorted((luminance(first), luminance(second)), reverse=True)
+            return (lighter + 0.05) / (darker + 0.05)
+
+        light = declarations(".skills-profile")
+        dark = declarations('[data-theme="dark"] .skills-profile')
+        kicker = declarations(".skills-kicker--exploring")
+        dark_kicker = declarations('[data-theme="dark"] .skills-kicker--exploring')
+        focus = declarations(".technical-toolkit a:focus-visible")
+        marker = declarations(".exploration-card::before")
+
+        self.assertEqual(light["--skills-coral"].lower(), "#d95d4f")
+        self.assertEqual(marker["background"], "var(--skills-coral)")
+        self.assertEqual(kicker["color"], "var(--skills-coral-text)")
+        self.assertEqual(dark_kicker["color"], "var(--skills-coral-text)")
+        self.assertEqual(focus["outline"], "3px solid var(--skills-focus)")
+
+        for theme, variables, surface in (
+            ("light", light, "#ffffff"),
+            ("dark", {**light, **dark}, "#242a31"),
+        ):
+            with self.subTest(theme=theme):
+                self.assertGreaterEqual(
+                    contrast(variables["--skills-coral-text"], surface), 4.5
+                )
+                self.assertGreaterEqual(
+                    contrast(variables["--skills-focus"], surface), 3.0
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

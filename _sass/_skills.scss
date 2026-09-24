@@ -5,6 +5,8 @@
   --skills-mist: #f4f7fb;
   --skills-ink: #253247;
   --skills-coral: #d95d4f;
+  --skills-coral-text: #b24a3f;
+  --skills-focus: #224b8d;
   --skills-border: #dce4ef;
   color: var(--skills-ink);
 }
@@ -42,7 +44,7 @@
 }
 
 .skills-kicker--exploring {
-  color: var(--skills-coral);
+  color: var(--skills-coral-text);
 }
 
 .skills-capabilities {
@@ -153,7 +155,7 @@
 
 .evidence-link:focus-visible,
 .technical-toolkit a:focus-visible {
-  outline: 3px solid rgba(63, 114, 184, 0.36);
+  outline: 3px solid var(--skills-focus);
   outline-offset: 3px;
 }
 
@@ -274,6 +276,8 @@
 [data-theme="dark"] .skills-profile {
   --skills-mist: #252b33;
   --skills-ink: #eef3fb;
+  --skills-coral-text: #ff8f83;
+  --skills-focus: #9fc3ff;
   --skills-border: #3b4553;
   color: #d8dee8;
 }
@@ -307,7 +311,7 @@
 }
 
 [data-theme="dark"] .skills-kicker--exploring {
-  color: var(--skills-coral);
+  color: var(--skills-coral-text);
 }
 
 [data-theme="dark"] .skill-keywords span {
