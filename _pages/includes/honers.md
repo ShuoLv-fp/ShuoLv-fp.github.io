@@ -23,8 +23,10 @@
 
 
 ## Scholarships
-- **First Prize Scholarship** (Top 20%, from [BIT](https://www.bit.edu.cn/)) (2024)  
-- **National Scholarship** (Top 1%, from [Ministry of Education of China](http://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/jyzt_2015nztzl/2015_zt06/15zt06_gxzzzc/gxzz_bzks/201508/t20150810_199202.html)) (2022, 2023)  
+- **National Scholarship (Master’s)** (Top 1%, from [Ministry of Education of China](http://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/jyzt_2015nztzl/2015_zt06/15zt06_gxzzzc/gxzz_bzks/201508/t20150810_199202.html)) (2026)  
+- **National Scholarship (Undergraduate)** (Top 1%, from [Ministry of Education of China](http://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/jyzt_2015nztzl/2015_zt06/15zt06_gxzzzc/gxzz_bzks/201508/t20150810_199202.html)) (2023)  
+- **National Scholarship (Undergraduate)** (Top 1%, from [Ministry of Education of China](http://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/jyzt_2015nztzl/2015_zt06/15zt06_gxzzzc/gxzz_bzks/201508/t20150810_199202.html)) (2022)  
 - **Gratitude to Modern Chinese Scientists Scholarship** (15 students per year at [SWU](https://www.swu.edu.cn/), from [SWJTU](https://ldsrw.swjtu.edu.cn/)) (2023)  
+- **First Prize Scholarship** (Top 20%, from [BIT](https://www.bit.edu.cn/)) (2024)  
 - **Distinguished Scholarship** (15 students per year at [SWU](https://www.swu.edu.cn/)) (2023)  
 - **First Prize Scholarship** (Top 20%, from [SWU](https://www.swu.edu.cn/)) (2021)  

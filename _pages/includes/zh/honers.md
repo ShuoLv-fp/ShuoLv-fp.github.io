@@ -23,8 +23,10 @@
 
 
 ## 奖学金
-- **一等学业奖学金**（前 20%，[北京理工大学](https://www.bit.edu.cn/)）（2024）  
-- **国家奖学金**（前 1%，[中国教育部](http://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/jyzt_2015nztzl/2015_zt06/15zt06_gxzzzc/gxzz_bzks/201508/t20150810_199202.html)）（2022、2023）  
+- **国家奖学金（硕士）**（前 1%，[中国教育部](http://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/jyzt_2015nztzl/2015_zt06/15zt06_gxzzzc/gxzz_bzks/201508/t20150810_199202.html)）（2026）  
+- **国家奖学金（本科）**（前 1%，[中国教育部](http://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/jyzt_2015nztzl/2015_zt06/15zt06_gxzzzc/gxzz_bzks/201508/t20150810_199202.html)）（2023）  
+- **国家奖学金（本科）**（前 1%，[中国教育部](http://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/jyzt_2015nztzl/2015_zt06/15zt06_gxzzzc/gxzz_bzks/201508/t20150810_199202.html)）（2022）  
 - **感恩中国近现代科学家奖学金**（[西南大学](https://www.swu.edu.cn/) 每年 15 人，[西南交通大学](https://ldsrw.swjtu.edu.cn/)）（2023）  
+- **一等学业奖学金**（前 20%，[北京理工大学](https://www.bit.edu.cn/)）（2024）  
 - **优秀学生奖学金**（[西南大学](https://www.swu.edu.cn/) 每年 15 人）（2023）  
 - **一等学业奖学金**（前 20%，[西南大学](https://www.swu.edu.cn/)）（2021）  
