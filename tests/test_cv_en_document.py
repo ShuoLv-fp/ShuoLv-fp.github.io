@@ -85,13 +85,15 @@ class EnglishCvSourceTests(unittest.TestCase):
         self.assertEqual(1, self.source.count("{Lead Developer}"))
         self.assertEqual(1, self.source.count("{Researcher}"))
 
-    def test_academic_service_has_two_entries_between_awards_and_skills(self):
-        headings = [r"\section{Awards and Honors}", r"\section{Academic Service}", r"\section{Technical Skills}"]
+    def test_academic_service_has_two_entries_after_awards(self):
+        headings = [r"\section{Awards and Honors}", r"\section{Academic Service}"]
         for heading in headings:
             self.assertIn(heading, self.source)
         positions = [self.source.index(heading) for heading in headings]
         self.assertEqual(sorted(positions), positions)
-        service = self.source.split(headings[1], 1)[1].split(headings[2], 1)[0]
+        skills_marker = r"% \section{Technical Skills}"
+        self.assertIn(skills_marker, self.source)
+        service = self.source.split(headings[1], 1)[1].split(skills_marker, 1)[0]
         self.assertIn("Teaching Assistant", service)
         self.assertIn("Algorithm Design and Analysis; Introduction to Algorithms; Big Data Analytics", service)
         self.assertIn("Reviewer", service)
@@ -133,7 +135,7 @@ class EnglishCvSourceTests(unittest.TestCase):
         positions = [self.source.find(title) for title in ordered_titles]
         self.assertEqual(sorted(positions), positions)
         self.assertIn(
-            r"\textit{Transl Psychiatry} (accepted Sep. 2026)",
+            r"\textit{Transl Psychiatry} (accepted Oct. 2026)",
             self.source,
         )
         self.assertIn(
@@ -185,7 +187,6 @@ class EnglishCvPdfTests(unittest.TestCase):
             "RESEARCH EXPERIENCE",
             "AWARDS AND HONORS",
             "ACADEMIC SERVICE",
-            "TECHNICAL SKILLS",
         ):
             with self.subTest(section=section):
                 self.assertIn(section, text.upper())
