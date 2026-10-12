@@ -27,8 +27,15 @@ class Settings:
     imap_folder: str = "INBOX"
     model: str = "deepseek-v4-flash-vision-exp"
     deepseek_base_url: str = "https://api.deepseek.com"
-    allowed_senders: tuple[str, ...] = ("scholaralerts-noreply@google.com",)
-    subject_terms: tuple[str, ...] = ("Scholar Alert", "Google Scholar")
+    allowed_senders: tuple[str, ...] = (
+        "scholaralerts-noreply@google.com",
+        "scholarcitations-noreply@google.com",
+    )
+    subject_terms: tuple[str, ...] = (
+        "Scholar Alert",
+        "Google Scholar",
+        "Follow articles by",
+    )
     recurring_lookback_days: int = 7
     first_run_lookback_days: int = 30
     timeout_seconds: int = 20
@@ -56,8 +63,17 @@ class Settings:
             imap_folder=os.getenv("FOXMAIL_IMAP_FOLDER", "INBOX"),
             model=os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash-vision-exp"),
             deepseek_base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
-            allowed_senders=_csv_setting("PAPER_FEED_ALLOWED_SENDERS", ("scholaralerts-noreply@google.com",)),
-            subject_terms=_csv_setting("PAPER_FEED_SUBJECT_TERMS", ("Scholar Alert", "Google Scholar")),
+            allowed_senders=_csv_setting(
+                "PAPER_FEED_ALLOWED_SENDERS",
+                (
+                    "scholaralerts-noreply@google.com",
+                    "scholarcitations-noreply@google.com",
+                ),
+            ),
+            subject_terms=_csv_setting(
+                "PAPER_FEED_SUBJECT_TERMS",
+                ("Scholar Alert", "Google Scholar", "Follow articles by"),
+            ),
             recurring_lookback_days=int(os.getenv("PAPER_FEED_RECURRING_LOOKBACK_DAYS", "7")),
             first_run_lookback_days=int(os.getenv("PAPER_FEED_FIRST_RUN_LOOKBACK_DAYS", "30")),
             timeout_seconds=int(os.getenv("PAPER_FEED_TIMEOUT_SECONDS", "20")),

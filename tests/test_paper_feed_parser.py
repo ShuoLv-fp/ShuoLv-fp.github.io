@@ -33,8 +33,25 @@ Content-Type: text/html; charset=UTF-8
 <table><tr class="gse_alrt_title"><td><a href="https://example.invalid/paper">Selected result</a></td></tr></table>
 """
         self.assertTrue(is_scholar_alert(raw, ("scholaralerts-noreply@google.com",), ("Scholar Alert",)))
-        self.assertEqual(DEFAULT_SENDERS, ("scholaralerts-noreply@google.com",))
+        self.assertEqual(
+            DEFAULT_SENDERS,
+            (
+                "scholaralerts-noreply@google.com",
+                "scholarcitations-noreply@google.com",
+            ),
+        )
         self.assertEqual(len(parse_scholar_message(raw)), 1)
+
+    def test_production_filter_accepts_followed_author_notifications(self):
+        raw = b"""From: Google Scholar Citations <scholarcitations-noreply@google.com>
+Subject: Follow articles by Example Researcher
+Content-Type: text/html
+
+<table class="gse_alrt"><tr><td class="gse_alrt_title"><a href="https://example.invalid/paper">A public paper</a></td></tr></table>
+"""
+        self.assertTrue(
+            is_scholar_alert(raw, DEFAULT_SENDERS, ("Follow articles by",))
+        )
 
     def test_fixture_filtering_and_parsing_use_separate_responsibilities(self):
         raw = (FIXTURES / "scholar_alert.html.eml").read_bytes()

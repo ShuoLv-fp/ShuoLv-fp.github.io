@@ -43,8 +43,17 @@ class SettingsTests(TestCase):
         self.assertEqual(settings.imap_folder, "INBOX")
         self.assertEqual(settings.model, "deepseek-v4-flash-vision-exp")
         self.assertEqual(settings.deepseek_base_url, "https://api.deepseek.com")
-        self.assertEqual(settings.allowed_senders, ("scholaralerts-noreply@google.com",))
-        self.assertEqual(settings.subject_terms, ("Scholar Alert", "Google Scholar"))
+        self.assertEqual(
+            settings.allowed_senders,
+            (
+                "scholaralerts-noreply@google.com",
+                "scholarcitations-noreply@google.com",
+            ),
+        )
+        self.assertEqual(
+            settings.subject_terms,
+            ("Scholar Alert", "Google Scholar", "Follow articles by"),
+        )
         self.assertEqual(settings.recurring_lookback_days, 7)
         self.assertEqual(settings.first_run_lookback_days, 30)
         self.assertEqual(settings.timeout_seconds, 20)

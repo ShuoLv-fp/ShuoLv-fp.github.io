@@ -18,8 +18,11 @@ from bs4 import BeautifulSoup, Tag
 from paper_feed.models import PaperCandidate
 
 
-DEFAULT_SENDERS = ("scholaralerts-noreply@google.com",)
-DEFAULT_SUBJECT_TERMS = ("Scholar Alert",)
+DEFAULT_SENDERS = (
+    "scholaralerts-noreply@google.com",
+    "scholarcitations-noreply@google.com",
+)
+DEFAULT_SUBJECT_TERMS = ("Scholar Alert", "Follow articles by")
 MAX_RESULTS = 100
 SHANGHAI = ZoneInfo("Asia/Shanghai")
 
