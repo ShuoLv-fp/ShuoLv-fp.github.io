@@ -200,6 +200,33 @@ class HomepagePresentationTests(unittest.TestCase):
                     contrast(variables["--skills-focus"], surface), 3.0
                 )
 
+    def test_bilingual_navigation_links_to_field_notes_blog(self):
+        for path, feed_title, feed_url, blog_title in (
+            (
+                Path("_data/navigation.yml"),
+                "Paper Feed",
+                "/paper-feed/",
+                "Blog",
+            ),
+            (
+                Path("_data/navigation-zh.yml"),
+                "学术速递",
+                "/zh/paper-feed/",
+                "博客",
+            ),
+        ):
+            with self.subTest(path=path):
+                text = path.read_text(encoding="utf-8")
+                expected = (
+                    f"  - title: '{feed_title}'\n"
+                    f"    url: '{feed_url}'\n\n"
+                    f"  - title: '{blog_title}'\n"
+                    "    url: '/lsBlog/'"
+                )
+                self.assertIn(expected, text)
+                self.assertEqual(text.count(f"title: '{blog_title}'"), 1)
+                self.assertEqual(text.count("url: '/lsBlog/'"), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

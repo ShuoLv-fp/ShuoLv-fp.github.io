@@ -16,6 +16,9 @@ main:
   - title: 'Paper Feed'
     url: '/paper-feed/'
 
+  - title: 'Blog'
+    url: '/lsBlog/'
+
   - title: 'Research'
     url: '/#research'
 

@@ -16,6 +16,9 @@ main_zh:
   - title: '学术速递'
     url: '/zh/paper-feed/'
 
+  - title: '博客'
+    url: '/lsBlog/'
+
   - title: '研究'
     url: '/zh/#research'
 
