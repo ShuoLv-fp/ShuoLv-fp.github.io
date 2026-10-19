@@ -5,18 +5,12 @@ from tests.test_ewu_ultralow_field_mri import parse_top_level_config
 
 
 class PhdAgentEntryTests(unittest.TestCase):
-    def test_both_skills_toolkits_preserve_gateway_and_direct_lean_links(self):
-        config = parse_top_level_config(Path("_config.yml").read_text(encoding="utf-8"))
-        self.assertEqual(
-            "https://shuo-phd-agent-gateway.pages.dev", config["phd_agent_url"]
-        )
+    def test_both_skills_toolkits_preserve_direct_lean_links(self):
         for path in (
             Path("_pages/includes/technical_skills.md"),
             Path("_pages/includes/zh/technical_skills.md"),
         ):
             text = path.read_text(encoding="utf-8")
-            self.assertIn('href="{{ site.phd_agent_url }}"', text)
-            self.assertEqual(1, text.count('href="{{ site.phd_agent_url }}"'))
             self.assertIn('<a href="https://lean-lang.org/">Lean</a>', text)
 
     def test_private_directories_are_excluded_from_jekyll(self):
@@ -24,7 +18,7 @@ class PhdAgentEntryTests(unittest.TestCase):
         for path in ("phd_application_agent", "phd-advisor-summary", "protected_phd_agent"):
             self.assertIn(path, config["exclude"])
 
-    def test_public_site_uses_the_deployed_private_gateway(self):
+    def test_config_retains_the_deployed_private_gateway(self):
         config = parse_top_level_config(Path("_config.yml").read_text(encoding="utf-8"))
         self.assertEqual(
             "https://shuo-phd-agent-gateway.pages.dev", config["phd_agent_url"]
