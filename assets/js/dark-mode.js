@@ -14,28 +14,34 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
 
-    function toggleDarkMode() {
-      const darkMode = localStorage.getItem('darkMode') === 'enabled';
-      
-      if (!darkMode) {
+    function applyTheme(theme) {
+      const darkMode = theme === 'dark';
+
+      if (darkMode) {
         document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('darkMode', 'enabled');
         sunIcon.style.display = 'none';
         moonIcon.style.display = 'block';
       } else {
         document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('darkMode', null);
         sunIcon.style.display = 'block';
         moonIcon.style.display = 'none';
       }
     }
 
-    // Initialize dark mode from localStorage
-    if (localStorage.getItem('darkMode') === 'enabled') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      sunIcon.style.display = 'none';
-      moonIcon.style.display = 'block';
+    function toggleDarkMode() {
+      const darkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+
+      if (!darkMode) {
+        localStorage.setItem('theme', 'dark');
+        applyTheme('dark');
+      } else {
+        localStorage.setItem('theme', 'light');
+        applyTheme('light');
+      }
     }
+
+    const savedTheme = localStorage.getItem('theme');
+    applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
 
     // Add click event listener
     darkModeToggle.addEventListener('click', toggleDarkMode);

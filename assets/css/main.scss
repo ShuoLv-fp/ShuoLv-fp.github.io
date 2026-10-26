@@ -124,6 +124,19 @@ h1:before, .anchor:before {
 }
 
 /* ===== Publication figure: unified frame, theme-aware background ===== */
+.publication-card {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);
+    gap: 24px;
+    margin: 18px 0;
+    align-items: start;
+}
+
+.publication-card__figure,
+.publication-card__details {
+    min-width: 0;
+}
+
 .pub-fig {
     width: 100%;
     aspect-ratio: 16 / 10;
@@ -131,6 +144,16 @@ h1:before, .anchor:before {
     background: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 700px) {
+    .publication-card {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .publication-card__figure {
+        width: min(100%, 420px);
+    }
 }
 
 [data-theme="dark"] .pub-fig {

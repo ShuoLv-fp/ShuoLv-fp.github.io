@@ -11,7 +11,6 @@ FOLLOWING_TITLE = (
     "Development of areal-level individualized homologous functional "
     "parcellations in youth"
 )
-PAPER = "/assets/files/atypical-functional-hierarchy-cerebellum-autism.pdf"
 IMAGE = "/images/pub/pub_cerebellar_autism_gradient.webp"
 CODE = "https://github.com/BIT-YangLab/ASD-Cerebellar-Functional-Gradients"
 AUTHORS = (
@@ -41,7 +40,9 @@ class CerebellarAutismPublicationTests(unittest.TestCase):
                 self.assertIn(TITLE, text)
                 self.assertIn(AUTHORS, text)
                 self.assertIn(status, text)
-                self.assertEqual(2, text.count(PAPER))
+                self.assertNotIn(
+                    "atypical-functional-hierarchy-cerebellum-autism.pdf", text
+                )
                 self.assertEqual(2, text.count(IMAGE))
                 self.assertIn(CODE, text)
 
@@ -62,7 +63,6 @@ class CerebellarAutismPublicationTests(unittest.TestCase):
 
     def test_static_assets_exist(self):
         for path in (
-            Path("assets/files/atypical-functional-hierarchy-cerebellum-autism.pdf"),
             Path("images/pub/pub_cerebellar_autism_gradient.png"),
             Path("images/pub/pub_cerebellar_autism_gradient.webp"),
         ):

@@ -105,6 +105,7 @@ class EnglishCvSourceTests(unittest.TestCase):
         self.assertIn(r"\section{Research Internship}", self.source)
         self.assertIn(r"\section{Research Experience}", self.source)
         self.assertEqual(6, self.source.count(r"\cvpublication" + "{"))
+        self.assertEqual(1, self.source.count(r"\cvpublicationnolink" + "{"))
         self.assertEqual(7, self.source.count(r"\experienceentry" + "{"))
         self.assertNotIn(r"\url{", self.source)
         targets = (
@@ -118,6 +119,17 @@ class EnglishCvSourceTests(unittest.TestCase):
         for target in targets:
             with self.subTest(target=target):
                 self.assertIn(target, self.source)
+
+    def test_cerebellar_autism_manuscript_has_no_preprint_link(self):
+        title = "Atypical functional hierarchy of the human cerebellum in autism"
+        self.assertIn(r"\newcommand{\cvpublicationnolink}", self.source)
+        self.assertIn(title, self.source)
+        self.assertIn(r"\textit{Manuscript under review} (Sep. 2026)", self.source)
+        block = self.source.split(title, 1)[0].rsplit(
+            r"\cvpublicationnolink", 1
+        )[-1] + title + self.source.split(title, 1)[1].split("\n\n", 1)[0]
+        self.assertNotIn(r"\href", block)
+        self.assertNotIn("atypical-functional-hierarchy-cerebellum-autism.pdf", self.source)
 
     def test_accepted_autism_paper_metadata_and_order(self):
         final_title = (
@@ -178,6 +190,9 @@ class EnglishCvPdfTests(unittest.TestCase):
             "https://doi.org/10.1101/2025.10.23.684286",
         }
         self.assertTrue(expected.issubset(uris), expected - uris)
+        self.assertNotIn(
+            "atypical-functional-hierarchy-cerebellum-autism.pdf", uris
+        )
 
         text = page.extract_text()
         for section in (
@@ -192,6 +207,10 @@ class EnglishCvPdfTests(unittest.TestCase):
                 self.assertIn(section, text.upper())
         self.assertNotIn("Born Mar. 2002", text)
         self.assertNotIn("+86 133", text)
+        self.assertIn(
+            "Atypical functional hierarchy of the human cerebellum in autism",
+            " ".join(text.split()),
+        )
 
     def test_academic_service_renders_as_two_content_lines(self):
         text = PdfReader(PDF_PATH).pages[0].extract_text()
