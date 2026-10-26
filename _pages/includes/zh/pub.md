@@ -39,8 +39,19 @@
   <div style="flex: 1 1 46%; min-width: 280px;">
     <span style="font-weight: 600; font-size: 1.05em;"><a href="https://www.biorxiv.org/content/10.1101/2025.10.23.684286v1" target="_blank">Alterations in functional brain network topography in autism revealed by normative models</a></span><br>
     <span class="pub-coauthor">Ruoqi Yang</span>, <span class="pub-coauthor">Xinyu Wu</span>, <strong>Shuo Lv</strong>, <span class="pub-coauthor">Jinlong Li</span>, <span class="pub-coauthor">Zhiming Wang</span>, <span class="pub-coauthor">Wenjing Zhu</span>, <span class="pub-coauthor">Tan Gao</span>, <span class="pub-coauthor">Guoyuan Yang*</span><br>
-    <em>Translational Psychiatry</em>，2026 年 9 月接收 &nbsp;|&nbsp; <a href="https://github.com/BIT-YangLab/NormativeModels_TopologicalNetwork_Autism" target="_blank">[代码]</a>
+    <em>Translational Psychiatry</em>（IF: 7.5），2026 年 10 月 &nbsp;|&nbsp; <a href="https://github.com/BIT-YangLab/NormativeModels_TopologicalNetwork_Autism" target="_blank">[代码]</a>
   <div class="pub-highlight">通过规范模型揭示自闭症功能脑网络拓扑的异常改变。</div></div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; margin: 18px 0; align-items: flex-start;">
+  <div style="flex: 1 1 46%; min-width: 280px;">
+    <a href="/images/pub/pub_cerebellar_autism_gradient.webp" data-lightbox="pubs" title="<a href='/assets/files/atypical-functional-hierarchy-cerebellum-autism.pdf' target='_blank' style='color:#fff;text-decoration:underline;'>查看手稿 &#8599;</a>"><img src="/images/pub/pub_cerebellar_autism_gradient.webp" class="pub-fig" loading="lazy" alt="Cerebellar functional gradients in autism"></a>
+  </div>
+  <div style="flex: 1 1 46%; min-width: 280px;">
+    <span style="font-weight: 600; font-size: 1.05em;"><a href="/assets/files/atypical-functional-hierarchy-cerebellum-autism.pdf" target="_blank">Atypical functional hierarchy of the human cerebellum in autism</a></span><br>
+    <span class="pub-coauthor">Wenjing Zhu</span>, <span class="pub-coauthor">Yu Zhang</span>, <span class="pub-coauthor">Ruoqi Yang</span>, <strong>Shuo Lv</strong>, <span class="pub-coauthor">Tan Gao</span>, <span class="pub-coauthor">Xinyu Wu</span>, <span class="pub-coauthor">Tiantian Liu</span>, <span class="pub-coauthor">Chuyang Ye</span>, <span class="pub-coauthor">Guoyuan Yang*</span>, <span class="pub-coauthor">Tianyi Yan*</span><br>
+    <em>研究手稿</em>，在投，2026 年 9 月 &nbsp;|&nbsp; <a href="https://github.com/BIT-YangLab/ASD-Cerebellar-Functional-Gradients" target="_blank">[代码]</a>
+  <div class="pub-highlight">揭示自闭症中压缩的小脑功能层级及其网络特异性重组。</div></div>
 </div>
 
 <div style="display: flex; flex-wrap: wrap; gap: 24px; margin: 18px 0; align-items: flex-start;">
