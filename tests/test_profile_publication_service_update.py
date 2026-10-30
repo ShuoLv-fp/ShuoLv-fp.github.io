@@ -1,6 +1,7 @@
 from pathlib import Path
 import re
 import unittest
+import xml.etree.ElementTree as ET
 
 
 class ProfilePublicationServiceUpdateTests(unittest.TestCase):
@@ -19,7 +20,11 @@ class ProfilePublicationServiceUpdateTests(unittest.TestCase):
     def test_publication_cards_use_responsive_two_to_eight_layout(self):
         styles = Path("assets/css/main.scss").read_text(encoding="utf-8")
         self.assertIn(".publication-card", styles)
-        self.assertIn("grid-template-columns: minmax(0, 2fr) minmax(0, 8fr);", styles)
+        self.assertIn(
+            "grid-template-columns: minmax(0, 20%) minmax(0, 80%);",
+            styles,
+        )
+        self.assertIn("padding-left: 24px;", styles)
         self.assertRegex(
             styles,
             r"@media \(max-width: 700px\)[\s\S]*?grid-template-columns: minmax\(0, 1fr\);",
@@ -39,6 +44,44 @@ class ProfilePublicationServiceUpdateTests(unittest.TestCase):
                     'class="pub-highlight"',
                     self.visible_source(text),
                 )
+
+    def test_internships_match_the_education_row_geometry(self):
+        styles = Path("assets/css/main.scss").read_text(encoding="utf-8")
+        logo_rule = re.search(
+            r"\.experience-row__logo\s*\{(?P<body>.*?)\}",
+            styles,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(logo_rule)
+        for declaration in (
+            "width: 60px;",
+            "height: 60px;",
+            "margin-left: 50px;",
+            "margin-right: 50px;",
+            "border-radius: 0;",
+            "object-fit: contain;",
+        ):
+            self.assertIn(declaration, logo_rule.group("body"))
+
+        for path in (
+            Path("_pages/includes/recent_projects.md"),
+            Path("_pages/includes/zh/recent_projects.md"),
+        ):
+            with self.subTest(path=path):
+                text = path.read_text(encoding="utf-8")
+                self.assertEqual(
+                    2,
+                    text.count('<img class="experience-row__logo"'),
+                )
+                self.assertNotIn('<div class="experience-row__logo">', text)
+
+    def test_bytedance_symbol_has_transparent_canvas_padding(self):
+        root = ET.parse(
+            "_pages/includes/images/bytedance.svg"
+        ).getroot()
+        self.assertEqual("60", root.attrib["width"])
+        self.assertEqual("60", root.attrib["height"])
+        self.assertEqual("-3.5 8 35.5 31.5", root.attrib["viewBox"])
 
     def test_research_outcomes_are_commented_and_ai4science_is_concise(self):
         expected = {

@@ -5,9 +5,7 @@
 
 <!-- ByteDance 官方字标取自 https://www.bytedance.com/。 -->
 <div class="experience-row">
-  <div class="experience-row__logo">
-    <img src="/_pages/includes/images/bytedance.svg" loading="lazy" alt="字节跳动 Logo" />
-  </div>
+  <img class="experience-row__logo" src="/_pages/includes/images/bytedance.svg" loading="lazy" alt="字节跳动 Logo" />
   <div class="experience-row__details">
     <div><strong>字节跳动 - Seed Foundation Model - AI4Math</strong>，中国北京（2025.11-2026.05）</div>
     <div class="experience-row__role">AI Agent 研发实习生</div>
@@ -17,9 +15,7 @@
 
 <!-- 智能知识官方标识取自 https://www.human-intelligence.cn/favicon.svg。 -->
 <div class="experience-row">
-  <div class="experience-row__logo">
-    <img src="/_pages/includes/images/human-intelligence.svg" loading="lazy" alt="智能知识 Logo" />
-  </div>
+  <img class="experience-row__logo" src="/_pages/includes/images/human-intelligence.svg" loading="lazy" alt="智能知识 Logo" />
   <div class="experience-row__details">
     <div><strong>智能知识 - Horizon</strong>, Beijing, China (2026.09-最近)</div>
     <div><strong>研发实习生</strong></div>

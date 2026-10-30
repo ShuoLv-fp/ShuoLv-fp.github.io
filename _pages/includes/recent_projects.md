@@ -5,9 +5,7 @@
 
 <!-- Official ByteDance wordmark sourced from https://www.bytedance.com/. -->
 <div class="experience-row">
-  <div class="experience-row__logo">
-    <img src="/_pages/includes/images/bytedance.svg" loading="lazy" alt="ByteDance logo" />
-  </div>
+  <img class="experience-row__logo" src="/_pages/includes/images/bytedance.svg" loading="lazy" alt="ByteDance logo" />
   <div class="experience-row__details">
     <div><strong>ByteDance, Seed Foundation Model - AI4Math</strong>, Beijing, China (Nov. 2025-May 2026)</div>
     <div class="experience-row__role">Research Intern, AI Agent Development</div>
@@ -17,9 +15,7 @@
 
 <!-- Official company mark sourced from https://www.human-intelligence.cn/favicon.svg. -->
 <div class="experience-row">
-  <div class="experience-row__logo">
-    <img src="/_pages/includes/images/human-intelligence.svg" loading="lazy" alt="Human Intelligence logo" />
-  </div>
+  <img class="experience-row__logo" src="/_pages/includes/images/human-intelligence.svg" loading="lazy" alt="Human Intelligence logo" />
   <div class="experience-row__details">
     <div><strong>Human Intelligence, Horizon</strong>, Beijing, China (Sept. 2026-Present)</div>
     <div class="experience-row__role">Research Intern, AI Agent Development</div>
