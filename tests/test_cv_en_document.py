@@ -106,7 +106,12 @@ class EnglishCvSourceTests(unittest.TestCase):
         self.assertIn(r"\section{Research Experience}", self.source)
         self.assertEqual(6, self.source.count(r"\cvpublication" + "{"))
         self.assertEqual(1, self.source.count(r"\cvpublicationnolink" + "{"))
-        self.assertEqual(7, self.source.count(r"\experienceentry" + "{"))
+        active_experiences = [
+            line
+            for line in self.source.splitlines()
+            if line.lstrip().startswith(r"\experienceentry{")
+        ]
+        self.assertEqual(7, len(active_experiences))
         self.assertNotIn(r"\url{", self.source)
         targets = (
             "https://doi.org/10.1038/s41467-026-72931-6",

@@ -44,8 +44,8 @@
     <dl class="toolkit-list">
       <!-- <div><dt>编程语言</dt><dd><a href="https://www.python.org/">Python</a><span>C++</span><span>Java</span><span>R</span><a href="https://lean-lang.org/">Lean</a><a href="{{ site.phd_agent_url }}" aria-label="打开私有博士申请工作流" rel="nofollow">博士申请工作流</a><span>HTML</span></dd></div> -->
       <div><dt>编程语言</dt><dd><a href="https://www.python.org/">Python</a><span>C++</span><span>Java</span><span>R</span><a href="https://lean-lang.org/">Lean</a><span>HTML</span></dd></div>
-      <div><dt>机器学习</dt><dd><a href="https://pytorch.org/">PyTorch</a><span>scikit-learn</span><span>Hugging Face</span><span>NumPy / SciPy</span><span>Pandas</span><span>PyTorch Geometric</span></dd></div>
-      <div><dt>智能体与大语言模型</dt><dd><span>LangChain</span><span>LangGraph</span><span>LlamaIndex</span><span>vLLM</span><span>Ollama</span><span>MCP</span><span>多智能体编排</span><span>测试时扩展</span></dd></div>
+      <!-- <div><dt>机器学习</dt><dd><a href="https://pytorch.org/">PyTorch</a><span>scikit-learn</span><span>Hugging Face</span><span>NumPy / SciPy</span><span>Pandas</span><span>PyTorch Geometric</span></dd></div> -->
+      <!-- <div><dt>智能体与大语言模型</dt><dd><span>LangChain</span><span>LangGraph</span><span>LlamaIndex</span><span>vLLM</span><span>Ollama</span><span>MCP</span><span>多智能体编排</span><span>测试时扩展</span></dd></div> -->
       <div><dt>神经影像与科研</dt><dd><span>fMRIPrep</span><span>Nilearn</span><span>FSL</span><span>PLINK</span><span>LaTeX</span><span>Git</span></dd></div>
     </dl>
   </div>

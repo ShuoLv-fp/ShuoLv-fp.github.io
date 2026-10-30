@@ -4,6 +4,11 @@ import unittest
 
 
 class ProfilePublicationServiceUpdateTests(unittest.TestCase):
+    @staticmethod
+    def visible_source(text):
+        text = re.sub(r"\{%\s*comment\s*%\}[\s\S]*?\{%\s*endcomment\s*%\}", "", text)
+        return re.sub(r"<!--[\s\S]*?-->", "", text)
+
     def test_light_mode_is_the_default_and_dark_mode_remains_optional(self):
         script = Path("assets/js/dark-mode.js").read_text(encoding="utf-8")
         self.assertIn("const savedTheme = localStorage.getItem('theme');", script)
@@ -11,10 +16,10 @@ class ProfilePublicationServiceUpdateTests(unittest.TestCase):
         self.assertIn("localStorage.setItem('theme', 'light')", script)
         self.assertNotIn("localStorage.setItem('darkMode', null)", script)
 
-    def test_publication_cards_use_responsive_three_to_seven_layout(self):
+    def test_publication_cards_use_responsive_two_to_eight_layout(self):
         styles = Path("assets/css/main.scss").read_text(encoding="utf-8")
         self.assertIn(".publication-card", styles)
-        self.assertIn("grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);", styles)
+        self.assertIn("grid-template-columns: minmax(0, 2fr) minmax(0, 8fr);", styles)
         self.assertRegex(
             styles,
             r"@media \(max-width: 700px\)[\s\S]*?grid-template-columns: minmax\(0, 1fr\);",
@@ -29,6 +34,53 @@ class ProfilePublicationServiceUpdateTests(unittest.TestCase):
                 self.assertEqual(7, text.count('class="publication-card__figure"'))
                 self.assertEqual(7, text.count('class="publication-card__details"'))
                 self.assertNotIn("flex: 1 1 46%", text)
+                self.assertEqual(7, text.count('class="pub-highlight"'))
+                self.assertNotIn(
+                    'class="pub-highlight"',
+                    self.visible_source(text),
+                )
+
+    def test_research_outcomes_are_commented_and_ai4science_is_concise(self):
+        expected = {
+            Path("_pages/includes/research_interests.md"): (
+                "Key outcomes",
+                "I am interested in using LLM-based agents",
+            ),
+            Path("_pages/includes/zh/research_interests.md"): (
+                "代表性成果",
+                "我关注利用大语言模型智能体",
+            ),
+        }
+        for path, (outcome_label, ai_copy) in expected.items():
+            with self.subTest(path=path):
+                text = path.read_text(encoding="utf-8")
+                visible = self.visible_source(text)
+                self.assertIn(outcome_label, text)
+                self.assertNotIn(outcome_label, visible)
+                self.assertIn(ai_copy, visible)
+                self.assertNotIn("ByteDance", visible)
+                self.assertNotIn("字节跳动", visible)
+
+    def test_technical_toolkit_shows_only_two_categories(self):
+        expected = {
+            Path("_pages/includes/technical_skills.md"): (
+                ("Programming", "Neuroimaging &amp; research"),
+                ("Machine learning", "Agents &amp; language models"),
+            ),
+            Path("_pages/includes/zh/technical_skills.md"): (
+                ("编程语言", "神经影像与科研"),
+                ("机器学习", "智能体与大语言模型"),
+            ),
+        }
+        for path, (visible_labels, hidden_labels) in expected.items():
+            with self.subTest(path=path):
+                text = path.read_text(encoding="utf-8")
+                visible = self.visible_source(text)
+                for label in visible_labels:
+                    self.assertIn(label, visible)
+                for label in hidden_labels:
+                    self.assertIn(label, text)
+                    self.assertNotIn(label, visible)
 
     def test_sidebar_profile_is_synchronized(self):
         config = Path("_config.yml").read_text(encoding="utf-8")

@@ -1,19 +1,39 @@
 <span class='anchor' id='projects'></span>
-<details markdown="1">
-<summary style="cursor: pointer; font-size: 1.25em; margin-bottom: 8px;">🚀 <strong>近期项目</strong> <span style="font-weight: normal; opacity: .7;">（7 个项目 — 点击展开）</span></summary>
+# 🚀 实习与项目
+
+## 实习经历
+
+<!-- ByteDance 官方字标取自 https://www.bytedance.com/。 -->
+<div class="experience-row">
+  <div class="experience-row__logo">
+    <img src="/_pages/includes/images/bytedance.svg" loading="lazy" alt="字节跳动 Logo" />
+  </div>
+  <div class="experience-row__details">
+    <div><strong>字节跳动 - Seed Foundation Model - AI4Math</strong>，中国北京（2025.11-2026.05）</div>
+    <div class="experience-row__role">AI Agent 研发实习生</div>
+    <!-- <div class="experience-row__description">面向数学竞赛题构建 Test-Time Scaling 多智能体系统，覆盖策略规划、并行求解、证明验证与失败回溯；迭代 5 个版本，覆盖 100 题以上，在 IMO 习题评测中取得 6.4/7 平均分。主导 Lean 4 形式化证明自动质检流程，生产 600+ 条形式化数据，推动专家质检效率提升 70%+；同时建立评测数据 SOP，交付 2,000+ 条数据与 11 份数据生产与质量规范。</div> -->
+  </div>
+</div>
+
+<!-- 智能知识官方标识取自 https://www.human-intelligence.cn/favicon.svg。 -->
+<div class="experience-row">
+  <div class="experience-row__logo">
+    <img src="/_pages/includes/images/human-intelligence.svg" loading="lazy" alt="智能知识 Logo" />
+  </div>
+  <div class="experience-row__details">
+    <div><strong>智能知识 - Horizon</strong>, Beijing, China (2026.09-最近)</div>
+    <div><strong>研发实习生</strong></div>
+    <!-- <div class="experience-row__role">详情待补充</div> -->
+  </div>
+</div>
+
+## 项目经历 {#project-list-zh}
 
 **通用网安智能体**（西南大学，2026.06-至今）
 
 - **角色：** 项目负责人；**导师：** Prof. Libo Zhang
 - 基于 LangGraph 构建 5 类专业 Agent 和 16 节点有界状态机，面向代码审计、渗透测试、应急响应与逆向分析，将 LLM 的任务理解、动态规划和反思能力同明确的权限、路由及退出规则解耦。
 - 设计 R0-R3 风险分级、Finding-Evidence 验证机制、高风险操作人工审批，以及状态-领域黑板双层协作架构，使 Agent 决策、工具调用与证据流转可追踪、可解释、可评估，并降低错误记忆对后续决策的污染。
-
-**字节跳动 Seed AI4Math 研究实习**（2025.11-2026.05）
-
-- **角色：** AI Agent 研发实习生
-- **MathNL TTS 多智能体推理：** 基于 Seed 2.0 系列模型开发数学竞赛题 Test-Time Scaling 系统，设计 Planner、Solver、Verifier 等角色协作完成候选策略生成、并行求解、证明验证与失败路径回溯；迭代 5 个版本，覆盖 100 题以上，在 IMO 习题评测中取得 6.4/7 平均分。
-- **Lean 4 形式化证明自动质检：** 主导融合静态规则、代码检索与 LLM-as-a-judge 的自动化工作流，生产 600+ 条形式化数据，推动专家质检效率提升 70%+。
-- **评测数据生产运维：** 围绕数据筛选、任务分类、正确性、难度、专家标注与质检流程建立标准化 SOP，交付 2,000+ 条数据并撰写 11 份数据生产与质量规范。
 
 **低维人脑时空动态**（北京理工大学，2023.12-至今）
 
@@ -45,5 +65,3 @@
 - **角色：** 项目负责人；**导师：** Prof. Shenglin Li
 - 使用 Java 实现中国象棋博弈系统，基于剪枝的 alpha-beta 搜索树设计搜索与评估函数，并实现人机对战和棋谱保存功能。
 - **奖项：** 2022 年中国计算机博弈锦标赛全国二等奖。
-
-</details>

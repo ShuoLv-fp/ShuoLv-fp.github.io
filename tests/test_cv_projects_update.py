@@ -55,34 +55,69 @@ class CvProjectsUpdateTests(unittest.TestCase):
                 )
                 self.assertIn(f'aria-label="{{{{ {label_key} }}}}"', profile)
 
-    def test_recent_projects_match_cv_scope_and_order(self):
+    def test_interns_and_projects_are_visible_and_ordered(self):
         expected = {
-            Path("_pages/includes/recent_projects.md"): [
+            Path("_pages/includes/recent_projects.md"): (
+                "# 🚀 Interns and Projects",
+                "## Intern Experience",
+                "## Projects {#project-list}",
+                "ByteDance",
+                "Human Intelligence",
+                "Details forthcoming",
+                [
                 "General-Purpose Cybersecurity Agent",
-                "ByteDance Seed AI4Math Research Internship",
                 "Low-Dimensional Spatiotemporal Dynamics of the Human Brain",
                 "Complex Social Awareness Modeling",
                 "Intelligent Factory Security",
                 "Large Language Model for Early Childhood Education",
                 "Xiangqi Game-Playing System",
-            ],
-            Path("_pages/includes/zh/recent_projects.md"): [
+                ],
+            ),
+            Path("_pages/includes/zh/recent_projects.md"): (
+                "# 🚀 实习与项目",
+                "## 实习经历",
+                "## 项目经历 {#project-list-zh}",
+                "字节跳动",
+                "智能知识",
+                "详情待补充",
+                [
                 "通用网安智能体",
-                "字节跳动 Seed AI4Math 研究实习",
                 "低维人脑时空动态",
                 "复杂社会意识建模",
                 "工厂智慧安防",
                 "幼教大模型",
                 "中国象棋博弈系统",
-            ],
+                ],
+            ),
         }
-        for path, titles in expected.items():
+        for path, values in expected.items():
             with self.subTest(path=path):
                 text = path.read_text(encoding="utf-8")
-                headings = re.findall(r"(?m)^\*\*(.+?)\*\*", text)
-                self.assertEqual(7, len(headings))
+                heading, internship_heading, project_heading, first_intern, second_intern, placeholder, titles = values
+                self.assertIn(heading, text)
+                self.assertIn(internship_heading, text)
+                self.assertIn(project_heading, text)
+                self.assertNotIn("<details", text)
+                self.assertLess(text.index(internship_heading), text.index(project_heading))
+                self.assertLess(text.index(first_intern), text.index(second_intern))
+                self.assertIn(placeholder, text)
                 positions = [text.index(f"**{title}**") for title in titles]
                 self.assertEqual(sorted(positions), positions)
+                self.assertEqual(6, len(positions))
+                self.assertIn("/bytedance", text)
+                self.assertIn("/human-intelligence", text)
+
+        self.assertTrue(any(Path("_pages/includes/images").glob("bytedance.*")))
+        self.assertTrue(any(Path("_pages/includes/images").glob("human-intelligence.*")))
+
+        self.assertIn(
+            "title: 'Interns & Projects'",
+            Path("_data/navigation.yml").read_text(encoding="utf-8"),
+        )
+        self.assertIn(
+            "title: '实习与项目'",
+            Path("_data/navigation-zh.yml").read_text(encoding="utf-8"),
+        )
 
     def test_recent_projects_include_verified_metrics_only(self):
         english = Path("_pages/includes/recent_projects.md").read_text(

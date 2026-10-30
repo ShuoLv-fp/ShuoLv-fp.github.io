@@ -1,19 +1,39 @@
 <span class='anchor' id='projects'></span>
-<details markdown="1">
-<summary style="cursor: pointer; font-size: 1.25em; margin-bottom: 8px;">🚀 <strong>Recent Projects</strong> <span style="font-weight: normal; opacity: .7;">(7 projects — click to expand)</span></summary>
+# 🚀 Interns and Projects
+
+## Intern Experience
+
+<!-- Official ByteDance wordmark sourced from https://www.bytedance.com/. -->
+<div class="experience-row">
+  <div class="experience-row__logo">
+    <img src="/_pages/includes/images/bytedance.svg" loading="lazy" alt="ByteDance logo" />
+  </div>
+  <div class="experience-row__details">
+    <div><strong>ByteDance, Seed Foundation Model - AI4Math</strong>, Beijing, China (Nov. 2025-May 2026)</div>
+    <div class="experience-row__role">Research Intern, AI Agent Development</div>
+    <!-- <div class="experience-row__description">Built a test-time-scaling multi-agent system for olympiad mathematics, including planning, parallel solving, verification, and backtracking; completed 5 iterations over 100+ problems and averaged 6.4/7 on an IMO problem set. Led an automated Lean 4 proof-QA workflow that produced 600+ formalized data items and improved expert review efficiency by 70%+. Standardized evaluation-data SOPs, delivering 2,000+ data items and 11 production and quality specifications.</div> -->
+  </div>
+</div>
+
+<!-- Official company mark sourced from https://www.human-intelligence.cn/favicon.svg. -->
+<div class="experience-row">
+  <div class="experience-row__logo">
+    <img src="/_pages/includes/images/human-intelligence.svg" loading="lazy" alt="Human Intelligence logo" />
+  </div>
+  <div class="experience-row__details">
+    <div><strong>Human Intelligence, Horizon</strong>, Beijing, China (Sept. 2026-Present)</div>
+    <div class="experience-row__role">Research Intern, AI Agent Development</div>
+    <!-- <div class="experience-row__role">Details forthcoming</div> -->
+  </div>
+</div>
+
+## Projects {#project-list}
 
 **General-Purpose Cybersecurity Agent** (SWU, Jun. 2026-Present)
 
 - **Role:** Project Lead; **Advisor:** Prof. Libo Zhang
 - Built 5 specialized agents and a 16-node bounded state machine with LangGraph for code audit, penetration testing, incident response, and reverse engineering. The architecture separates LLM-based interpretation, planning, and reflection from explicit permissions, routing, and termination rules.
 - Designed R0-R3 risk levels, Finding-Evidence validation, human approval for high-risk actions, and a two-layer state/domain blackboard to make decisions, tool calls, and evidence flows traceable and evaluable while limiting memory contamination.
-
-**ByteDance Seed AI4Math Research Internship** (Nov. 2025-May 2026)
-
-- **Role:** Research Intern, AI Agent Development
-- **MathNL TTS multi-agent reasoning:** Built a test-time-scaling system on the Seed 2.0 model family for olympiad mathematics. Designed Planner, Solver, and Verifier collaboration for strategy generation, parallel solving, proof verification, and backtracking; completed 5 iterations over 100+ problems and averaged 6.4/7 on an IMO problem set.
-- **Automated Lean 4 proof QA:** Led a workflow combining static rules, code retrieval, and LLM-as-a-judge evaluation. Produced 600+ formalized data items and improved expert review efficiency by 70%+.
-- **Evaluation-data operations:** Standardized SOPs for selection, classification, correctness, difficulty, expert annotation, and QA; delivered 2,000+ data items and authored 11 production and quality specifications.
 
 **Low-Dimensional Spatiotemporal Dynamics of the Human Brain** (BIT, Dec. 2023-Present)
 
@@ -45,5 +65,3 @@
 - **Role:** Project Lead; **Advisor:** Prof. Shenglin Li
 - Implemented a Java Chinese chess engine using a pruned alpha-beta search tree, custom search and evaluation functions, human-vs-computer play, and game-record storage.
 - **Award:** National Second Prize, 2022 Chinese Computer Game Championship.
-
-</details>

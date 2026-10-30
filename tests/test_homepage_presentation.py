@@ -6,14 +6,22 @@ import unittest
 class HomepagePresentationTests(unittest.TestCase):
     def test_markdown_is_enabled_in_disclosure_panels(self):
         for path in (
-            Path("_pages/includes/recent_projects.md"),
             Path("_pages/includes/teaching.md"),
-            Path("_pages/includes/zh/recent_projects.md"),
             Path("_pages/includes/zh/teaching.md"),
         ):
             with self.subTest(path=path):
                 text = path.read_text(encoding="utf-8")
                 self.assertIn('<details markdown="1">', text)
+
+    def test_interns_and_projects_are_not_disclosure_panels(self):
+        for path in (
+            Path("_pages/includes/recent_projects.md"),
+            Path("_pages/includes/zh/recent_projects.md"),
+        ):
+            with self.subTest(path=path):
+                text = path.read_text(encoding="utf-8")
+                self.assertNotIn("<details", text)
+                self.assertNotIn("<summary", text)
 
     def test_ccscw_card_uses_extracted_figure(self):
         for path in (
