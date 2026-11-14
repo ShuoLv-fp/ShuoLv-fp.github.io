@@ -15,7 +15,11 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-24.04-arm, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +40,7 @@ jobs:
           node --test tests/js/google-scholar-stats.test.js
       - name: Fetch Google Scholar statistics
         working-directory: google_scholar_crawler
-        run: python probe_cloud.py
+        run: python main.py
         timeout-minutes: 5
         env:
           SCHOLAR_FETCH_MODE: direct
