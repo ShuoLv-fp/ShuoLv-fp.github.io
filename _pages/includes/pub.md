@@ -6,6 +6,7 @@
   <a class="stat-chip" href="https://scholar.google.com/citations?user=VAsm0T8AAAAJ" target="_blank"><i class="fas fa-fw fa-graduation-cap"></i> Google Scholar</a>
   <span class="stat-chip">Citations: <span id="total_cit">--</span></span>
   <span class="stat-chip">h-index: <span id="h_index">--</span></span>
+  <span class="stat-chip">Updated: <span id="scholar_updated" aria-live="polite">--</span></span>
 </div>
 
 ## Journal Articles

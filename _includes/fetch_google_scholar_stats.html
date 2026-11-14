@@ -1,35 +1,66 @@
 <script>
     $(document).ready(function () {
-        var gsDataUrls = [];
+        if (!document.getElementById('total_cit')) return;
+        var gsDataUrls = [
+            'https://raw.githubusercontent.com/{{ site.repository }}/google-scholar-stats/gs_data.json'
+        ];
         {% if site.google_scholar_stats_use_cdn %}
         gsDataUrls.push('https://cdn.jsdelivr.net/gh/{{ site.repository }}@google-scholar-stats/gs_data.json');
         {% endif %}
 
-        gsDataUrls.push('https://raw.githubusercontent.com/{{ site.repository }}/google-scholar-stats/gs_data.json');
+        var isChinese = document.documentElement.lang.indexOf('zh') === 0;
+        var newestUpdate = -Infinity;
+        var pending = gsDataUrls.length;
+        var setText = function (id, value) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = String(value);
+        };
+        var validCount = function (value) {
+            return Number.isInteger(value) && value >= 0;
+        };
 
         var renderStats = function (data) {
-            var setText = function (id, value) {
-                var el = document.getElementById(id);
-                if (el) el.innerHTML = value;
-            };
+            if (!data || !validCount(data.citedby) || !validCount(data.hindex) ||
+                typeof data.updated !== 'string') return;
+            // Older snapshots used a naive UTC timestamp from the Actions runner.
+            var updated = data.updated.replace(' ', 'T').replace(/(\.\d{3})\d+/, '$1');
+            if (!/(Z|[+-]\d{2}:\d{2})$/i.test(updated)) updated += 'Z';
+            var timestamp = Date.parse(updated);
+            if (!Number.isFinite(timestamp) || timestamp <= newestUpdate) return;
+            newestUpdate = timestamp;
             setText('total_cit', data['citedby']);
             setText('h_index', data['hindex']);
+            var date = new Date(timestamp).toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' });
+            var stale = Date.now() - timestamp > 10 * 24 * 60 * 60 * 1000;
+            setText('scholar_updated', date + (stale ? (isChinese ? '（数据已过期）' : ' (outdated)') : ''));
+            var status = document.getElementById('scholar_updated');
+            if (status) status.title = new Date(timestamp).toISOString();
             var citationEles = document.getElementsByClassName('show_paper_citations')
             Array.prototype.forEach.call(citationEles, element => {
                 var paperId = element.getAttribute('data')
                 var publication = data['publications'] && data['publications'][paperId]
-                if (publication) {
-                    element.innerHTML = '| Citations: ' + publication['num_citations'];
+                if (publication && validCount(publication.num_citations)) {
+                    element.textContent = '| Citations: ' + publication['num_citations'];
                 }
             });
         };
 
-        var loadStats = function (index) {
-            $.getJSON(gsDataUrls[index], renderStats).fail(function () {
-                if (index + 1 < gsDataUrls.length) loadStats(index + 1);
-            });
+        var finished = function () {
+            pending -= 1;
+            if (pending === 0 && newestUpdate === -Infinity) {
+                setText('scholar_updated', isChinese ? '暂时无法获取' : 'Temporarily unavailable');
+            }
         };
 
-        loadStats(0);
+        gsDataUrls.forEach(function (url) {
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                cache: false,
+                timeout: 10000,
+                success: function (data) { renderStats(data); finished(); },
+                error: finished
+            });
+        });
     })
 </script>
