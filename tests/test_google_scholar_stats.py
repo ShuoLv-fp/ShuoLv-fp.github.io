@@ -50,9 +50,9 @@ class GoogleScholarStatsTests(unittest.TestCase):
         self.assertIn("cache: false", script)
         self.assertIn("timeout:", script)
 
-    def test_both_languages_show_last_successful_update(self):
+    def test_both_languages_hide_scholar_update_date(self):
         for path in ("_pages/includes/pub.md", "_pages/includes/zh/pub.md"):
-            self.assertIn('id="scholar_updated"', Path(path).read_text())
+            self.assertNotIn('id="scholar_updated"', Path(path).read_text())
 
     def test_weekly_update_documents_local_execution(self):
         guide = Path("docs/google-scholar-stats.md").read_text()
