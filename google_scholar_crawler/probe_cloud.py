@@ -44,8 +44,25 @@ try:
     summary = {'client': 'requests', 'status': response.status_code,
                'seconds': round(time.monotonic() - started, 2), **describe(response.content)}
     print(json.dumps(summary), flush=True)
-    if not summary['metrics']:
-        raise SystemExit(1)
+    if summary['metrics']:
+        raise SystemExit(0)
 except Exception as error:
     print(json.dumps({'client': 'requests', 'error': type(error).__name__}), flush=True)
-    raise SystemExit(1)
+
+from curl_cffi import requests as browser_requests
+for label, url in [('chrome', URL), ('chrome-regional', URL.replace('scholar.google.com', 'scholar.google.com.hk'))]:
+    try:
+        response = browser_requests.get(url, impersonate='chrome', timeout=25)
+        summary = {'client': label, 'status': response.status_code, **describe(response.content)}
+        print(json.dumps(summary), flush=True)
+        if summary['metrics']:
+            raise SystemExit(0)
+    except Exception as error:
+        print(json.dumps({'client': label, 'error': type(error).__name__}), flush=True)
+
+try:
+    response = requests.get('https://r.jina.ai/' + URL, timeout=45, headers={'X-No-Cache':'true'})
+    print(json.dumps({'client':'jina-reader', 'status':response.status_code, 'body':response.text[:9000]}), flush=True)
+except Exception as error:
+    print(json.dumps({'client':'jina-reader','error':type(error).__name__}), flush=True)
+raise SystemExit(1)

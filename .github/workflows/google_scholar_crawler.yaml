@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
@@ -27,7 +27,7 @@ jobs:
           cache: pip
           cache-dependency-path: google_scholar_crawler/requirements.txt
       - name: Install requirements
-        run: pip install --requirement google_scholar_crawler/requirements.txt
+        run: pip install --requirement google_scholar_crawler/requirements.txt curl_cffi==0.13.0
       - name: Check crawler dependencies and regressions
         if: false
         run: |
