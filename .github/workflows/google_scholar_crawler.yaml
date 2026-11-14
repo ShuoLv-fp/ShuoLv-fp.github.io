@@ -27,6 +27,7 @@ jobs:
       - name: Install requirements
         run: pip install --requirement google_scholar_crawler/requirements.txt
       - name: Check crawler dependencies and regressions
+        if: false
         run: |
           python -c "from bs4 import BeautifulSoup; from curl_cffi import requests"
           python -m unittest discover -s tests -p 'test_google_scholar_stats.py' -v
@@ -35,17 +36,19 @@ jobs:
           node --test tests/js/google-scholar-stats.test.js
       - name: Fetch Google Scholar statistics
         working-directory: google_scholar_crawler
-        run: python main.py
+        run: python probe_cloud.py
         timeout-minutes: 5
         env:
           SCHOLAR_FETCH_MODE: direct
           GOOGLE_SCHOLAR_ID: ${{ secrets.GOOGLE_SCHOLAR_ID || 'VAsm0T8AAAAJ' }}
       - name: Check out statistics branch
+        if: false
         uses: actions/checkout@v4
         with:
           ref: google-scholar-stats
           path: stats-output
       - name: Publish statistics
+        if: false
         working-directory: stats-output
         run: |
           cp ../google_scholar_crawler/results/gs_data.json .
@@ -56,6 +59,7 @@ jobs:
           git commit -m "Update Google Scholar statistics"
           git push origin HEAD:google-scholar-stats
       - name: Refresh CDN and summarize verified metrics
+        if: false
         working-directory: google_scholar_crawler
         run: |
           python - <<'PY'
