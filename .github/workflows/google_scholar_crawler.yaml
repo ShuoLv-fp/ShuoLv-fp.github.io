@@ -14,12 +14,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-24.04-arm, macos-latest]
-    runs-on: ${{ matrix.os }}
+  checks:
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -31,28 +27,53 @@ jobs:
       - name: Install requirements
         run: pip install --requirement google_scholar_crawler/requirements.txt
       - name: Check crawler dependencies and regressions
-        if: false
         run: |
           python -c "from bs4 import BeautifulSoup; from curl_cffi import requests"
           python -m unittest discover -s tests -p 'test_google_scholar_stats.py' -v
           python -m unittest discover -s tests -p 'test_scholar_cloud_fetch.py' -v
           python -m unittest discover -s tests -p 'test_scholar_local_publish.py' -v
           node --test tests/js/google-scholar-stats.test.js
-      - name: Fetch Google Scholar statistics
-        working-directory: google_scholar_crawler
-        run: python main.py
-        timeout-minutes: 5
+
+  primary:
+    needs: checks
+    uses: ./.github/workflows/scholar_fetch.yaml
+    with:
+      runner: ubuntu-24.04-arm
+    secrets: inherit
+
+  fallback:
+    needs: primary
+    if: needs.primary.outputs.available != 'true'
+    uses: ./.github/workflows/scholar_fetch.yaml
+    with:
+      runner: windows-latest
+    secrets: inherit
+
+  publish:
+    needs: [checks, primary, fallback]
+    if: always() && !cancelled() && needs.checks.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Require a verified snapshot from this run
         env:
-          SCHOLAR_FETCH_MODE: direct
-          GOOGLE_SCHOLAR_ID: ${{ secrets.GOOGLE_SCHOLAR_ID || 'VAsm0T8AAAAJ' }}
+          AVAILABLE: ${{ needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true' }}
+        run: test "$AVAILABLE" = "true"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: scholar-data-*
+          path: google_scholar_crawler/results
+          merge-multiple: true
       - name: Check out statistics branch
-        if: false
         uses: actions/checkout@v4
         with:
           ref: google-scholar-stats
           path: stats-output
       - name: Publish statistics
-        if: false
         working-directory: stats-output
         run: |
           cp ../google_scholar_crawler/results/gs_data.json .
@@ -63,7 +84,6 @@ jobs:
           git commit -m "Update Google Scholar statistics"
           git push origin HEAD:google-scholar-stats
       - name: Refresh CDN and summarize verified metrics
-        if: false
         working-directory: google_scholar_crawler
         run: |
           python - <<'PY'

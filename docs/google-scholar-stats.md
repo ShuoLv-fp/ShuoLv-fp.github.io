@@ -9,13 +9,17 @@ The computer and Codex do not need to remain running. This is a weekly snapshot.
 1. The cloud crawler reads the public profile using bounded curl requests and a
    browser-compatible curl_cffi fallback. Each transport gets at most three
    attempts. Total citations and h-index come from the profile's metrics table.
+   An ARM Linux hosted runner is primary; Windows is used only if it cannot obtain
+   a verified profile. Both hosted networks passed live fetching on November 14.
 2. It validates the canonical author ID, name, metrics, and publication IDs before
    writing JSON. An HTTP 200 block page is rejected. A successful snapshot gets
    an internal UTC timestamp. The publication list records whether it is complete;
    profile-wide metrics are independent of publication pagination.
 3. The workflow publishes only the two JSON files to google-scholar-stats using
-   a normal push. A failed crawl leaves published data unchanged and fails visibly;
-   no old snapshot is stamped as fresh. After publishing, it requests a CDN purge.
+   a normal push. A runner's access refusal triggers the fallback, and the final
+   publish gate requires a verified snapshot artifact from this workflow run.
+   If both networks fail, the overall workflow fails and published data stays
+   unchanged. No old snapshot is stamped as fresh. Publishing requests a CDN purge.
    A cache-purge failure is reported without reverting the successful publication.
 4. Both homepages read GitHub Raw and, when enabled in site configuration,
    jsDelivr. They display the valid response with the newest update timestamp,
@@ -41,8 +45,8 @@ the latest available snapshot. Page builds do not trigger extra crawls.
   A successful update must produce a newer timestamp in gs_data.json on the
   google-scholar-stats branch. The automation checks that value after publishing.
 - The local publisher is restricted to author VAsm0T8AAAAJ. Google Scholar can
-  still reject traffic; a failed run keeps the old snapshot and the page flags
-  its age after 10 days. Inspect the log and retry once after a transient failure.
+  still reject traffic; a failed run keeps the old snapshot. Inspect the internal
+  JSON timestamp and workflow log, then retry once after a transient failure.
   Do not substitute another database's counts for Google Scholar's metrics.
 - Cloud publishing uses the existing GITHUB_TOKEN. No paid API, proxy credential,
   or local runner is required. Google's service remains an external dependency;

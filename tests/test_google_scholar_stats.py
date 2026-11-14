@@ -16,7 +16,13 @@ class GoogleScholarStatsTests(unittest.TestCase):
 
         self.assertIn("workflow_dispatch:", workflow)
         self.assertIn('cron: "17 1 * * 1"', workflow)
-        self.assertIn('SCHOLAR_FETCH_MODE: direct', workflow)
+        fetch_workflow = Path(".github/workflows/scholar_fetch.yaml").read_text()
+        self.assertIn('SCHOLAR_FETCH_MODE: direct', fetch_workflow)
+        self.assertIn('runner: ubuntu-24.04-arm', workflow)
+        self.assertIn("needs.primary.outputs.available != 'true'", workflow)
+        self.assertIn("needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true'", workflow)
+        self.assertIn('test "$AVAILABLE" = "true"', workflow)
+        self.assertIn('actions/download-artifact@v4', workflow)
         self.assertNotIn('continue-on-error:', workflow)
         self.assertNotIn('if: false', workflow)
         self.assertNotIn('--force', workflow)
@@ -25,12 +31,9 @@ class GoogleScholarStatsTests(unittest.TestCase):
         self.assertIn("timeout-minutes: 10", workflow)
         self.assertIn("actions/checkout@v4", workflow)
         self.assertIn("actions/setup-python@v5", workflow)
-        self.assertRegex(
-            workflow,
-            r"(?s)name: Fetch Google Scholar statistics\s+"
-            r"working-directory: google_scholar_crawler\s+"
-            r"run: python main\.py",
-        )
+        self.assertIn('if python main.py; then', fetch_workflow)
+        self.assertIn("steps.fetch.outputs.available == 'true'", fetch_workflow)
+        self.assertIn('if-no-files-found: error', fetch_workflow)
 
     def test_crawler_uses_current_scholarly_release(self):
         requirements = Path(
