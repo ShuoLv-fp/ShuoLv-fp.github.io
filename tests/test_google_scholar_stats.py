@@ -15,7 +15,7 @@ class GoogleScholarStatsTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
 
         self.assertIn("workflow_dispatch:", workflow)
-        self.assertIn('cron: "17 1 * * 1"', workflow)
+        self.assertNotIn("schedule:", workflow)
         self.assertNotIn("page_build:", workflow)
         self.assertIn("contents: write", workflow)
         self.assertIn("timeout-minutes: 10", workflow)
@@ -53,6 +53,12 @@ class GoogleScholarStatsTests(unittest.TestCase):
     def test_both_languages_show_last_successful_update(self):
         for path in ("_pages/includes/pub.md", "_pages/includes/zh/pub.md"):
             self.assertIn('id="scholar_updated"', Path(path).read_text())
+
+    def test_weekly_update_documents_local_execution(self):
+        guide = Path("docs/google-scholar-stats.md").read_text()
+        self.assertIn("Codex", guide)
+        self.assertIn("09:17 Asia/Shanghai", guide)
+        self.assertIn("update_stats.py", guide)
 
 
 class CrawlerOutputTests(unittest.TestCase):

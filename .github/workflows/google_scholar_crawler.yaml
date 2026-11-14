@@ -1,10 +1,8 @@
 name: Get Citation Data
 
 on:
+  # Weekly updates run locally through Codex; hosted runner IPs receive HTTP 403.
   workflow_dispatch:
-  schedule:
-    # Mondays at 09:17 Asia/Shanghai (01:17 UTC).
-    - cron: "17 1 * * 1"
 
 permissions:
   contents: write
