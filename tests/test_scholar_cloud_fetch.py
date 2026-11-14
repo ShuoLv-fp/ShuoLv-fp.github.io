@@ -1,7 +1,11 @@
 import importlib.util
+import copy
+import io
+import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
+from urllib.error import URLError
 
 
 SCRIPT = Path('google_scholar_crawler/cloud_fetch.py')
@@ -16,6 +20,11 @@ PROFILE = '''<html><head><link rel="canonical" href="https://scholar.google.com/
 
 
 class CloudFetchTests(unittest.TestCase):
+    def setUp(self):
+        environment = patch.dict('os.environ', {'SERPAPI_API_KEY': ''})
+        environment.start()
+        self.addCleanup(environment.stop)
+
     def load_module(self):
         self.assertTrue(SCRIPT.exists(), 'Cloud fetcher is required')
         spec = importlib.util.spec_from_file_location('cloud_fetch', SCRIPT)
@@ -53,3 +62,44 @@ class CloudFetchTests(unittest.TestCase):
         with patch.object(module, 'fetch_curl', side_effect=RuntimeError('HTTP 403')), patch.object(module, 'fetch_browser', side_effect=RuntimeError('HTTP 403')), patch.object(module.time, 'sleep'):
             with self.assertRaises(RuntimeError):
                 module.fetch_author('VAsm0T8AAAAJ')
+
+    def provider_data(self):
+        return {
+            'search_metadata': {'status': 'Success'},
+            'search_parameters': {'engine': 'google_scholar_author', 'author_id': 'VAsm0T8AAAAJ'},
+            'author': {'name': 'Shuo Lv'},
+            'cited_by': {'table': [{'citations': {'all': 32}}, {'h_index': {'all': 2}}]},
+            'articles': [{'title': 'Paper', 'citation_id': 'VAsm0T8AAAAJ:paper',
+                          'cited_by': {'value': 25}, 'year': '2024'}],
+        }
+
+    def test_configured_provider_supplies_verified_google_metrics(self):
+        module = self.load_module()
+        self.assertTrue(hasattr(module, 'fetch_provider'))
+        with patch.dict('os.environ', {'SERPAPI_API_KEY': 'test-secret'}), patch.object(
+            module, 'urlopen', return_value=io.BytesIO(json.dumps(self.provider_data()).encode())
+        ) as request, patch.object(module, 'fetch_curl') as direct:
+            data = module.fetch_author('VAsm0T8AAAAJ')
+        self.assertEqual((data['citedby'], data['hindex']), (32, 2))
+        self.assertEqual(data['source'], 'google-scholar-via-serpapi')
+        direct.assert_not_called()
+        self.assertIn('no_cache=true', request.call_args.args[0].full_url)
+
+    def test_provider_rejects_wrong_author_missing_metrics_or_failed_search(self):
+        module = self.load_module()
+        self.assertTrue(hasattr(module, 'parse_provider'))
+        for field, value in (('search_parameters', {'author_id': 'wrong'}),
+                             ('cited_by', {'table': []}),
+                             ('search_metadata', {'status': 'Error'})):
+            data = copy.deepcopy(self.provider_data())
+            data[field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                module.parse_provider(data, 'VAsm0T8AAAAJ')
+
+    def test_provider_network_errors_never_expose_api_key(self):
+        module = self.load_module()
+        self.assertTrue(hasattr(module, 'fetch_provider'))
+        with patch.object(module, 'urlopen', side_effect=URLError('https://example.invalid/?api_key=test-secret')):
+            with self.assertRaises(RuntimeError) as error:
+                module.fetch_provider('VAsm0T8AAAAJ', 'test-secret')
+        self.assertNotIn('test-secret', str(error.exception))

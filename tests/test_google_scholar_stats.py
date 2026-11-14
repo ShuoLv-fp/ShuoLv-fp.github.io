@@ -18,6 +18,7 @@ class GoogleScholarStatsTests(unittest.TestCase):
         self.assertIn('cron: "17 1 * * 1"', workflow)
         fetch_workflow = Path(".github/workflows/scholar_fetch.yaml").read_text()
         self.assertIn('SCHOLAR_FETCH_MODE: direct', fetch_workflow)
+        self.assertIn('secrets.SERPAPI_API_KEY', fetch_workflow)
         self.assertIn('runner: ubuntu-24.04-arm', workflow)
         self.assertIn("needs.primary.outputs.available != 'true'", workflow)
         self.assertIn("needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true'", workflow)

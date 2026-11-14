@@ -66,7 +66,12 @@ jobs:
       - name: Require a verified snapshot from this run
         env:
           AVAILABLE: ${{ needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true' || needs.retry.outputs.available == 'true' }}
-        run: test "$AVAILABLE" = "true"
+        run: |
+          if ! test "$AVAILABLE" = "true"; then
+            echo "No fresh Google Scholar snapshot was obtained. Existing published data is unchanged."
+            echo "All hosted attempts were blocked or invalid. Configure SERPAPI_API_KEY in repository Secrets for provider-backed fetching." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:

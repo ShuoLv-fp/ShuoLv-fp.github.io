@@ -3,6 +3,16 @@
 GitHub Actions fetches public author profile VAsm0T8AAAAJ every Monday
 at 09:17 Asia/Shanghai (01:17 UTC), with manual dispatch also available.
 The computer and Codex do not need to remain running. This is a weekly snapshot.
+Direct access from shared hosted IPs remains intermittent: some runs succeeded,
+but later ARM and Windows runners were all blocked. A direct-only configuration
+is best effort, not a verified reliability fix.
+
+For a provider-backed configuration, add a repository Actions secret named
+SERPAPI_API_KEY. The crawler then prefers SerpAPI's google_scholar_author endpoint
+with no_cache=true and validates the returned author ID and all-time metrics.
+This optional path is tested with the documented response schema, but needs a
+real credential and successful live run before it can be considered accepted.
+See https://serpapi.com/google-scholar-author-api for service and account details.
 
 ## Data flow
 
@@ -37,8 +47,8 @@ the latest available snapshot. Page builds do not trigger extra crawls.
 - For an immediate cloud update, select Actions > **Get Citation Data** >
   **Run workflow** on main. Check the fetch, publish, and summary steps. A green
   run must advance the internal timestamp in gs_data.json on google-scholar-stats.
-- The previous local Codex automation is paused after cloud acceptance to avoid
-  duplicate weekly runs. The update_stats.py utility remains for manual recovery:
+- The previous local Codex automation is paused to avoid duplicate weekly runs.
+  The update_stats.py utility remains for manual recovery:
 
       google_scholar_crawler/.venv/bin/python google_scholar_crawler/update_stats.py --publish
 
@@ -49,8 +59,9 @@ the latest available snapshot. Page builds do not trigger extra crawls.
   still reject traffic; a failed run keeps the old snapshot. Inspect the internal
   JSON timestamp and workflow log, then retry once after a transient failure.
   Do not substitute another database's counts for Google Scholar's metrics.
-- Cloud publishing uses the existing GITHUB_TOKEN. No paid API, proxy credential,
-  or local runner is required. Google's service remains an external dependency;
+- Cloud publishing uses the existing GITHUB_TOKEN. Direct fetching needs no API
+  credential; the optional provider uses only SERPAPI_API_KEY from Actions Secrets.
+  API URLs containing the credential are never printed. Google and the provider remain external dependencies;
   failed validation cannot be converted to a successful run with stale values.
 
 ## Dependency incident

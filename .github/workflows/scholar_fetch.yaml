@@ -38,6 +38,7 @@ jobs:
         timeout-minutes: 5
         env:
           SCHOLAR_FETCH_MODE: direct
+          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
           GOOGLE_SCHOLAR_ID: ${{ secrets.GOOGLE_SCHOLAR_ID || 'VAsm0T8AAAAJ' }}
         run: |
           if python main.py; then
