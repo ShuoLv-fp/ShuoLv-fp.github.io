@@ -2,109 +2,25 @@ name: Get Citation Data
 
 on:
   workflow_dispatch:
-  schedule:
-    # Mondays at 09:17 Asia/Shanghai.
-    - cron: "17 1 * * 1"
 
 permissions:
-  contents: write
-
-concurrency:
-  group: google-scholar-stats
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  checks:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+  diagnose:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04-arm, windows-latest]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 8
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: pip
-          cache-dependency-path: google_scholar_crawler/requirements.txt
-      - name: Install requirements
-        run: pip install --requirement google_scholar_crawler/requirements.txt
-      - name: Check crawler dependencies and regressions
-        run: |
-          python -c "from bs4 import BeautifulSoup; from curl_cffi import requests"
-          python -m unittest discover -s tests -p 'test_google_scholar_stats.py' -v
-          python -m unittest discover -s tests -p 'test_scholar_cloud_fetch.py' -v
-          python -m unittest discover -s tests -p 'test_scholar_local_publish.py' -v
-          node --test tests/js/google-scholar-stats.test.js
-
-  primary:
-    needs: checks
-    uses: ./.github/workflows/scholar_fetch.yaml
-    with:
-      runner: ubuntu-24.04-arm
-    secrets: inherit
-
-  fallback:
-    needs: primary
-    if: needs.primary.outputs.available != 'true'
-    uses: ./.github/workflows/scholar_fetch.yaml
-    with:
-      runner: windows-latest
-    secrets: inherit
-
-  retry:
-    needs: [primary, fallback]
-    if: always() && !cancelled() && needs.primary.result == 'success' && needs.primary.outputs.available != 'true' && needs.fallback.outputs.available != 'true'
-    uses: ./.github/workflows/scholar_fetch.yaml
-    with:
-      runner: ubuntu-24.04-arm
-    secrets: inherit
-
-  publish:
-    needs: [checks, primary, fallback, retry]
-    if: always() && !cancelled() && needs.checks.result == 'success'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Require a verified snapshot from this run
-        env:
-          AVAILABLE: ${{ needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true' || needs.retry.outputs.available == 'true' }}
-        run: |
-          if ! test "$AVAILABLE" = "true"; then
-            echo "No fresh Google Scholar snapshot was obtained. Existing published data is unchanged."
-            echo "All hosted attempts were blocked or invalid. Configure SERPAPI_API_KEY in repository Secrets for provider-backed fetching." >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: scholar-data-*
-          path: google_scholar_crawler/results
-          merge-multiple: true
-      - name: Check out statistics branch
-        uses: actions/checkout@v4
-        with:
-          ref: google-scholar-stats
-          path: stats-output
-      - name: Publish statistics
-        working-directory: stats-output
-        run: |
-          cp ../google_scholar_crawler/results/gs_data.json .
-          cp ../google_scholar_crawler/results/gs_data_shieldsio.json .
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add gs_data.json gs_data_shieldsio.json
-          git commit -m "Update Google Scholar statistics"
-          git push origin HEAD:google-scholar-stats
-      - name: Refresh CDN and summarize verified metrics
-        working-directory: google_scholar_crawler
-        run: |
-          python - <<'PY'
-          import json, os
-          from pathlib import Path
-          from update_stats import refresh_cdn
-          refresh_cdn()
-          data = json.loads(Path('results/gs_data.json').read_text())
-          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
-              summary.write(f"Google Scholar: **{data['citedby']} citations**, **h-index {data['hindex']}**.\n\nFetched: {data['updated']}\n")
-          PY
+      - run: pip install beautifulsoup4 curl_cffi==0.13.0
+      - run: python google_scholar_crawler/probe_direct.py
