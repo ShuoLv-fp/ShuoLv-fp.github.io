@@ -17,6 +17,8 @@ received HTTP 403 from Google Scholar, while local fetches succeeded.
    google-scholar-stats branch. It skips equal or older snapshots and uses a
    normal push so concurrent updates are never force-overwritten. A failed crawl
    leaves previously published data unchanged. The main checkout is not changed.
+   After publishing, the wrapper requests a jsDelivr cache purge for both files.
+   A cache-purge failure is reported without reverting the successful publication.
 4. Both homepages read GitHub Raw and, when enabled in site configuration,
    jsDelivr. They display the valid response with the newest update timestamp,
    regardless of response order. Browser cache is bypassed; upstream CDN caches

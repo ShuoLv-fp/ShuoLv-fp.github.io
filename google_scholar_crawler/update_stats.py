@@ -9,11 +9,28 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from urllib.request import urlopen
 
 
 REPOSITORY = 'https://github.com/ShuoLv-fp/ShuoLv-fp.github.io.git'
 BRANCH = 'google-scholar-stats'
 FILES = ('gs_data.json', 'gs_data_shieldsio.json')
+
+
+def refresh_cdn():
+    refreshed = True
+    for filename in FILES:
+        url = f'https://purge.jsdelivr.net/gh/ShuoLv-fp/ShuoLv-fp.github.io@{BRANCH}/{filename}'
+        try:
+            with urlopen(url, timeout=20) as response:
+                result = json.load(response)
+            if result.get('status') != 'finished':
+                refreshed = False
+                print(f'CDN refresh still pending for {filename}', file=sys.stderr)
+        except (OSError, ValueError) as error:
+            refreshed = False
+            print(f'CDN refresh failed for {filename}: {error}', file=sys.stderr)
+    return refreshed
 
 
 def update_time(value):
@@ -68,6 +85,7 @@ def main():
                        check=True, timeout=180)
         if arguments.publish:
             publish_results(Path(directory) / 'results')
+            refresh_cdn()
         else:
             print('Fetch succeeded. Use --publish to update the website.')
 

@@ -1,16 +1,40 @@
 import importlib.util
+import io
 import json
 from pathlib import Path
 import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
+from urllib.error import URLError
 
 
 SCRIPT = Path("google_scholar_crawler/update_stats.py")
 
 
 class LocalPublishTests(unittest.TestCase):
+    def load_publisher(self):
+        spec = importlib.util.spec_from_file_location("local_publish", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def test_cdn_refresh_purges_both_published_files(self):
+        module = self.load_publisher()
+        self.assertTrue(hasattr(module, "refresh_cdn"))
+        with patch.object(module, "urlopen", side_effect=lambda *args, **kwargs: io.BytesIO(b'{"status":"finished"}')) as request:
+            self.assertTrue(module.refresh_cdn())
+            self.assertEqual(request.call_count, 2)
+            urls = [call.args[0] for call in request.call_args_list]
+            for filename in module.FILES:
+                self.assertTrue(any(url.endswith('/' + filename) for url in urls))
+
+    def test_cdn_failure_does_not_undo_published_data(self):
+        module = self.load_publisher()
+        self.assertTrue(hasattr(module, "refresh_cdn"))
+        with patch.object(module, "urlopen", side_effect=URLError("temporarily unavailable")):
+            self.assertFalse(module.refresh_cdn())
+
     def test_publish_updates_only_stats_branch_and_preserves_newer_data(self):
         self.assertTrue(SCRIPT.exists(), "A local publisher is required for the weekly automation")
         spec = importlib.util.spec_from_file_location("local_publish", SCRIPT)
