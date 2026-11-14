@@ -8,9 +8,7 @@
         gsDataUrls.push('https://cdn.jsdelivr.net/gh/{{ site.repository }}@google-scholar-stats/gs_data.json');
         {% endif %}
 
-        var isChinese = document.documentElement.lang.indexOf('zh') === 0;
         var newestUpdate = -Infinity;
-        var pending = gsDataUrls.length;
         var setText = function (id, value) {
             var el = document.getElementById(id);
             if (el) el.textContent = String(value);
@@ -30,11 +28,6 @@
             newestUpdate = timestamp;
             setText('total_cit', data['citedby']);
             setText('h_index', data['hindex']);
-            var date = new Date(timestamp).toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' });
-            var stale = Date.now() - timestamp > 10 * 24 * 60 * 60 * 1000;
-            setText('scholar_updated', date + (stale ? (isChinese ? '（数据已过期）' : ' (outdated)') : ''));
-            var status = document.getElementById('scholar_updated');
-            if (status) status.title = new Date(timestamp).toISOString();
             var citationEles = document.getElementsByClassName('show_paper_citations')
             Array.prototype.forEach.call(citationEles, element => {
                 var paperId = element.getAttribute('data')
@@ -45,21 +38,14 @@
             });
         };
 
-        var finished = function () {
-            pending -= 1;
-            if (pending === 0 && newestUpdate === -Infinity) {
-                setText('scholar_updated', isChinese ? '暂时无法获取' : 'Temporarily unavailable');
-            }
-        };
-
         gsDataUrls.forEach(function (url) {
             $.ajax({
                 url: url,
                 dataType: 'json',
                 cache: false,
                 timeout: 10000,
-                success: function (data) { renderStats(data); finished(); },
-                error: finished
+                success: renderStats,
+                error: function () { /* Keep any valid response from the other source. */ }
             });
         });
     })

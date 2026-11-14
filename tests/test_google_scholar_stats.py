@@ -15,7 +15,11 @@ class GoogleScholarStatsTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
 
         self.assertIn("workflow_dispatch:", workflow)
-        self.assertNotIn("schedule:", workflow)
+        self.assertIn('cron: "17 1 * * 1"', workflow)
+        self.assertIn('SCHOLAR_FETCH_MODE: direct', workflow)
+        self.assertNotIn('continue-on-error:', workflow)
+        self.assertNotIn('if: false', workflow)
+        self.assertNotIn('--force', workflow)
         self.assertNotIn("page_build:", workflow)
         self.assertIn("contents: write", workflow)
         self.assertIn("timeout-minutes: 10", workflow)
@@ -54,9 +58,9 @@ class GoogleScholarStatsTests(unittest.TestCase):
         for path in ("_pages/includes/pub.md", "_pages/includes/zh/pub.md"):
             self.assertNotIn('id="scholar_updated"', Path(path).read_text())
 
-    def test_weekly_update_documents_local_execution(self):
+    def test_weekly_update_documents_cloud_execution(self):
         guide = Path("docs/google-scholar-stats.md").read_text()
-        self.assertIn("Codex", guide)
+        self.assertIn("GitHub Actions", guide)
         self.assertIn("09:17 Asia/Shanghai", guide)
         self.assertIn("update_stats.py", guide)
 
@@ -73,7 +77,7 @@ class CrawlerOutputTests(unittest.TestCase):
         try:
             os.chdir(directory)
             with patch.dict("sys.modules", {"scholarly": module}), patch.dict(
-                os.environ, {"GOOGLE_SCHOLAR_ID": "test-author"}
+                os.environ, {"GOOGLE_SCHOLAR_ID": "test-author", "SCHOLAR_FETCH_MODE": "scholarly"}
             ):
                 runpy.run_path(str(script), run_name="__main__")
         finally:

@@ -1,8 +1,10 @@
 name: Get Citation Data
 
 on:
-  # Weekly updates run locally through Codex; hosted runner IPs receive HTTP 403.
   workflow_dispatch:
+  schedule:
+    # Mondays at 09:17 Asia/Shanghai.
+    - cron: "17 1 * * 1"
 
 permissions:
   contents: write
@@ -13,11 +15,7 @@ concurrency:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -27,30 +25,45 @@ jobs:
           cache: pip
           cache-dependency-path: google_scholar_crawler/requirements.txt
       - name: Install requirements
-        run: pip install --requirement google_scholar_crawler/requirements.txt curl_cffi==0.13.0
+        run: pip install --requirement google_scholar_crawler/requirements.txt
       - name: Check crawler dependencies and regressions
-        if: false
         run: |
-          python -c "from scholarly import scholarly; from bibtexparser.bibdatabase import BibDatabase"
+          python -c "from bs4 import BeautifulSoup; from curl_cffi import requests"
           python -m unittest discover -s tests -p 'test_google_scholar_stats.py' -v
+          python -m unittest discover -s tests -p 'test_scholar_cloud_fetch.py' -v
+          python -m unittest discover -s tests -p 'test_scholar_local_publish.py' -v
           node --test tests/js/google-scholar-stats.test.js
       - name: Fetch Google Scholar statistics
         working-directory: google_scholar_crawler
-        run: python probe_cloud.py
+        run: python main.py
         timeout-minutes: 5
         env:
+          SCHOLAR_FETCH_MODE: direct
           GOOGLE_SCHOLAR_ID: ${{ secrets.GOOGLE_SCHOLAR_ID || 'VAsm0T8AAAAJ' }}
+      - name: Check out statistics branch
+        uses: actions/checkout@v4
+        with:
+          ref: google-scholar-stats
+          path: stats-output
       - name: Publish statistics
-        if: false
-        working-directory: google_scholar_crawler/results
+        working-directory: stats-output
         run: |
-          git init
-          git checkout -b google-scholar-stats
+          cp ../google_scholar_crawler/results/gs_data.json .
+          cp ../google_scholar_crawler/results/gs_data_shieldsio.json .
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add *.json
-          git commit -m "Updated Citation Data"
-          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin google-scholar-stats
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git add gs_data.json gs_data_shieldsio.json
+          git commit -m "Update Google Scholar statistics"
+          git push origin HEAD:google-scholar-stats
+      - name: Refresh CDN and summarize verified metrics
+        working-directory: google_scholar_crawler
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from update_stats import refresh_cdn
+          refresh_cdn()
+          data = json.loads(Path('results/gs_data.json').read_text())
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write(f"Google Scholar: **{data['citedby']} citations**, **h-index {data['hindex']}**.\n\nFetched: {data['updated']}\n")
+          PY
