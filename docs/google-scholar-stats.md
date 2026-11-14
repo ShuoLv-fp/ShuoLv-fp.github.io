@@ -10,7 +10,8 @@ The computer and Codex do not need to remain running. This is a weekly snapshot.
    browser-compatible curl_cffi fallback. Each transport gets at most three
    attempts. Total citations and h-index come from the profile's metrics table.
    An ARM Linux hosted runner is primary; Windows is used only if it cannot obtain
-   a verified profile. Both hosted networks passed live fetching on November 14.
+   a verified profile. A final ARM retry allocates a fresh hosted runner when both
+   earlier attempts are blocked. Both hosted networks passed live fetching on November 14.
 2. It validates the canonical author ID, name, metrics, and publication IDs before
    writing JSON. An HTTP 200 block page is rejected. A successful snapshot gets
    an internal UTC timestamp. The publication list records whether it is complete;
@@ -18,7 +19,7 @@ The computer and Codex do not need to remain running. This is a weekly snapshot.
 3. The workflow publishes only the two JSON files to google-scholar-stats using
    a normal push. A runner's access refusal triggers the fallback, and the final
    publish gate requires a verified snapshot artifact from this workflow run.
-   If both networks fail, the overall workflow fails and published data stays
+   If all three runners fail, the overall workflow fails and published data stays
    unchanged. No old snapshot is stamped as fresh. Publishing requests a CDN purge.
    A cache-purge failure is reported without reverting the successful publication.
 4. Both homepages read GitHub Raw and, when enabled in site configuration,

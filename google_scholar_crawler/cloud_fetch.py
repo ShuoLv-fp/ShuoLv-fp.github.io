@@ -22,7 +22,8 @@ def parse_profile(body, scholar_id):
     soup = BeautifulSoup(body, 'html.parser')
     canonical = soup.find('link', rel='canonical')
     if not canonical or parse_qs(urlparse(canonical.get('href', '')).query).get('user') != [scholar_id]:
-        raise ValueError('Response is not the requested Google Scholar profile')
+        title = soup.title.get_text(strip=True)[:120] if soup.title else 'untitled'
+        raise ValueError(f'Response is not the requested Google Scholar profile (page: {title})')
     name = soup.select_one('#gsc_prf_in')
     if not name or not name.get_text(strip=True):
         raise ValueError('Google Scholar profile has no author name')

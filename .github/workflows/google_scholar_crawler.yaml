@@ -49,15 +49,23 @@ jobs:
       runner: windows-latest
     secrets: inherit
 
+  retry:
+    needs: [primary, fallback]
+    if: always() && !cancelled() && needs.primary.result == 'success' && needs.primary.outputs.available != 'true' && needs.fallback.outputs.available != 'true'
+    uses: ./.github/workflows/scholar_fetch.yaml
+    with:
+      runner: ubuntu-24.04-arm
+    secrets: inherit
+
   publish:
-    needs: [checks, primary, fallback]
+    needs: [checks, primary, fallback, retry]
     if: always() && !cancelled() && needs.checks.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Require a verified snapshot from this run
         env:
-          AVAILABLE: ${{ needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true' }}
+          AVAILABLE: ${{ needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true' || needs.retry.outputs.available == 'true' }}
         run: test "$AVAILABLE" = "true"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

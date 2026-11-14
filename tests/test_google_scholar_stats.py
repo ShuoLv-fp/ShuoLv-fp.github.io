@@ -21,6 +21,7 @@ class GoogleScholarStatsTests(unittest.TestCase):
         self.assertIn('runner: ubuntu-24.04-arm', workflow)
         self.assertIn("needs.primary.outputs.available != 'true'", workflow)
         self.assertIn("needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true'", workflow)
+        self.assertIn("needs.retry.outputs.available == 'true'", workflow)
         self.assertIn('test "$AVAILABLE" = "true"', workflow)
         self.assertIn('actions/download-artifact@v4', workflow)
         self.assertNotIn('continue-on-error:', workflow)
