@@ -16,9 +16,10 @@ class GoogleScholarStatsTests(unittest.TestCase):
 
         self.assertIn("workflow_dispatch:", workflow)
         self.assertIn('cron: "17 1 * * 1"', workflow)
+        self.assertIn('cron: "17 7,13 * * 1"', workflow)
         fetch_workflow = Path(".github/workflows/scholar_fetch.yaml").read_text()
         self.assertIn('SCHOLAR_FETCH_MODE: direct', fetch_workflow)
-        self.assertIn('secrets.SERPAPI_API_KEY', fetch_workflow)
+        self.assertNotIn('SERPAPI_API_KEY', fetch_workflow)
         self.assertIn('runner: ubuntu-24.04-arm', workflow)
         self.assertIn("needs.primary.outputs.available != 'true'", workflow)
         self.assertIn("needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true'", workflow)
@@ -33,9 +34,11 @@ class GoogleScholarStatsTests(unittest.TestCase):
         self.assertIn("timeout-minutes: 10", workflow)
         self.assertIn("actions/checkout@v4", workflow)
         self.assertIn("actions/setup-python@v5", workflow)
-        self.assertIn('if python main.py; then', fetch_workflow)
+        self.assertIn('75)', fetch_workflow)
+        self.assertIn('if: steps.snapshot.outputs.available', workflow)
         self.assertIn("steps.fetch.outputs.available == 'true'", fetch_workflow)
         self.assertIn('if-no-files-found: error', fetch_workflow)
+        self.assertIn('*) exit "$status"', fetch_workflow)
 
     def test_crawler_uses_current_scholarly_release(self):
         requirements = Path(
@@ -71,6 +74,32 @@ class GoogleScholarStatsTests(unittest.TestCase):
 
 
 class CrawlerOutputTests(unittest.TestCase):
+    def test_temporary_block_preserves_files_and_returns_deferred_status(self):
+        class ScholarUnavailable(RuntimeError):
+            pass
+
+        client = types.ModuleType('cloud_fetch')
+        client.ScholarUnavailable = ScholarUnavailable
+        client.fetch_author = Mock(side_effect=ScholarUnavailable('HTTP 403'))
+        script = Path('google_scholar_crawler/main.py').resolve()
+        original = Path.cwd()
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'results'
+            output.mkdir()
+            snapshot = output / 'gs_data.json'
+            original_data = '{"citedby": 32, "hindex": 2, "updated": "2026-11-01T00:00:00Z"}'
+            snapshot.write_text(original_data)
+            try:
+                os.chdir(directory)
+                with patch.dict('sys.modules', {'cloud_fetch': client}), patch.dict(
+                    os.environ, {'SCHOLAR_FETCH_MODE': 'direct'}
+                ):
+                    namespace = runpy.run_path(str(script))
+                    self.assertEqual(namespace['main'](), 75)
+                self.assertEqual(snapshot.read_text(), original_data)
+            finally:
+                os.chdir(original)
+
     def run_crawler(self, author, directory):
         client = Mock()
         client.search_author_id.return_value = author

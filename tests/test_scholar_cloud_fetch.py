@@ -1,11 +1,7 @@
 import importlib.util
-import copy
-import io
-import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
-from urllib.error import URLError
 
 
 SCRIPT = Path('google_scholar_crawler/cloud_fetch.py')
@@ -59,47 +55,36 @@ class CloudFetchTests(unittest.TestCase):
 
     def test_all_failed_transports_raise_instead_of_publishing_old_data(self):
         module = self.load_module()
+        self.assertTrue(hasattr(module, 'ScholarUnavailable'))
         with patch.object(module, 'fetch_curl', side_effect=RuntimeError('HTTP 403')), patch.object(module, 'fetch_browser', side_effect=RuntimeError('HTTP 403')), patch.object(module.time, 'sleep'):
-            with self.assertRaises(RuntimeError):
+            with self.assertRaises(module.ScholarUnavailable):
                 module.fetch_author('VAsm0T8AAAAJ')
 
-    def provider_data(self):
-        return {
-            'search_metadata': {'status': 'Success'},
-            'search_parameters': {'engine': 'google_scholar_author', 'author_id': 'VAsm0T8AAAAJ'},
-            'author': {'name': 'Shuo Lv'},
-            'cited_by': {'table': [{'citations': {'all': 32}}, {'h_index': {'all': 2}}]},
-            'articles': [{'title': 'Paper', 'citation_id': 'VAsm0T8AAAAJ:paper',
-                          'cited_by': {'value': 25}, 'year': '2024'}],
-        }
-
-    def test_configured_provider_supplies_verified_google_metrics(self):
+    def test_only_free_direct_access_even_if_provider_key_is_present(self):
         module = self.load_module()
-        self.assertTrue(hasattr(module, 'fetch_provider'))
         with patch.dict('os.environ', {'SERPAPI_API_KEY': 'test-secret'}), patch.object(
-            module, 'urlopen', return_value=io.BytesIO(json.dumps(self.provider_data()).encode())
-        ) as request, patch.object(module, 'fetch_curl') as direct:
+            module, 'fetch_provider', create=True
+        ) as provider, patch.object(module, 'fetch_curl', return_value=PROFILE) as direct:
             data = module.fetch_author('VAsm0T8AAAAJ')
+        provider.assert_not_called()
+        direct.assert_called_once()
         self.assertEqual((data['citedby'], data['hindex']), (32, 2))
-        self.assertEqual(data['source'], 'google-scholar-via-serpapi')
-        direct.assert_not_called()
-        self.assertIn('no_cache=true', request.call_args.args[0].full_url)
+        self.assertEqual(data['source'], 'google-scholar-profile')
 
-    def test_provider_rejects_wrong_author_missing_metrics_or_failed_search(self):
+    def test_programming_errors_are_not_treated_as_temporary_blocks(self):
         module = self.load_module()
-        self.assertTrue(hasattr(module, 'parse_provider'))
-        for field, value in (('search_parameters', {'author_id': 'wrong'}),
-                             ('cited_by', {'table': []}),
-                             ('search_metadata', {'status': 'Error'})):
-            data = copy.deepcopy(self.provider_data())
-            data[field] = value
-            with self.subTest(field=field), self.assertRaises(ValueError):
-                module.parse_provider(data, 'VAsm0T8AAAAJ')
+        with patch.object(module, 'fetch_curl', side_effect=TypeError('bug')), patch.object(module, 'fetch_browser', return_value=PROFILE):
+            with self.assertRaises(TypeError):
+                module.fetch_author('VAsm0T8AAAAJ')
 
-    def test_provider_network_errors_never_expose_api_key(self):
+    def test_blocked_transports_are_not_retried_on_the_same_network(self):
         module = self.load_module()
-        self.assertTrue(hasattr(module, 'fetch_provider'))
-        with patch.object(module, 'urlopen', side_effect=URLError('https://example.invalid/?api_key=test-secret')):
-            with self.assertRaises(RuntimeError) as error:
-                module.fetch_provider('VAsm0T8AAAAJ', 'test-secret')
-        self.assertNotIn('test-secret', str(error.exception))
+        self.assertTrue(hasattr(module, 'ScholarBlocked'))
+        with patch.object(module, 'fetch_curl', side_effect=module.ScholarBlocked('HTTP 403')) as direct, patch.object(
+            module, 'fetch_browser', side_effect=module.ScholarBlocked('HTTP 429')
+        ) as browser, patch.object(module.time, 'sleep') as sleep:
+            with self.assertRaises(module.ScholarUnavailable):
+                module.fetch_author('VAsm0T8AAAAJ')
+        direct.assert_called_once()
+        browser.assert_called_once()
+        sleep.assert_not_called()

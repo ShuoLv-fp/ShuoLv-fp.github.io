@@ -38,15 +38,18 @@ jobs:
         timeout-minutes: 5
         env:
           SCHOLAR_FETCH_MODE: direct
-          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
           GOOGLE_SCHOLAR_ID: ${{ secrets.GOOGLE_SCHOLAR_ID || 'VAsm0T8AAAAJ' }}
         run: |
-          if python main.py; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "available=false" >> "$GITHUB_OUTPUT"
-            echo "This runner could not obtain a valid profile; the parent workflow must use another runner or fail." >> "$GITHUB_STEP_SUMMARY"
-          fi
+          status=0
+          python main.py || status=$?
+          case "$status" in
+            0) echo "available=true" >> "$GITHUB_OUTPUT" ;;
+            75)
+              echo "available=false" >> "$GITHUB_OUTPUT"
+              echo "Google Scholar is unavailable on this runner. No new data was produced; another runner or a scheduled recovery may retry." >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            *) exit "$status" ;;
+          esac
       - name: Upload verified snapshot
         if: steps.fetch.outputs.available == 'true'
         uses: actions/upload-artifact@v4

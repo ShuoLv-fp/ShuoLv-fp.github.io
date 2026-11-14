@@ -1,18 +1,22 @@
 """Fetch and validate a public Scholar profile with bounded HTTP requests."""
 
 import logging
-import json
-import os
 import re
 import subprocess
 import tempfile
 import time
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
-from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup
+
+
+class ScholarUnavailable(RuntimeError):
+    """No validated snapshot is available from the current network."""
+
+
+class ScholarBlocked(RuntimeError):
+    """Google explicitly refused this transport; retry on a later network."""
 
 
 def count(value):
@@ -79,6 +83,8 @@ def fetch_curl(url):
              '--max-time', '25', '--output', str(path), '--write-out', '%{http_code}', url],
             capture_output=True, text=True, timeout=30,
         )
+        if result.stdout.strip() in ('403', '429'):
+            raise ScholarBlocked(f'curl HTTP {result.stdout.strip()}')
         if result.returncode != 0 or result.stdout.strip() != '200':
             raise RuntimeError(f'curl HTTP {result.stdout.strip() or "unavailable"}, exit {result.returncode}')
         return path.read_bytes()
@@ -86,88 +92,39 @@ def fetch_curl(url):
 
 def fetch_browser(url):
     from curl_cffi import requests
-    response = requests.get(url, impersonate='chrome', timeout=25,
-                            headers={'Accept-Language': 'en-US,en;q=0.9'})
+    from curl_cffi.requests.exceptions import RequestException
+    try:
+        response = requests.get(url, impersonate='chrome', timeout=25,
+                                headers={'Accept-Language': 'en-US,en;q=0.9'})
+    except RequestException as error:
+        raise RuntimeError(f'browser transport failed: {type(error).__name__}') from None
+    if response.status_code in (403, 429):
+        raise ScholarBlocked(f'browser transport HTTP {response.status_code}')
     if response.status_code != 200:
         raise RuntimeError(f'browser transport HTTP {response.status_code}')
     return response.content
 
 
-def parse_provider(data, scholar_id):
-    parameters = data.get('search_parameters', {})
-    if (data.get('search_metadata', {}).get('status') != 'Success' or
-            parameters.get('engine') != 'google_scholar_author' or
-            parameters.get('author_id') != scholar_id):
-        raise ValueError('Provider did not return the requested Google Scholar search')
-    name = data.get('author', {}).get('name')
-    if not isinstance(name, str) or not name.strip():
-        raise ValueError('Provider response has no author name')
-    author = {'scholar_id': scholar_id, 'name': name,
-              'source': 'google-scholar-via-serpapi', 'publications': {}}
-    fields = {'citations': 'citedby', 'h_index': 'hindex', 'i10_index': 'i10index'}
-    for row in data.get('cited_by', {}).get('table', []):
-        for label, field in fields.items():
-            if label in row:
-                value = row[label].get('all')
-                if type(value) is not int or value < 0:
-                    raise ValueError('Provider returned an invalid Scholar metric')
-                author[field] = value
-    if 'citedby' not in author or 'hindex' not in author:
-        raise ValueError('Provider citation total or h-index is missing')
-    for article in data.get('articles', []):
-        paper_id = article.get('citation_id', '')
-        value = article.get('cited_by', {}).get('value', 0)
-        if not paper_id.startswith(scholar_id + ':') or type(value) is not int or value < 0:
-            raise ValueError('Provider publication ID or count is invalid')
-        author['publications'][paper_id] = {
-            'author_pub_id': paper_id, 'num_citations': value,
-            'bib': {'title': article.get('title', ''), 'pub_year': article.get('year', '')},
-        }
-    author['publications_complete'] = not bool(data.get('serpapi_pagination', {}).get('next'))
-    return author
-
-
-def fetch_provider(scholar_id, api_key):
-    query = urlencode({'engine': 'google_scholar_author', 'author_id': scholar_id,
-                       'hl': 'en', 'no_cache': 'true', 'api_key': api_key})
-    request = Request('https://serpapi.com/search.json?' + query,
-                      headers={'Accept': 'application/json'})
-    try:
-        with urlopen(request, timeout=45) as response:
-            data = json.load(response)
-    except HTTPError as error:
-        raise RuntimeError(f'SerpAPI returned HTTP {error.code}') from None
-    except (URLError, OSError, ValueError):
-        # Request URLs contain the key; never include them in logs or tracebacks.
-        raise RuntimeError('SerpAPI request failed or returned invalid JSON') from None
-    try:
-        return parse_provider(data, scholar_id)
-    except (AttributeError, TypeError, KeyError, ValueError):
-        raise RuntimeError('SerpAPI did not return valid Google Scholar metrics') from None
-
-
 def fetch_author(scholar_id):
-    api_key = os.environ.get('SERPAPI_API_KEY', '').strip()
-    if api_key:
-        try:
-            return fetch_provider(scholar_id, api_key)
-        except RuntimeError as error:
-            logging.info('%s; trying direct Scholar access', error)
     url = 'https://scholar.google.com/citations?' + urlencode({'user': scholar_id, 'hl': 'en'})
     failures = []
+    blocked = set()
+    transports = (fetch_curl, fetch_browser)
     for attempt in range(3):
+        if len(blocked) == len(transports):
+            break
         if attempt:
             time.sleep(5 * attempt)
-        for transport in (fetch_curl, fetch_browser):
+        for transport in transports:
+            if transport in blocked:
+                continue
             try:
                 author = parse_profile(transport(url), scholar_id)
                 logging.info('Validated Google Scholar profile: citations=%s h-index=%s', author['citedby'], author['hindex'])
                 return author
             except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as error:
+                if isinstance(error, ScholarBlocked):
+                    blocked.add(transport)
                 failures.append(str(error))
                 logging.info('Scholar request attempt %s did not return a valid profile: %s', attempt + 1, error)
-            except Exception as error:
-                # curl_cffi transport exceptions are optional until this path is used.
-                failures.append(type(error).__name__)
-                logging.info('Scholar transport attempt %s failed: %s', attempt + 1, type(error).__name__)
-    raise RuntimeError('No valid Google Scholar profile after bounded retries: ' + '; '.join(failures))
+    raise ScholarUnavailable('No valid Google Scholar profile after bounded attempts: ' + '; '.join(failures))

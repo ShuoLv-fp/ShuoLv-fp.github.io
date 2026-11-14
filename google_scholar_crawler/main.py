@@ -11,8 +11,12 @@ def main():
     scholar_id = os.environ.get('GOOGLE_SCHOLAR_ID', 'VAsm0T8AAAAJ')
     logging.info('Fetching Google Scholar profile %s', scholar_id)
     if os.environ.get('SCHOLAR_FETCH_MODE') == 'direct':
-        from cloud_fetch import fetch_author
-        author = fetch_author(scholar_id)
+        from cloud_fetch import fetch_author, ScholarUnavailable
+        try:
+            author = fetch_author(scholar_id)
+        except ScholarUnavailable as error:
+            logging.info('Update deferred; published data is unchanged. %s', error)
+            return 75
     else:
         from scholarly import scholarly
         scholarly.set_timeout(20)
@@ -51,4 +55,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    status = main()
+    if status:
+        raise SystemExit(status)

@@ -5,6 +5,8 @@ on:
   schedule:
     # Mondays at 09:17 Asia/Shanghai.
     - cron: "17 1 * * 1"
+    # Recovery only: skip if this week's refresh already succeeded.
+    - cron: "17 7,13 * * 1"
 
 permissions:
   contents: write
@@ -17,6 +19,8 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      due: ${{ steps.freshness.outputs.due }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -32,10 +36,20 @@ jobs:
           python -m unittest discover -s tests -p 'test_google_scholar_stats.py' -v
           python -m unittest discover -s tests -p 'test_scholar_cloud_fetch.py' -v
           python -m unittest discover -s tests -p 'test_scholar_local_publish.py' -v
+          python -m unittest discover -s tests -p 'test_scholar_weekly_refresh.py' -v
           node --test tests/js/google-scholar-stats.test.js
+      - name: Read last published snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: google-scholar-stats
+          path: published-stats
+      - name: Check weekly freshness
+        id: freshness
+        run: python google_scholar_crawler/weekly_refresh.py published-stats/gs_data.json >> "$GITHUB_OUTPUT"
 
   primary:
     needs: checks
+    if: needs.checks.outputs.due == 'true'
     uses: ./.github/workflows/scholar_fetch.yaml
     with:
       runner: ubuntu-24.04-arm
@@ -59,34 +73,45 @@ jobs:
 
   publish:
     needs: [checks, primary, fallback, retry]
-    if: always() && !cancelled() && needs.checks.result == 'success'
+    if: always() && !cancelled() && needs.checks.result == 'success' && needs.checks.outputs.due == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Require a verified snapshot from this run
+      - name: Determine snapshot outcome
+        id: snapshot
         env:
           AVAILABLE: ${{ needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true' || needs.retry.outputs.available == 'true' }}
+          JOB_FAILED: ${{ needs.primary.result == 'failure' || needs.fallback.result == 'failure' || needs.retry.result == 'failure' }}
         run: |
-          if ! test "$AVAILABLE" = "true"; then
-            echo "No fresh Google Scholar snapshot was obtained. Existing published data is unchanged."
-            echo "All hosted attempts were blocked or invalid. Configure SERPAPI_API_KEY in repository Secrets for provider-backed fetching." >> "$GITHUB_STEP_SUMMARY"
+          if test "$JOB_FAILED" = "true"; then
+            echo "A collector encountered a setup or program error; inspect its logs."
             exit 1
           fi
+          echo "available=$AVAILABLE" >> "$GITHUB_OUTPUT"
+          if ! test "$AVAILABLE" = "true"; then
+            echo "### Deferred: no fresh Google Scholar snapshot" >> "$GITHUB_STEP_SUMMARY"
+            echo "Google refused the free direct requests or returned an invalid profile. This run did not fetch or publish new metrics; the previous data and its timestamp are unchanged. Monday recovery attempts run at 15:17 and 21:17 Asia/Shanghai and skip after a successful weekly update." >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/checkout@v4
+        if: steps.snapshot.outputs.available == 'true'
       - uses: actions/setup-python@v5
+        if: steps.snapshot.outputs.available == 'true'
         with:
           python-version: "3.11"
       - uses: actions/download-artifact@v4
+        if: steps.snapshot.outputs.available == 'true'
         with:
           pattern: scholar-data-*
           path: google_scholar_crawler/results
           merge-multiple: true
       - name: Check out statistics branch
+        if: steps.snapshot.outputs.available == 'true'
         uses: actions/checkout@v4
         with:
           ref: google-scholar-stats
           path: stats-output
       - name: Publish statistics
+        if: steps.snapshot.outputs.available == 'true'
         working-directory: stats-output
         run: |
           cp ../google_scholar_crawler/results/gs_data.json .
@@ -97,6 +122,7 @@ jobs:
           git commit -m "Update Google Scholar statistics"
           git push origin HEAD:google-scholar-stats
       - name: Refresh CDN and summarize verified metrics
+        if: steps.snapshot.outputs.available == 'true'
         working-directory: google_scholar_crawler
         run: |
           python - <<'PY'

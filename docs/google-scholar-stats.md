@@ -3,22 +3,22 @@
 GitHub Actions fetches public author profile VAsm0T8AAAAJ every Monday
 at 09:17 Asia/Shanghai (01:17 UTC), with manual dispatch also available.
 The computer and Codex do not need to remain running. This is a weekly snapshot.
-Direct access from shared hosted IPs remains intermittent: some runs succeeded,
-but later ARM and Windows runners were all blocked. A direct-only configuration
-is best effort, not a verified reliability fix.
+Only free direct requests to Google Scholar are used; no paid service, proxy,
+or provider credential is required. Direct access from shared hosted IPs remains
+intermittent: some runs succeeded, but later ARM and Windows runners were blocked.
+Even the Scholar homepage returned 403/429 in a same-run session/navigation probe.
+This configuration cannot guarantee that Google will accept each week's request.
 
-For a provider-backed configuration, add a repository Actions secret named
-SERPAPI_API_KEY. The crawler then prefers SerpAPI's google_scholar_author endpoint
-with no_cache=true and validates the returned author ID and all-time metrics.
-This optional path is tested with the documented response schema, but needs a
-real credential and successful live run before it can be considered accepted.
-See https://serpapi.com/google-scholar-author-api for service and account details.
+Recovery attempts run on Monday at 15:17 and 21:17 Asia/Shanghai. Before fetching,
+scheduled runs check the published snapshot and skip if it was successfully
+updated in the current Shanghai calendar week. Manual dispatch always fetches.
 
 ## Data flow
 
 1. The cloud crawler reads the public profile using bounded curl requests and a
-   browser-compatible curl_cffi fallback. Each transport gets at most three
-   attempts. Total citations and h-index come from the profile's metrics table.
+   browser-compatible curl_cffi fallback. Transient errors get at most three
+   attempts. A transport receiving HTTP 403/429 is not retried on the same runner.
+   Total citations and h-index come from the profile's metrics table.
    An ARM Linux hosted runner is primary; Windows is used only if it cannot obtain
    a verified profile. A final ARM retry allocates a fresh hosted runner when both
    earlier attempts are blocked. Both hosted networks passed live fetching on November 14.
@@ -29,8 +29,11 @@ See https://serpapi.com/google-scholar-author-api for service and account detail
 3. The workflow publishes only the two JSON files to google-scholar-stats using
    a normal push. A runner's access refusal triggers the fallback, and the final
    publish gate requires a verified snapshot artifact from this workflow run.
-   If all three runners fail, the overall workflow fails and published data stays
-   unchanged. No old snapshot is stamped as fresh. Publishing requests a CDN purge.
+   If all three networks are blocked or return invalid profiles, the run completes
+   with an explicit **Deferred: no fresh Google Scholar snapshot** summary and
+   skips publishing. This is not a successful fetch. Published data and its
+   timestamp stay unchanged. Dependency, program, and publishing failures still
+   fail the workflow. No old snapshot is stamped as fresh. Publishing requests a CDN purge.
    A cache-purge failure is reported without reverting the successful publication.
 4. Both homepages read GitHub Raw and, when enabled in site configuration,
    jsDelivr. They display the valid response with the newest update timestamp,
@@ -46,7 +49,9 @@ the latest available snapshot. Page builds do not trigger extra crawls.
 
 - For an immediate cloud update, select Actions > **Get Citation Data** >
   **Run workflow** on main. Check the fetch, publish, and summary steps. A green
-  run must advance the internal timestamp in gs_data.json on google-scholar-stats.
+  fetch must advance the internal timestamp in gs_data.json on google-scholar-stats.
+  A green workflow can also mean a deferred update or a skipped recovery; inspect
+  its summary and the snapshot timestamp to distinguish these outcomes.
 - The previous local Codex automation is paused to avoid duplicate weekly runs.
   The update_stats.py utility remains for manual recovery:
 
@@ -59,10 +64,9 @@ the latest available snapshot. Page builds do not trigger extra crawls.
   still reject traffic; a failed run keeps the old snapshot. Inspect the internal
   JSON timestamp and workflow log, then retry once after a transient failure.
   Do not substitute another database's counts for Google Scholar's metrics.
-- Cloud publishing uses the existing GITHUB_TOKEN. Direct fetching needs no API
-  credential; the optional provider uses only SERPAPI_API_KEY from Actions Secrets.
-  API URLs containing the credential are never printed. Google and the provider remain external dependencies;
-  failed validation cannot be converted to a successful run with stale values.
+- Cloud publishing uses the existing GITHUB_TOKEN. Fetching needs no API
+  credential. Google remains an external dependency; deferred attempts do not
+  update the snapshot or claim a successful fetch.
 
 ## Dependency incident
 
@@ -87,9 +91,12 @@ Install crawler dependencies in an isolated environment, then run from the repo:
     python -m unittest discover -s tests -p 'test_google_scholar_stats.py' -v
     python -m unittest discover -s tests -p 'test_scholar_cloud_fetch.py' -v
     python -m unittest discover -s tests -p 'test_scholar_local_publish.py' -v
+    python -m unittest discover -s tests -p 'test_scholar_weekly_refresh.py' -v
     node --test tests/js/google-scholar-stats.test.js
 
 Tests cover invalid metrics preserving prior files, UTC timestamps, weekly
 cloud execution, stale CDN responses arriving in either order, failed sources,
 malformed data, legitimate zero counts, hidden dates in both languages, and publishing
 to an isolated Git remote without changing main or overwriting newer snapshots.
+They also cover deferred exit status, preserving timestamps on access refusal,
+not swallowing programming errors, and Shanghai calendar-week recovery gating.

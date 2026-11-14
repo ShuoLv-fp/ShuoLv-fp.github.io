@@ -16,7 +16,7 @@ Academic personal homepage of Shuo Lv (吕烁), a Master's student at Beijing In
 
 ## Maintenance Notes
 
-- Google Scholar statistics refresh in GitHub Actions on Mondays at 09:17 Asia/Shanghai. See the [statistics operations guide](docs/google-scholar-stats.md) for manual refresh and recovery.
+- Google Scholar statistics use free direct fetching in GitHub Actions on Mondays at 09:17 Asia/Shanghai, with recovery attempts at 15:17 and 21:17 only if that week's update has not succeeded. See the [statistics operations guide](docs/google-scholar-stats.md) for manual refresh and deferred-update status.
 - Keep the English (`includes/`) and Chinese (`includes/zh/`) sections in sync when updating content.
 - Paper titles, author lists, and journal names stay in English in both languages; only narrative text is translated.
 - Paper-feed credentials belong only in GitHub Actions Secrets. Follow the [paper-feed operations guide](docs/paper-feed-operations.md) for preview, publishing, credential rotation, and recovery.
