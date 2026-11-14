@@ -1,12 +1,16 @@
 from scholarly import scholarly
 import json
+import logging
 from datetime import datetime, timezone
 import os
 from pathlib import Path
 
 
 def main():
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+    logging.getLogger('httpx').setLevel(logging.WARNING)
     scholar_id = os.environ.get('GOOGLE_SCHOLAR_ID', 'VAsm0T8AAAAJ')
+    logging.info('Fetching Google Scholar profile %s', scholar_id)
     scholarly.set_timeout(20)
     scholarly.set_retries(3)
     author = scholarly.search_author_id(scholar_id)
