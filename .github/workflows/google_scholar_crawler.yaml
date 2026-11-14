@@ -1,8 +1,10 @@
 name: Get Citation Data
 
 on:
-  # Weekly updates run locally through Codex; hosted runner IPs receive HTTP 403.
   workflow_dispatch:
+  schedule:
+    # Mondays at 09:17 Asia/Shanghai.
+    - cron: "17 1 * * 1"
 
 permissions:
   contents: write
@@ -12,7 +14,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  checks:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -26,25 +28,70 @@ jobs:
         run: pip install --requirement google_scholar_crawler/requirements.txt
       - name: Check crawler dependencies and regressions
         run: |
-          python -c "from scholarly import scholarly; from bibtexparser.bibdatabase import BibDatabase"
+          python -c "from bs4 import BeautifulSoup; from curl_cffi import requests"
           python -m unittest discover -s tests -p 'test_google_scholar_stats.py' -v
+          python -m unittest discover -s tests -p 'test_scholar_cloud_fetch.py' -v
+          python -m unittest discover -s tests -p 'test_scholar_local_publish.py' -v
           node --test tests/js/google-scholar-stats.test.js
-      - name: Fetch Google Scholar statistics
-        working-directory: google_scholar_crawler
-        run: python main.py
-        timeout-minutes: 5
+
+  primary:
+    needs: checks
+    uses: ./.github/workflows/scholar_fetch.yaml
+    with:
+      runner: ubuntu-24.04-arm
+    secrets: inherit
+
+  fallback:
+    needs: primary
+    if: needs.primary.outputs.available != 'true'
+    uses: ./.github/workflows/scholar_fetch.yaml
+    with:
+      runner: windows-latest
+    secrets: inherit
+
+  publish:
+    needs: [checks, primary, fallback]
+    if: always() && !cancelled() && needs.checks.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Require a verified snapshot from this run
         env:
-          GOOGLE_SCHOLAR_ID: ${{ secrets.GOOGLE_SCHOLAR_ID || 'VAsm0T8AAAAJ' }}
+          AVAILABLE: ${{ needs.primary.outputs.available == 'true' || needs.fallback.outputs.available == 'true' }}
+        run: test "$AVAILABLE" = "true"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: scholar-data-*
+          path: google_scholar_crawler/results
+          merge-multiple: true
+      - name: Check out statistics branch
+        uses: actions/checkout@v4
+        with:
+          ref: google-scholar-stats
+          path: stats-output
       - name: Publish statistics
-        working-directory: google_scholar_crawler/results
+        working-directory: stats-output
         run: |
-          git init
-          git checkout -b google-scholar-stats
+          cp ../google_scholar_crawler/results/gs_data.json .
+          cp ../google_scholar_crawler/results/gs_data_shieldsio.json .
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add *.json
-          git commit -m "Updated Citation Data"
-          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin google-scholar-stats
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git add gs_data.json gs_data_shieldsio.json
+          git commit -m "Update Google Scholar statistics"
+          git push origin HEAD:google-scholar-stats
+      - name: Refresh CDN and summarize verified metrics
+        working-directory: google_scholar_crawler
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from update_stats import refresh_cdn
+          refresh_cdn()
+          data = json.loads(Path('results/gs_data.json').read_text())
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write(f"Google Scholar: **{data['citedby']} citations**, **h-index {data['hindex']}**.\n\nFetched: {data['updated']}\n")
+          PY

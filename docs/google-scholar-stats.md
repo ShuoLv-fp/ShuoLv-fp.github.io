@@ -1,40 +1,43 @@
 # Google Scholar statistics
 
-A Codex local automation fetches public author profile VAsm0T8AAAAJ every Monday
-at 09:17 Asia/Shanghai. The computer must be online and Codex available to run the
-automation. This is a weekly snapshot. The GitHub Actions workflow is retained
-for manual diagnostics only: two hosted-runner attempts on November 14, 2026
-received HTTP 403 from Google Scholar, while local fetches succeeded.
+GitHub Actions fetches public author profile VAsm0T8AAAAJ every Monday
+at 09:17 Asia/Shanghai (01:17 UTC), with manual dispatch also available.
+The computer and Codex do not need to remain running. This is a weekly snapshot.
 
 ## Data flow
 
-1. The Python crawler reads citation totals, h-index, and publication citations
-   using scholarly.
-2. It validates the author ID and metrics before writing JSON. A successful
-   snapshot gets a timezone-aware UTC update timestamp.
-3. The local update_stats.py wrapper runs the crawler with a three-minute limit,
-   then publishes only the two JSON files in a temporary clone of the
-   google-scholar-stats branch. It skips equal or older snapshots and uses a
-   normal push so concurrent updates are never force-overwritten. A failed crawl
-   leaves previously published data unchanged. The main checkout is not changed.
-   After publishing, the wrapper requests a jsDelivr cache purge for both files.
+1. The cloud crawler reads the public profile using bounded curl requests and a
+   browser-compatible curl_cffi fallback. Each transport gets at most three
+   attempts. Total citations and h-index come from the profile's metrics table.
+   An ARM Linux hosted runner is primary; Windows is used only if it cannot obtain
+   a verified profile. Both hosted networks passed live fetching on November 14.
+2. It validates the canonical author ID, name, metrics, and publication IDs before
+   writing JSON. An HTTP 200 block page is rejected. A successful snapshot gets
+   an internal UTC timestamp. The publication list records whether it is complete;
+   profile-wide metrics are independent of publication pagination.
+3. The workflow publishes only the two JSON files to google-scholar-stats using
+   a normal push. A runner's access refusal triggers the fallback, and the final
+   publish gate requires a verified snapshot artifact from this workflow run.
+   If both networks fail, the overall workflow fails and published data stays
+   unchanged. No old snapshot is stamped as fresh. Publishing requests a CDN purge.
    A cache-purge failure is reported without reverting the successful publication.
 4. Both homepages read GitHub Raw and, when enabled in site configuration,
    jsDelivr. They display the valid response with the newest update timestamp,
    regardless of response order. Browser cache is bypassed; upstream CDN caches
    can still lag.
-5. The visible update date uses Asia/Shanghai. Snapshots over 10 days old are
-   marked outdated, and a failed page load shows a temporary-unavailability message.
+5. The website displays citation metrics without an update date. Internal
+   timestamps remain available in the JSON and workflow summary for verification.
 
 The data branch update does not require rebuilding Jekyll. A page refresh loads
 the latest available snapshot. Page builds do not trigger extra crawls.
 
 ## Operations
 
-- The Codex automation **每周更新 Google Scholar 引用数据** runs the local wrapper
-  using the isolated environment at google_scholar_crawler/.venv. Publishing uses
-  the existing Git credential helper; no credential is written to source files.
-- For an immediate update, run from the repository root:
+- For an immediate cloud update, select Actions > **Get Citation Data** >
+  **Run workflow** on main. Check the fetch, publish, and summary steps. A green
+  run must advance the internal timestamp in gs_data.json on google-scholar-stats.
+- The previous local Codex automation is paused after cloud acceptance to avoid
+  duplicate weekly runs. The update_stats.py utility remains for manual recovery:
 
       google_scholar_crawler/.venv/bin/python google_scholar_crawler/update_stats.py --publish
 
@@ -42,15 +45,12 @@ the latest available snapshot. Page builds do not trigger extra crawls.
   A successful update must produce a newer timestamp in gs_data.json on the
   google-scholar-stats branch. The automation checks that value after publishing.
 - The local publisher is restricted to author VAsm0T8AAAAJ. Google Scholar can
-  still reject traffic; a failed run keeps the old snapshot and the page flags
-  its age after 10 days. Inspect the log and retry once after a transient failure.
+  still reject traffic; a failed run keeps the old snapshot. Inspect the internal
+  JSON timestamp and workflow log, then retry once after a transient failure.
   Do not substitute another database's counts for Google Scholar's metrics.
-- For optional cloud diagnostics, repository Actions still offers **Get Citation
-  Data** with manual dispatch. It has no scheduled trigger, because this runner
-  was blocked. Its publish token and permissions remain unchanged.
-- An always-on update independent of this computer would require an accessible
-  self-hosted runner or a configured Scholar data provider. Neither is required
-  or provisioned for the current local schedule.
+- Cloud publishing uses the existing GITHUB_TOKEN. No paid API, proxy credential,
+  or local runner is required. Google's service remains an external dependency;
+  failed validation cannot be converted to a successful run with stale values.
 
 ## Dependency incident
 
@@ -60,9 +60,11 @@ the September 8 snapshot visible. scholarly 1.7.11 requires the bibtexparser v1
 interface, so bibtexparser 1.4.4 is pinned explicitly. Keep the import smoke check
 when upgrading either dependency.
 
-After fixing that dependency, hosted runs on November 14 logged repeated Google
-Scholar HTTP 403 responses and timed out. The local environment fetched 32
-citations and h-index 2 successfully, so weekly execution moved to this computer.
+After fixing that dependency, the scholarly cloud path repeatedly received HTTP
+403 and stalled in session-recreation loops. Linux and macOS both reproduced the
+block. A later Linux curl request returned a genuine profile with 32 citations and
+h-index 2. Production now uses direct requests, bounded fallback, and explicit
+validation. The previous local fallback is superseded by the cloud schedule.
 
 ## Local verification
 
@@ -71,10 +73,11 @@ Install crawler dependencies in an isolated environment, then run from the repo:
     python -m pip install -r google_scholar_crawler/requirements.txt
     python -c "from scholarly import scholarly; from bibtexparser.bibdatabase import BibDatabase"
     python -m unittest discover -s tests -p 'test_google_scholar_stats.py' -v
+    python -m unittest discover -s tests -p 'test_scholar_cloud_fetch.py' -v
     python -m unittest discover -s tests -p 'test_scholar_local_publish.py' -v
     node --test tests/js/google-scholar-stats.test.js
 
-Tests cover invalid metrics preserving prior files, UTC timestamps, manual-only
+Tests cover invalid metrics preserving prior files, UTC timestamps, weekly
 cloud execution, stale CDN responses arriving in either order, failed sources,
-malformed data, legitimate zero counts, both language variants, and publishing
+malformed data, legitimate zero counts, hidden dates in both languages, and publishing
 to an isolated Git remote without changing main or overwriting newer snapshots.

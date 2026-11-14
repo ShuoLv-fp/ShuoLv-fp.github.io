@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 
 function page(language = "en") {
-  const elements = Object.fromEntries(["total_cit", "h_index", "scholar_updated"]
+  const elements = Object.fromEntries(["total_cit", "h_index"]
     .map(id => [id, { textContent: "--", title: "" }]));
   const requests = [];
   const document = {
@@ -42,7 +42,7 @@ test("both sources are checked and older CDN data never replaces newer raw data"
   cdn.success(old);
   assert.equal(elements.total_cit.textContent, "42");
   assert.equal(elements.h_index.textContent, "3");
-  assert.match(elements.scholar_updated.textContent, /2026-11-14/);
+  assert.equal(elements.scholar_updated, undefined);
 });
 
 test("newer raw data replaces an already rendered cached response", () => {
@@ -53,13 +53,13 @@ test("newer raw data replaces an already rendered cached response", () => {
   assert.equal(elements.total_cit.textContent, "42");
 });
 
-test("a failed source leaves the valid response visible with its actual date", () => {
+test("a failed source leaves the valid metrics visible without an update date", () => {
   const { requests, elements } = page("zh");
   assert.equal(requests.length, 2);
   requests[1].success(old);
   requests[0].error();
   assert.equal(elements.total_cit.textContent, "28");
-  assert.match(elements.scholar_updated.textContent, /2026-09-08.*过期/);
+  assert.equal(elements.scholar_updated, undefined);
 });
 
 test("malformed or failed responses never render invalid metrics", () => {
@@ -69,7 +69,7 @@ test("malformed or failed responses never render invalid metrics", () => {
     requests[0].success(payload);
     requests[1].error();
     assert.equal(elements.total_cit.textContent, "--");
-    assert.match(elements.scholar_updated.textContent, /unavailable/i);
+    assert.equal(elements.h_index.textContent, "--");
   }
 });
 
