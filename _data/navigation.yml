@@ -19,9 +19,6 @@ main:
   - title: 'Blog'
     url: '/lsBlog/'
 
-  - title: 'Research'
-    url: '/#research'
-
   - title: 'Interns & Projects'
     url: '/#projects'
 

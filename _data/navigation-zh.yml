@@ -19,9 +19,6 @@ main_zh:
   - title: '博客'
     url: '/lsBlog/'
 
-  - title: '研究'
-    url: '/zh/#research'
-
   - title: '实习与项目'
     url: '/zh/#projects'
 

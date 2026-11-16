@@ -29,8 +29,6 @@ News 板块暂时隐藏（保留文件以备恢复）：{% include_relative incl
 
 {% include_relative includes/zh/pub.md %}
 
-{% include_relative includes/zh/research_interests.md %}
-
 {% include_relative includes/zh/recent_projects.md %}
 
 {% include_relative includes/zh/honers.md %}
